@@ -1,0 +1,18 @@
+[package]
+name = "depcheck_cli"
+version = "0.1.0"
+authors = ["awesome author"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = {version = "3.0.10", features = ["cargo", "derive"]}
+walkdir = "2.3.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+swc_ecma_parser = "0.87.1"
+swc_common = {version = "0.17.2", features = ["tty-emitter"]}
+swc_ecma_ast = "0.65.3"
+swc_atoms = "0.2.9"
+swc_ecma_dep_graph = "0.58.0"
