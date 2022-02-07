@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "used-dep": "0.0.1"
+  },
+  "devDependencies": {
+    "unused-dev-dep": "~1.8.1"
+  }
+}

@@ -1,0 +1,19 @@
+.DS_Store
+Profile-*.json
+# Editor configuration
+.vscode
+.idea
+.vs
+# Release artifacts
+**/target
+# Ignore test files that contributors could create locally
+/test.*
+# Ignore lockfiles
+yarn.lock
+npm-shrinkwrap.json
+pnpm-lock.yaml
+**/node_modules
+**/dist
+
+# https://github.com/nnethercote/dhat-rs output file
+dhat-heap.json

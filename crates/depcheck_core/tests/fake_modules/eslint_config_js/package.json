@@ -1,0 +1,10 @@
+{
+  "devDependencies": {
+    "eslint-config-foo-bar": "*",
+    "eslint": "*"
+  },
+  "scripts": {
+    "lint": "eslint --config ./config.js",
+    "unused": "does something else"
+  }
+}
