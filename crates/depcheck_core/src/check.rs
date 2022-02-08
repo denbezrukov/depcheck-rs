@@ -5,27 +5,28 @@ use swc_common::{
     errors::{ColorConfig, Handler},
     SourceMap,
 };
-use swc_ecma_dep_graph::analyze_dependencies;
+use swc_ecma_dep_graph::{analyze_dependencies, DependencyDescriptor, DependencyKind};
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsConfig};
 use walkdir::WalkDir;
 use crate::package::{self, Package};
 
-pub fn analyze_package(directory: &Path) -> package::Result<()> {
+pub fn check_package(directory: &Path) -> package::Result<()> {
     let mut package_path = directory.to_owned();
     package_path.push("package.json");
-    let package = Package::from_path(package_path).unwrap();
+    let package = Package::from_path(package_path)?;
 
+    check_directory(directory);
     Ok(())
 }
 
-pub fn analyze_directory(directory: &Path) {
-    println!("{:?}", directory);
+pub fn check_directory(directory: &Path) {
+    let mut dependencies = Vec::with_capacity(1000);
 
     for entry in WalkDir::new(directory)
         .into_iter()
         .filter_entry(|entry| {
             let file_name = entry.file_name().to_string_lossy();
-            file_name != "node_modules" && file_name != "dist" && !file_name.contains("tests")
+            file_name != "node_modules" && file_name != "dist"
         })
         .filter_map(|entry| Result::ok(entry))
         .filter(|dir_entry| dir_entry.file_type().is_file())
@@ -40,16 +41,21 @@ pub fn analyze_directory(directory: &Path) {
         })
     {
         if entry.file_type().is_file() {
-            analyze_file(entry.path());
+            let file_dependencies = check_file(entry.path());
+            dependencies.push(file_dependencies);
         }
     }
+
+    dependencies.iter().flatten().for_each(|dependency| {
+        println!("{:?}", dependency);
+    });
 }
 
-pub fn analyze_file(path: &Path) {
+pub fn check_file(file: &Path) -> Vec<DependencyDescriptor> {
     let cm: Lrc<SourceMap> = Default::default();
     let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
 
-    let fm = cm.load_file(path).expect("failed to load");
+    let fm = cm.load_file(file).expect("failed to load");
 
     let comments = SingleThreadedComments::default();
     let lexer = Lexer::new(
@@ -75,9 +81,5 @@ pub fn analyze_file(path: &Path) {
 
     let dependencies = analyze_dependencies(&module, &comments);
 
-    println!("{:#?}", dependencies);
-
-    for dependency in dependencies {
-        println!("{:#?}", dependency.specifier);
-    }
+    dependencies
 }

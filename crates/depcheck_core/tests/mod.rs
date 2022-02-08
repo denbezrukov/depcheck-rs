@@ -1,4 +1,4 @@
-use depckeck_core::check::analyze_directory;
+use depckeck_core::check::check_directory;
 use depckeck_core::package::Package;
 use std::env;
 use std::path::PathBuf;
@@ -17,5 +17,5 @@ fn test_package() {
 
     println!("{:#?}", package);
 
-    // analyze_directory(&path);
+    check_directory(&path);
 }
