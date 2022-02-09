@@ -1,5 +1,5 @@
 use crate::package::{self, Package};
-use std::collections::HashSet;
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::path::{Component, Path, PathBuf};
 use swc_common::comments::SingleThreadedComments;
 use swc_common::sync::Lrc;
@@ -25,31 +25,35 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
     let package = Package::from_path(package_path)?;
     let using_dependencies = check_directory(directory);
 
-    let package_dependencies: HashSet<String> = package
-        .dependencies
-        .keys()
-        .map(|key| key.to_string())
-        .collect();
+    let using_dependencies =
+        using_dependencies
+            .values()
+            .fold(HashSet::with_capacity(1_000), |mut acc, value| {
+                acc.extend(value);
+                acc
+            });
 
-    let unused_dependencies = package_dependencies
+    let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
+
+    let unused_dependencies: HashSet<_> = package_dependencies
         .difference(&using_dependencies)
         .cloned()
         .collect();
 
-    let missing_dependencies = using_dependencies
+    let missing_dependencies: HashSet<_> = using_dependencies
         .difference(&package_dependencies)
         .cloned()
         .collect();
 
     Ok(CheckResult {
-        using_dependencies,
-        unused_dependencies,
-        missing_dependencies,
+        using_dependencies: HashSet::new(),
+        unused_dependencies: HashSet::new(),
+        missing_dependencies: HashSet::new(),
     })
 }
 
-pub fn check_directory(directory: PathBuf) -> HashSet<String> {
-    let mut dependencies = Vec::with_capacity(1000);
+pub fn check_directory(directory: PathBuf) -> BTreeMap<PathBuf, HashSet<String>> {
+    let mut dependencies = BTreeMap::new();
 
     for entry in WalkDir::new(directory)
         .into_iter()
@@ -70,21 +74,32 @@ pub fn check_directory(directory: PathBuf) -> HashSet<String> {
         })
     {
         let file_dependencies = check_file(entry.path());
-        dependencies.push(file_dependencies);
+        let file_dependencies: HashSet<_> = file_dependencies
+            .iter()
+            .flat_map(|dependency| {
+                let dependency = PathBuf::from(dependency.specifier.to_string());
+                let root = dependency.components().next()?;
+                match root {
+                    Component::Normal(root) => Some(root.to_str()?.to_string()),
+                    _ => None,
+                }
+            })
+            .collect();
+        dependencies.insert(entry.path().to_owned(), file_dependencies);
     }
-
+    // dependencies
+    //     .iter()
+    //     .flatten()
+    //     .flat_map(|dependency| {
+    //         let dependency = PathBuf::from(dependency.specifier.to_string());
+    //         let root = dependency.components().next()?;
+    //         match root {
+    //             Component::Normal(root) => Some(root.to_str()?.to_string()),
+    //             _ => None,
+    //         }
+    //     })
+    //     .collect()
     dependencies
-        .iter()
-        .flatten()
-        .flat_map(|dependency| {
-            let dependency = PathBuf::from(dependency.specifier.to_string());
-            let root = dependency.components().next()?;
-            match root {
-                Component::Normal(root) => Some(root.to_str()?.to_string()),
-                _ => None,
-            }
-        })
-        .collect()
 }
 
 pub fn check_file(file: &Path) -> Vec<DependencyDescriptor> {
