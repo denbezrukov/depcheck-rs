@@ -1,25 +1,54 @@
-use std::path::Path;
+use crate::package::{self, Package};
+use std::collections::HashSet;
+use std::path::{Component, Path, PathBuf};
 use swc_common::comments::SingleThreadedComments;
 use swc_common::sync::Lrc;
 use swc_common::{
     errors::{ColorConfig, Handler},
     SourceMap,
 };
-use swc_ecma_dep_graph::{analyze_dependencies, DependencyDescriptor, DependencyKind};
+use swc_ecma_dep_graph::{analyze_dependencies, DependencyDescriptor};
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsConfig};
 use walkdir::WalkDir;
-use crate::package::{self, Package};
 
-pub fn check_package(directory: &Path) -> package::Result<()> {
-    let mut package_path = directory.to_owned();
-    package_path.push("package.json");
-    let package = Package::from_path(package_path)?;
-
-    check_directory(directory);
-    Ok(())
+#[derive(Debug, Default, Eq, PartialEq)]
+pub struct CheckResult {
+    pub using_dependencies: HashSet<String>,
+    pub unused_dependencies: HashSet<String>,
+    pub missing_dependencies: HashSet<String>,
 }
 
-pub fn check_directory(directory: &Path) {
+pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
+    let mut package_path = directory.to_owned();
+    package_path.push("package.json");
+
+    let package = Package::from_path(package_path)?;
+    let using_dependencies = check_directory(directory);
+
+    let package_dependencies: HashSet<String> = package
+        .dependencies
+        .keys()
+        .map(|key| key.to_string())
+        .collect();
+
+    let unused_dependencies = package_dependencies
+        .difference(&using_dependencies)
+        .cloned()
+        .collect();
+
+    let missing_dependencies = using_dependencies
+        .difference(&package_dependencies)
+        .cloned()
+        .collect();
+
+    Ok(CheckResult {
+        using_dependencies,
+        unused_dependencies,
+        missing_dependencies,
+    })
+}
+
+pub fn check_directory(directory: PathBuf) -> HashSet<String> {
     let mut dependencies = Vec::with_capacity(1000);
 
     for entry in WalkDir::new(directory)
@@ -40,15 +69,22 @@ pub fn check_directory(directory: &Path) {
             }
         })
     {
-        if entry.file_type().is_file() {
-            let file_dependencies = check_file(entry.path());
-            dependencies.push(file_dependencies);
-        }
+        let file_dependencies = check_file(entry.path());
+        dependencies.push(file_dependencies);
     }
 
-    dependencies.iter().flatten().for_each(|dependency| {
-        println!("{:?}", dependency);
-    });
+    dependencies
+        .iter()
+        .flatten()
+        .flat_map(|dependency| {
+            let dependency = PathBuf::from(dependency.specifier.to_string());
+            let root = dependency.components().next()?;
+            match root {
+                Component::Normal(root) => Some(root.to_str()?.to_string()),
+                _ => None,
+            }
+        })
+        .collect()
 }
 
 pub fn check_file(file: &Path) -> Vec<DependencyDescriptor> {
@@ -79,7 +115,5 @@ pub fn check_file(file: &Path) -> Vec<DependencyDescriptor> {
         .map_err(|e| e.into_diagnostic(&handler).emit())
         .expect("failed to parser module");
 
-    let dependencies = analyze_dependencies(&module, &comments);
-
-    dependencies
+    analyze_dependencies(&module, &comments)
 }

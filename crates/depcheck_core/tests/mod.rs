@@ -1,5 +1,4 @@
-use depckeck_core::check::check_directory;
-use depckeck_core::package::Package;
+use depckeck_core::check::{check_package, CheckResult};
 use std::env;
 use std::path::PathBuf;
 
@@ -11,11 +10,28 @@ fn test_package() {
     path.push("tests");
     path.push("package");
 
-    let mut package_path = path.clone();
-    package_path.push("package.json");
-    let package = Package::from_path(package_path).unwrap();
+    let actual = check_package(path).unwrap();
 
-    println!("{:#?}", package);
+    let expected = CheckResult {
+        using_dependencies: vec![
+            String::from("@packageSubSubDir"),
+            String::from("@package"),
+            String::from("react"),
+            String::from("@packageRoot"),
+            String::from("@packageSubDir"),
+        ]
+        .into_iter()
+        .collect(),
+        unused_dependencies: vec![String::from("unusedPackage")].into_iter().collect(),
+        missing_dependencies: vec![
+            String::from("@packageSubSubDir"),
+            String::from("react"),
+            String::from("@packageRoot"),
+            String::from("@packageSubDir"),
+        ]
+        .into_iter()
+        .collect(),
+    };
 
-    check_directory(&path);
+    assert_eq!(actual, expected);
 }
