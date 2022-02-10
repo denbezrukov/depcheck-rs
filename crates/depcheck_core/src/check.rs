@@ -14,7 +14,7 @@ use walkdir::WalkDir;
 
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct CheckResult {
-    pub using_dependencies: BTreeMap<RelativePathBuf, HashSet<String>>,
+    pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
     pub unused_dependencies: HashSet<String>,
     pub missing_dependencies: HashSet<String>,
 }
@@ -26,32 +26,47 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
     let package = Package::from_path(package_path)?;
     let using_dependencies = check_directory(directory);
 
-    let exclusive_using_dependencies =
-        using_dependencies
-            .values()
-            .fold(HashSet::with_capacity(1_000), |mut acc, value| {
-                acc.extend(value);
-                acc
-            });
+    let mut result = BTreeMap::new();
 
-    let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
+    using_dependencies
+        .into_iter()
+        .for_each(|(path, dependencies)| {
+            dependencies.iter().for_each(|dependency| {
+                let mut files = result
+                    .entry(dependency.clone())
+                    .or_insert(HashSet::with_capacity(100));
+                files.insert(path.clone());
+            })
+        });
 
-    let unused_dependencies: HashSet<_> = package_dependencies
-        .difference(&exclusive_using_dependencies)
-        .cloned()
-        .cloned()
-        .collect();
+    println!("{:#?}", result);
 
-    let missing_dependencies: HashSet<_> = exclusive_using_dependencies
-        .difference(&package_dependencies)
-        .cloned()
-        .cloned()
-        .collect();
+    // let exclusive_using_dependencies =
+    //     using_dependencies
+    //         .values()
+    //         .fold(HashSet::with_capacity(1_000), |mut acc, value| {
+    //             acc.extend(value);
+    //             acc
+    //         });
+    //
+    // let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
+    //
+    // let unused_dependencies: HashSet<_> = package_dependencies
+    //     .difference(&exclusive_using_dependencies)
+    //     .cloned()
+    //     .cloned()
+    //     .collect();
+    //
+    // let missing_dependencies: HashSet<_> = exclusive_using_dependencies
+    //     .difference(&package_dependencies)
+    //     .cloned()
+    //     .cloned()
+    //     .collect();
 
     Ok(CheckResult {
-        using_dependencies,
-        unused_dependencies,
-        missing_dependencies,
+        using_dependencies: result,
+        unused_dependencies: Default::default(),
+        missing_dependencies: Default::default(),
     })
 }
 

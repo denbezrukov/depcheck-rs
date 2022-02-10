@@ -17,31 +17,41 @@ fn test_package() {
     let expected = CheckResult {
         using_dependencies: BTreeMap::from([
             (
-                RelativePathBuf::from("src/rootFile.ts"),
+                String::from("@package"),
                 vec![
-                    String::from("react"),
-                    String::from("@packageRoot"),
-                    String::from("@package"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
             ),
             (
-                RelativePathBuf::from("src/subDir/subDirFile.ts"),
-                vec![
-                    String::from("react"),
-                    String::from("@packageSubDir"),
-                    String::from("@package"),
-                ]
+                String::from("@packageRoot"),
+                vec![RelativePathBuf::from("src/rootFile.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("@packageSubDir"),
+                vec![RelativePathBuf::from("src/subDir/subDirFile.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("@packageSubSubDir"),
+                vec![RelativePathBuf::from(
+                    "src/subDir/subSubDir/subSubDirFile.ts",
+                )]
                 .into_iter()
                 .collect(),
             ),
             (
-                RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                String::from("react"),
                 vec![
-                    String::from("@package"),
-                    String::from("@packageSubSubDir"),
-                    String::from("react"),
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
