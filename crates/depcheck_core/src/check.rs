@@ -13,7 +13,7 @@ use walkdir::WalkDir;
 
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct CheckResult {
-    pub using_dependencies: HashSet<String>,
+    pub using_dependencies: BTreeMap<PathBuf, HashSet<String>>,
     pub unused_dependencies: HashSet<String>,
     pub missing_dependencies: HashSet<String>,
 }
@@ -25,7 +25,7 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
     let package = Package::from_path(package_path)?;
     let using_dependencies = check_directory(directory);
 
-    let using_dependencies =
+    let exclusive_using_dependencies =
         using_dependencies
             .values()
             .fold(HashSet::with_capacity(1_000), |mut acc, value| {
@@ -36,26 +36,28 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
     let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
 
     let unused_dependencies: HashSet<_> = package_dependencies
-        .difference(&using_dependencies)
+        .difference(&exclusive_using_dependencies)
+        .cloned()
         .cloned()
         .collect();
 
-    let missing_dependencies: HashSet<_> = using_dependencies
+    let missing_dependencies: HashSet<_> = exclusive_using_dependencies
         .difference(&package_dependencies)
+        .cloned()
         .cloned()
         .collect();
 
     Ok(CheckResult {
-        using_dependencies: HashSet::new(),
-        unused_dependencies: HashSet::new(),
-        missing_dependencies: HashSet::new(),
+        using_dependencies,
+        unused_dependencies,
+        missing_dependencies,
     })
 }
 
 pub fn check_directory(directory: PathBuf) -> BTreeMap<PathBuf, HashSet<String>> {
     let mut dependencies = BTreeMap::new();
 
-    for entry in WalkDir::new(directory)
+    for entry in WalkDir::new(&directory)
         .into_iter()
         .filter_entry(|entry| {
             let file_name = entry.file_name().to_string_lossy();
@@ -85,20 +87,10 @@ pub fn check_directory(directory: PathBuf) -> BTreeMap<PathBuf, HashSet<String>>
                 }
             })
             .collect();
-        dependencies.insert(entry.path().to_owned(), file_dependencies);
+
+        let relative_file_path = entry.path().strip_prefix(&directory).unwrap();
+        dependencies.insert(relative_file_path.to_owned(), file_dependencies);
     }
-    // dependencies
-    //     .iter()
-    //     .flatten()
-    //     .flat_map(|dependency| {
-    //         let dependency = PathBuf::from(dependency.specifier.to_string());
-    //         let root = dependency.components().next()?;
-    //         match root {
-    //             Component::Normal(root) => Some(root.to_str()?.to_string()),
-    //             _ => None,
-    //         }
-    //     })
-    //     .collect()
     dependencies
 }
 
