@@ -1,4 +1,5 @@
 use depckeck_core::check::{check_package, CheckResult};
+use relative_path::RelativePathBuf;
 use std::collections::BTreeMap;
 use std::env;
 use std::path::PathBuf;
@@ -16,7 +17,7 @@ fn test_package() {
     let expected = CheckResult {
         using_dependencies: BTreeMap::from([
             (
-                PathBuf::from("src\rootFile.ts"),
+                RelativePathBuf::from("src/rootFile.ts"),
                 vec![
                     String::from("react"),
                     String::from("@packageRoot"),
@@ -26,21 +27,21 @@ fn test_package() {
                 .collect(),
             ),
             (
-                PathBuf::from("src/subDir/subDirFile.ts"),
+                RelativePathBuf::from("src/subDir/subDirFile.ts"),
                 vec![
                     String::from("react"),
-                    String::from("@packageRoot"),
+                    String::from("@packageSubDir"),
                     String::from("@package"),
                 ]
                 .into_iter()
                 .collect(),
             ),
             (
-                PathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                 vec![
-                    String::from("react"),
+                    String::from("@package"),
                     String::from("@packageSubSubDir"),
-                    String::from("@package"),
+                    String::from("react"),
                 ]
                 .into_iter()
                 .collect(),

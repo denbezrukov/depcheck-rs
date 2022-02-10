@@ -1,5 +1,6 @@
 use crate::package::{self, Package};
-use std::collections::{BTreeMap, HashMap, HashSet};
+use relative_path::RelativePathBuf;
+use std::collections::{BTreeMap, HashSet};
 use std::path::{Component, Path, PathBuf};
 use swc_common::comments::SingleThreadedComments;
 use swc_common::sync::Lrc;
@@ -13,7 +14,7 @@ use walkdir::WalkDir;
 
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct CheckResult {
-    pub using_dependencies: BTreeMap<PathBuf, HashSet<String>>,
+    pub using_dependencies: BTreeMap<RelativePathBuf, HashSet<String>>,
     pub unused_dependencies: HashSet<String>,
     pub missing_dependencies: HashSet<String>,
 }
@@ -54,7 +55,7 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
     })
 }
 
-pub fn check_directory(directory: PathBuf) -> BTreeMap<PathBuf, HashSet<String>> {
+pub fn check_directory(directory: PathBuf) -> BTreeMap<RelativePathBuf, HashSet<String>> {
     let mut dependencies = BTreeMap::new();
 
     for entry in WalkDir::new(&directory)
@@ -88,7 +89,8 @@ pub fn check_directory(directory: PathBuf) -> BTreeMap<PathBuf, HashSet<String>>
             })
             .collect();
 
-        let relative_file_path = entry.path().strip_prefix(&directory).unwrap();
+        let relative_file_path =
+            RelativePathBuf::from_path(entry.path().strip_prefix(&directory).unwrap()).unwrap();
         dependencies.insert(relative_file_path.to_owned(), file_dependencies);
     }
     dependencies
