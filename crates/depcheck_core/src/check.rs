@@ -58,7 +58,7 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
 pub fn check_directory(directory: PathBuf) -> BTreeMap<RelativePathBuf, HashSet<String>> {
     let mut dependencies = BTreeMap::new();
 
-    for entry in WalkDir::new(&directory)
+    WalkDir::new(&directory)
         .into_iter()
         .filter_entry(|entry| {
             let file_name = entry.file_name().to_string_lossy();
@@ -75,24 +75,24 @@ pub fn check_directory(directory: PathBuf) -> BTreeMap<RelativePathBuf, HashSet<
                 extension == "ts" || extension == "tsx"
             }
         })
-    {
-        let file_dependencies = check_file(entry.path());
-        let file_dependencies: HashSet<_> = file_dependencies
-            .iter()
-            .flat_map(|dependency| {
-                let dependency = PathBuf::from(dependency.specifier.to_string());
-                let root = dependency.components().next()?;
-                match root {
-                    Component::Normal(root) => Some(root.to_str()?.to_string()),
-                    _ => None,
-                }
-            })
-            .collect();
+        .for_each(|entry| {
+            let file_dependencies = check_file(entry.path());
+            let file_dependencies: HashSet<_> = file_dependencies
+                .iter()
+                .flat_map(|dependency| {
+                    let dependency = PathBuf::from(dependency.specifier.to_string());
+                    let root = dependency.components().next()?;
+                    match root {
+                        Component::Normal(root) => Some(root.to_str()?.to_string()),
+                        _ => None,
+                    }
+                })
+                .collect();
 
-        let relative_file_path =
-            RelativePathBuf::from_path(entry.path().strip_prefix(&directory).unwrap()).unwrap();
-        dependencies.insert(relative_file_path.to_owned(), file_dependencies);
-    }
+            let relative_file_path =
+                RelativePathBuf::from_path(entry.path().strip_prefix(&directory).unwrap()).unwrap();
+            dependencies.insert(relative_file_path.to_owned(), file_dependencies);
+        });
     dependencies
 }
 
@@ -115,8 +115,8 @@ pub fn check_file(file: &Path) -> Vec<DependencyDescriptor> {
 
     let mut parser = Parser::new_from(lexer);
 
-    for e in parser.take_errors() {
-        e.into_diagnostic(&handler).emit();
+    for error in parser.take_errors() {
+        error.into_diagnostic(&handler).emit();
     }
 
     let module = parser
