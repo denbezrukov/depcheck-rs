@@ -13,8 +13,10 @@ pub type DepsSet = BTreeMap<String, String>;
 #[serde(rename_all = "camelCase")]
 pub struct Package {
     /// The package name.
+    #[serde(default)]
     pub name: String,
     /// The package version.
+    #[serde(default)]
     pub version: String,
     /// The optional list of dependencies.
     #[serde(default)]

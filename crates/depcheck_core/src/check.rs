@@ -9,7 +9,7 @@ use swc_common::{
     SourceMap,
 };
 use swc_ecma_dep_graph::{analyze_dependencies, DependencyDescriptor};
-use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsConfig};
+use swc_ecma_parser::{lexer::Lexer, EsConfig, Parser, StringInput, Syntax, TsConfig};
 use walkdir::WalkDir;
 
 use crate::package::{self, Package};
@@ -79,7 +79,8 @@ pub fn check_directory(directory: PathBuf) -> BTreeMap<RelativePathBuf, HashSet<
             }
             Some(extension) => {
                 let extension = extension.to_string_lossy();
-                extension == "ts" || extension == "tsx"
+                // extension == "ts" || extension == "tsx"
+                extension == "js" || extension == "jsx"
             }
         })
         .for_each(|entry| {
@@ -110,9 +111,18 @@ pub fn check_file(file: &Path) -> Vec<DependencyDescriptor> {
     let fm = cm.load_file(file).expect("failed to load");
 
     let comments = SingleThreadedComments::default();
+    // let lexer = Lexer::new(
+    //     Syntax::Typescript(TsConfig {
+    //         tsx: true,
+    //         ..Default::default()
+    //     }),
+    //     Default::default(),
+    //     StringInput::from(&*fm),
+    //     Some(&comments),
+    // );
     let lexer = Lexer::new(
-        Syntax::Typescript(TsConfig {
-            tsx: true,
+        Syntax::Es(EsConfig {
+            jsx: true,
             ..Default::default()
         }),
         Default::default(),

@@ -72,3 +72,28 @@ fn test_package() {
 
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn test_import_function_missing() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("import_function_missing");
+
+    let actual = check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            vec![RelativePathBuf::from("index.js")]
+                .into_iter()
+                .collect(),
+        )]),
+        unused_dependencies: Default::default(),
+        missing_dependencies: Default::default(),
+    };
+
+    assert_eq!(actual, expected);
+}
