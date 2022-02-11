@@ -58,14 +58,16 @@ fn test_package() {
             ),
         ]),
         unused_dependencies: vec![String::from("unusedPackage")].into_iter().collect(),
-        missing_dependencies: vec![
-            String::from("@packageSubSubDir"),
-            String::from("react"),
-            String::from("@packageRoot"),
-            String::from("@packageSubDir"),
-        ]
-        .into_iter()
-        .collect(),
+        missing_dependencies: BTreeMap::from([(
+            String::from("@package"),
+            vec![
+                RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                RelativePathBuf::from("src/rootFile.ts"),
+            ]
+            .into_iter()
+            .collect(),
+        )]),
     };
 
     assert_eq!(actual, expected);

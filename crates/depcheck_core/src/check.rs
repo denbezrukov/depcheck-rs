@@ -1,7 +1,7 @@
-use crate::package::{self, Package};
-use relative_path::RelativePathBuf;
 use std::collections::{BTreeMap, HashSet};
 use std::path::{Component, Path, PathBuf};
+
+use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
 use swc_common::sync::Lrc;
 use swc_common::{
@@ -12,11 +12,13 @@ use swc_ecma_dep_graph::{analyze_dependencies, DependencyDescriptor};
 use swc_ecma_parser::{lexer::Lexer, Parser, StringInput, Syntax, TsConfig};
 use walkdir::WalkDir;
 
+use crate::package::{self, Package};
+
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct CheckResult {
     pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
     pub unused_dependencies: HashSet<String>,
-    pub missing_dependencies: HashSet<String>,
+    pub missing_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
 }
 
 pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
@@ -24,49 +26,39 @@ pub fn check_package(directory: PathBuf) -> package::Result<CheckResult> {
     package_path.push("package.json");
 
     let package = Package::from_path(package_path)?;
-    let using_dependencies = check_directory(directory);
 
-    let mut result = BTreeMap::new();
+    let dependencies = check_directory(directory);
 
-    using_dependencies
-        .into_iter()
-        .for_each(|(path, dependencies)| {
-            dependencies.iter().for_each(|dependency| {
-                let mut files = result
-                    .entry(dependency.clone())
-                    .or_insert(HashSet::with_capacity(100));
-                files.insert(path.clone());
-            })
-        });
+    let mut using_dependencies = BTreeMap::new();
 
-    println!("{:#?}", result);
+    dependencies.into_iter().for_each(|(path, dependencies)| {
+        dependencies.iter().for_each(|dependency| {
+            let files = using_dependencies
+                .entry(dependency.clone())
+                .or_insert(HashSet::with_capacity(100));
+            files.insert(path.clone());
+        })
+    });
 
-    // let exclusive_using_dependencies =
-    //     using_dependencies
-    //         .values()
-    //         .fold(HashSet::with_capacity(1_000), |mut acc, value| {
-    //             acc.extend(value);
-    //             acc
-    //         });
-    //
-    // let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
-    //
-    // let unused_dependencies: HashSet<_> = package_dependencies
-    //     .difference(&exclusive_using_dependencies)
-    //     .cloned()
-    //     .cloned()
-    //     .collect();
-    //
-    // let missing_dependencies: HashSet<_> = exclusive_using_dependencies
-    //     .difference(&package_dependencies)
-    //     .cloned()
-    //     .cloned()
-    //     .collect();
+    let missing_dependencies = using_dependencies
+        .iter()
+        .filter(|(dependency, _)| package.dependencies.contains_key(*dependency))
+        .map(|(dependency, files)| (dependency.clone(), files.clone()))
+        .collect();
+
+    let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
+    let exclusive_using_dependencies: HashSet<&String> = using_dependencies.keys().collect();
+
+    let unused_dependencies = package_dependencies
+        .difference(&exclusive_using_dependencies)
+        .cloned()
+        .cloned()
+        .collect();
 
     Ok(CheckResult {
-        using_dependencies: result,
-        unused_dependencies: Default::default(),
-        missing_dependencies: Default::default(),
+        using_dependencies,
+        unused_dependencies,
+        missing_dependencies,
     })
 }
 
