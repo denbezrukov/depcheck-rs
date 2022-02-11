@@ -8,3 +8,4 @@ import {
   Kek2,
 } from '@package/first3/src/something2/my';
 import {lol} from 'react';
+import {Another} from '../rootFile';
