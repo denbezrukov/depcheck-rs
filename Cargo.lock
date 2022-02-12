@@ -172,6 +172,7 @@ dependencies = [
 name = "depckeck_core"
 version = "0.0.0"
 dependencies = [
+ "regex",
  "relative-path",
  "serde",
  "serde_json",

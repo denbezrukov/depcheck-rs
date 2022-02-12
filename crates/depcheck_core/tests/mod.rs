@@ -1,4 +1,4 @@
-use depckeck_core::check::{check_package, CheckResult};
+use depckeck_core::check::{CheckResult, Checker};
 use relative_path::RelativePathBuf;
 use std::collections::BTreeMap;
 use std::env;
@@ -12,7 +12,8 @@ fn test_package() {
     path.push("tests");
     path.push("package");
 
-    let actual = check_package(path).unwrap();
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
 
     let expected = CheckResult {
         using_dependencies: BTreeMap::from([
@@ -82,7 +83,8 @@ fn test_import_function_missing() {
     path.push("fake_modules");
     path.push("import_function_missing");
 
-    let actual = check_package(path).unwrap();
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
 
     let expected = CheckResult {
         using_dependencies: BTreeMap::from([(
