@@ -37,6 +37,7 @@ impl Default for CheckerOptions {
     }
 }
 
+#[cfg(test)]
 mod tests {
     use super::CheckerOptions;
 
