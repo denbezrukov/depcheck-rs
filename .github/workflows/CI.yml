@@ -38,6 +38,25 @@ jobs:
         with:
           command: fmt
           args: --all -- --check
+          
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+
+      - name: cargo build
+        uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: --verbose
 
   test:
     name: Test ${{ matrix.rust }} on ${{ matrix.os }}
