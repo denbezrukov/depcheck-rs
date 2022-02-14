@@ -53,7 +53,7 @@ impl Checker {
 
         let missing_dependencies = using_dependencies
             .iter()
-            .filter(|(dependency, _)| package.dependencies.contains_key(*dependency))
+            .filter(|(dependency, _)| !package.dependencies.contains_key(*dependency))
             .map(|(dependency, files)| (dependency.clone(), files.clone()))
             .collect();
 

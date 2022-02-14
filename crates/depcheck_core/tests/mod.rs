@@ -59,16 +59,38 @@ fn test_package() {
             ),
         ]),
         unused_dependencies: vec![String::from("unusedPackage")].into_iter().collect(),
-        missing_dependencies: BTreeMap::from([(
-            String::from("@package"),
-            vec![
-                RelativePathBuf::from("src/subDir/subDirFile.ts"),
-                RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                RelativePathBuf::from("src/rootFile.ts"),
-            ]
-            .into_iter()
-            .collect(),
-        )]),
+        missing_dependencies: BTreeMap::from([
+            (
+                String::from("react"),
+                vec![
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
+                ]
+                .into_iter()
+                .collect(),
+            ),
+            (
+                String::from("@packageRoot"),
+                vec![RelativePathBuf::from("src/rootFile.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("@packageSubDir"),
+                vec![RelativePathBuf::from("src/subDir/subDirFile.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("@packageSubSubDir"),
+                vec![RelativePathBuf::from(
+                    "src/subDir/subSubDir/subSubDirFile.ts",
+                )]
+                .into_iter()
+                .collect(),
+            ),
+        ]),
     };
 
     assert_eq!(actual, expected);
@@ -94,7 +116,12 @@ fn test_import_function_missing() {
                 .collect(),
         )]),
         unused_dependencies: Default::default(),
-        missing_dependencies: Default::default(),
+        missing_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            vec![RelativePathBuf::from("index.js")]
+                .into_iter()
+                .collect(),
+        )]),
     };
 
     assert_eq!(actual, expected);
