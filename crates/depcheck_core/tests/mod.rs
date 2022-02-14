@@ -317,3 +317,158 @@ fn test_bad_es6() {
 
     assert_eq!(actual, expected);
 }
+
+#[test]
+fn test_good() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("good");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("optimist"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("foo"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    // assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_good_es6() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("good_es6");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("basic-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("default-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("default-member-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("member-alias-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("member-alias-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("member-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("mixed-default-star-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("mixed-member-alias-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("mixed-name-memeber-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("multiple-member-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("named-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("name-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("star-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("star-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        unused_dependencies: [String::from("unsupported-syntax")].into_iter().collect(),
+        ..Default::default()
+    };
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_gatsby() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("gatsby");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        unused_dependencies: [
+            String::from("gatsby-plugin-react-helmet"),
+            String::from("gatsby-plugin-sass"),
+        ]
+        .into_iter()
+        .collect(),
+        ..Default::default()
+    };
+
+    // assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_good_es7() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("good_es7");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("ecmascript-rest-spread"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_eq!(actual, expected);
+}
