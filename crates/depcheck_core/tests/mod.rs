@@ -19,7 +19,7 @@ fn test_package() {
         using_dependencies: BTreeMap::from([
             (
                 String::from("@package"),
-                vec![
+                [
                     RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
@@ -29,19 +29,19 @@ fn test_package() {
             ),
             (
                 String::from("@packageRoot"),
-                vec![RelativePathBuf::from("src/rootFile.ts")]
+                [RelativePathBuf::from("src/rootFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
                 String::from("@packageSubDir"),
-                vec![RelativePathBuf::from("src/subDir/subDirFile.ts")]
+                [RelativePathBuf::from("src/subDir/subDirFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
                 String::from("@packageSubSubDir"),
-                vec![RelativePathBuf::from(
+                [RelativePathBuf::from(
                     "src/subDir/subSubDir/subSubDirFile.ts",
                 )]
                 .into_iter()
@@ -49,7 +49,7 @@ fn test_package() {
             ),
             (
                 String::from("react"),
-                vec![
+                [
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
@@ -58,11 +58,11 @@ fn test_package() {
                 .collect(),
             ),
         ]),
-        unused_dependencies: vec![String::from("unusedPackage")].into_iter().collect(),
+        unused_dependencies: [String::from("unusedPackage")].into_iter().collect(),
         missing_dependencies: BTreeMap::from([
             (
                 String::from("react"),
-                vec![
+                [
                     RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
@@ -72,25 +72,26 @@ fn test_package() {
             ),
             (
                 String::from("@packageRoot"),
-                vec![RelativePathBuf::from("src/rootFile.ts")]
+                [RelativePathBuf::from("src/rootFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
                 String::from("@packageSubDir"),
-                vec![RelativePathBuf::from("src/subDir/subDirFile.ts")]
+                [RelativePathBuf::from("src/subDir/subDirFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
                 String::from("@packageSubSubDir"),
-                vec![RelativePathBuf::from(
+                [RelativePathBuf::from(
                     "src/subDir/subSubDir/subSubDirFile.ts",
                 )]
                 .into_iter()
                 .collect(),
             ),
         ]),
+        ..Default::default()
     };
 
     assert_eq!(actual, expected);
@@ -111,17 +112,207 @@ fn test_import_function_missing() {
     let expected = CheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("anyone"),
-            vec![RelativePathBuf::from("index.js")]
-                .into_iter()
-                .collect(),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
         )]),
-        unused_dependencies: Default::default(),
         missing_dependencies: BTreeMap::from([(
             String::from("anyone"),
-            vec![RelativePathBuf::from("index.js")]
-                .into_iter()
-                .collect(),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
         )]),
+        ..Default::default()
+    };
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_import_function() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("import_function");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("optimist"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_import_function_webpack() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("import_function_webpack");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("optimist"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_require_resolve_missing() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("require_resolve_missing");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    // assert_eq!(actual, expected); //TODO
+}
+
+#[test]
+fn test_require_resolve() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("require_resolve");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("optimist"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    //assert_eq!(actual, expected); //TODO
+}
+
+#[test]
+fn test_bad() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("bad");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        unused_dependencies: [String::from("optimist")].into_iter().collect(),
+        ..Default::default()
+    };
+
+    assert_eq!(actual, expected);
+}
+
+#[test]
+fn test_bad_es6() {
+    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+    ));
+    path.push("tests");
+    path.push("fake_modules");
+    path.push("bad_es6");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = CheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("find-me"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("default-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("default-member-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("member-alias-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("member-alias-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("member-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("mixed-default-star-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("mixed-member-alias-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("mixed-name-memeber-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("multiple-member-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("named-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("name-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("star-export"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("star-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        unused_dependencies: [String::from("dont-find-me")].into_iter().collect(),
+        ..Default::default()
     };
 
     assert_eq!(actual, expected);

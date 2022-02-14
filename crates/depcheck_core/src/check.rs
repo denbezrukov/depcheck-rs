@@ -14,6 +14,7 @@ use crate::parsers::Parsers;
 pub struct CheckResult {
     pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
     pub unused_dependencies: HashSet<String>,
+    pub unused_dev_dependencies: HashSet<String>,
     pub missing_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
 }
 
@@ -53,11 +54,15 @@ impl Checker {
 
         let missing_dependencies = using_dependencies
             .iter()
-            .filter(|(dependency, _)| !package.dependencies.contains_key(*dependency))
+            .filter(|(dependency, _)| {
+                !package.dependencies.contains_key(*dependency)
+                    && !package.dev_dependencies.contains_key(*dependency)
+            })
             .map(|(dependency, files)| (dependency.clone(), files.clone()))
             .collect();
 
         let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
+        let package_dev_dependencies: HashSet<&String> = package.dev_dependencies.keys().collect();
         let exclusive_using_dependencies = using_dependencies.keys().collect();
 
         let unused_dependencies = package_dependencies
@@ -65,9 +70,15 @@ impl Checker {
             .map(|v| (*v).clone())
             .collect();
 
+        let unused_dev_dependencies = package_dev_dependencies
+            .difference(&exclusive_using_dependencies)
+            .map(|v| (*v).clone())
+            .collect();
+
         Ok(CheckResult {
             using_dependencies,
             unused_dependencies,
+            unused_dev_dependencies,
             missing_dependencies,
         })
     }
