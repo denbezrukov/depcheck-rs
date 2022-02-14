@@ -7,10 +7,10 @@ pub struct CheckerOptions {
 impl Default for CheckerOptions {
     fn default() -> Self {
         let ignore_patterns = RegexSet::new(&[
-            r".git",
-            r".svn",
-            r".hg",
-            r".idea",
+            r"\.git$",
+            r"\.svn$",
+            r"\.hg$",
+            r"\.idea$",
             r"^node_modules$",
             r"^dist$",
             r"^build$",
