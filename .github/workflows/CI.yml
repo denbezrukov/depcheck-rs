@@ -56,12 +56,11 @@ jobs:
 
         include:
           - rust: stable
-            features: "--features full"
+            params: "--verbose"
           - rust: beta
-            features: "--features full"
+            params: "--verbose"
           - rust: nightly
-            features: "--features full,nightly"
-            benches: true
+            params: "--verbose"
 
     runs-on: ${{ matrix.os }}
 
@@ -80,4 +79,4 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: test
-          args: ${{ matrix.features }}
+          args: ${{ matrix.params }}
