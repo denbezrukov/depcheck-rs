@@ -58,12 +58,11 @@ impl Checker {
             .collect();
 
         let package_dependencies: HashSet<&String> = package.dependencies.keys().collect();
-        let exclusive_using_dependencies: HashSet<&String> = using_dependencies.keys().collect();
+        let exclusive_using_dependencies = using_dependencies.keys().collect();
 
         let unused_dependencies = package_dependencies
             .difference(&exclusive_using_dependencies)
-            .cloned()
-            .cloned()
+            .map(|v| (*v).clone())
             .collect();
 
         Ok(CheckResult {
