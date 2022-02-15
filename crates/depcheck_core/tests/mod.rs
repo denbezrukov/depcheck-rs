@@ -490,23 +490,23 @@ fn test_package() {
 // }
 //
 // #[test]
-// fn test_good_es7_flow() {
-//     let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
-//         "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
-//     ));
-//     path.push("tests");
-//     path.push("fake_modules");
-//     path.push("good_es7_flow");
+//fn test_good_es7_flow() {
+// let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
+//     "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
+// ));
+// path.push("tests");
+// path.push("fake_modules");
+// path.push("good_es7_flow");
 //
-//     let checker = Checker::default();
-//     let actual = checker.check_package(path).unwrap();
+// let checker = Checker::default();
+// let actual = checker.check_package(path).unwrap();
 //
-//     let expected = CheckResult {
-//         using_dependencies: BTreeMap::from([(
-//             String::from("ecmascript-rest-spread"),
-//             [RelativePathBuf::from("index.js")].into_iter().collect(),
-//         )]),
-//         ..Default::default()
+// let expected = CheckResult {
+//     using_dependencies: BTreeMap::from([(
+//         String::from("ecmascript-rest-spread"),
+//         [RelativePathBuf::from("index.js")].into_iter().collect(),
+//     )]),
+//     ..Default::default()
 //     };
 //
 //     // assert_eq!(actual, expected);
