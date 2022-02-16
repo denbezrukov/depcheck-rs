@@ -1,7 +1,7 @@
 use std::collections::{BTreeMap, HashSet};
 use std::path::{Component, PathBuf};
 
-use relative_path::{RelativePath, RelativePathBuf};
+use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
 use swc_ecma_dep_graph::analyze_dependencies;
 use walkdir::WalkDir;
@@ -9,54 +9,6 @@ use walkdir::WalkDir;
 use crate::options::CheckerOptions;
 use crate::package::{self, Package};
 use crate::parsers::Parsers;
-
-#[derive(Debug, Default, Eq, PartialEq)]
-pub struct CheckResult {
-    pub package: Package,
-    pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
-}
-
-impl CheckResult {
-    pub fn get_result(&self) -> CheckDerive {
-        let missing_dependencies: BTreeMap<_, _> = self
-            .using_dependencies
-            .iter()
-            .filter(|(dependency, _)| {
-                !self.package.dependencies.contains_key(*dependency)
-                    && !self.package.dev_dependencies.contains_key(*dependency)
-            })
-            .map(|(dependency, files)| (dependency.as_str(), files))
-            .collect();
-
-        let package_dependencies: HashSet<&String> = self.package.dependencies.keys().collect();
-        let package_dev_dependencies: HashSet<&String> =
-            self.package.dev_dependencies.keys().collect();
-        let exclusive_using_dependencies = self.using_dependencies.keys().collect();
-
-        let unused_dependencies: HashSet<_> = package_dependencies
-            .difference(&exclusive_using_dependencies)
-            .map(|v| v.as_str())
-            .collect();
-
-        let unused_dev_dependencies: HashSet<_> = package_dev_dependencies
-            .difference(&exclusive_using_dependencies)
-            .map(|v| v.as_str())
-            .collect();
-
-        CheckDerive {
-            unused_dependencies,
-            unused_dev_dependencies,
-            missing_dependencies,
-        }
-    }
-}
-
-#[derive(Default, Debug, Eq, PartialEq)]
-pub struct CheckDerive<'a> {
-    pub unused_dependencies: HashSet<&'a str>,
-    pub unused_dev_dependencies: HashSet<&'a str>,
-    pub missing_dependencies: BTreeMap<&'a str, &'a HashSet<RelativePathBuf>>,
-}
 
 pub struct Checker {
     options: CheckerOptions,
@@ -138,5 +90,45 @@ impl Checker {
                 dependencies.insert(relative_file_path.to_owned(), file_dependencies);
             });
         dependencies
+    }
+}
+
+#[derive(Debug, Default, Eq, PartialEq)]
+pub struct CheckResult {
+    pub package: Package,
+    pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
+}
+
+impl CheckResult {
+    pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
+        self.using_dependencies
+            .iter()
+            .filter(|(dependency, _)| {
+                !self.package.dependencies.contains_key(*dependency)
+                    && !self.package.dev_dependencies.contains_key(*dependency)
+            })
+            .map(|(dependency, files)| (dependency.as_str(), files))
+            .collect()
+    }
+
+    pub fn get_unused_dependencies(&self) -> HashSet<&str> {
+        let package_dependencies: HashSet<&String> = self.package.dependencies.keys().collect();
+
+        package_dependencies
+            .into_iter()
+            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
+            .map(|v| v.as_str())
+            .collect()
+    }
+
+    pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
+        let package_dev_dependencies: HashSet<&String> =
+            self.package.dev_dependencies.keys().collect();
+
+        package_dev_dependencies
+            .into_iter()
+            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
+            .map(|v| v.as_str())
+            .collect()
     }
 }

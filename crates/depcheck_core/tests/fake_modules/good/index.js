@@ -2,4 +2,4 @@
 
 const optimist = require('optimist');
 
-const foo = require(`foo`); // eslint-disable-line quotes
+const foo = require('foo'); // eslint-disable-line quotes
