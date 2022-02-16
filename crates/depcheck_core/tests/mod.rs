@@ -13,10 +13,7 @@ struct ExpectedCheckResult<'a> {
 }
 
 fn assert_result(actual: CheckResult, expected: ExpectedCheckResult) {
-    assert_eq!(
-        actual.using_dependencies,
-        expected.using_dependencies
-    );
+    assert_eq!(actual.using_dependencies, expected.using_dependencies);
     assert_eq!(
         actual.get_missing_dependencies(),
         expected.missing_dependencies
@@ -53,8 +50,8 @@ fn test_package() {
         RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
         RelativePathBuf::from("src/rootFile.ts"),
     ]
-        .into_iter()
-        .collect();
+    .into_iter()
+    .collect();
 
     let package_root_files = [RelativePathBuf::from("src/rootFile.ts")]
         .into_iter()
@@ -67,8 +64,8 @@ fn test_package() {
     let package_sub_sub_dir_files = [RelativePathBuf::from(
         "src/subDir/subSubDir/subSubDirFile.ts",
     )]
-        .into_iter()
-        .collect();
+    .into_iter()
+    .collect();
 
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
@@ -79,8 +76,8 @@ fn test_package() {
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
                 ]
-                    .into_iter()
-                    .collect(),
+                .into_iter()
+                .collect(),
             ),
             (
                 String::from("@packageRoot"),
@@ -99,8 +96,8 @@ fn test_package() {
                 [RelativePathBuf::from(
                     "src/subDir/subSubDir/subSubDirFile.ts",
                 )]
-                    .into_iter()
-                    .collect(),
+                .into_iter()
+                .collect(),
             ),
             (
                 String::from("react"),
@@ -109,8 +106,8 @@ fn test_package() {
                     RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
                 ]
-                    .into_iter()
-                    .collect(),
+                .into_iter()
+                .collect(),
             ),
         ]),
         missing_dependencies: BTreeMap::from([
@@ -139,9 +136,7 @@ fn test_import_function_missing() {
             String::from("anyone"),
             [RelativePathBuf::from("index.js")].into_iter().collect(),
         )]),
-        missing_dependencies: BTreeMap::from([
-            ("anyone", &anyone_files),
-        ]),
+        missing_dependencies: BTreeMap::from([("anyone", &anyone_files)]),
         ..Default::default()
     };
 
