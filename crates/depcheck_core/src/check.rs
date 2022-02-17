@@ -9,6 +9,7 @@ use walkdir::WalkDir;
 use crate::options::CheckerOptions;
 use crate::package::{self, Package};
 use crate::parsers::Parsers;
+use swc_ecma_parser::Syntax;
 
 pub struct Checker {
     options: CheckerOptions,
@@ -68,11 +69,11 @@ impl Checker {
             .filter_map(|file| {
                 self.parsers
                     .parse_file(file.path())
-                    .map(|module| (file, module))
+                    .map(|(module, syntax)| (file, module, syntax))
             })
-            .for_each(|(file, module)| {
+            .for_each(|(file, module, syntax)| {
                 let file_dependencies = analyze_dependencies(&module, &comments);
-                let file_dependencies: HashSet<_> = file_dependencies
+                let mut file_dependencies: HashSet<_> = file_dependencies
                     .iter()
                     .flat_map(|dependency| {
                         let dependency = PathBuf::from(dependency.specifier.to_string());
@@ -87,6 +88,18 @@ impl Checker {
                 let relative_file_path =
                     RelativePathBuf::from_path(file.path().strip_prefix(&directory).unwrap())
                         .unwrap();
+
+                match syntax {
+                    Syntax::Typescript(_) => {
+                        let types_dependencies = file_dependencies
+                            .clone()
+                            .into_iter()
+                            .map(|dependency| "@types/".to_owned() + &dependency);
+
+                        file_dependencies.extend(types_dependencies)
+                    }
+                    _ => {}
+                }
                 dependencies.insert(relative_file_path.to_owned(), file_dependencies);
             });
         dependencies

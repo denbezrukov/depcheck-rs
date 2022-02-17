@@ -20,6 +20,7 @@ impl Default for Parsers {
                 r"\.tsx?$",
                 Syntax::Typescript(TsConfig {
                     tsx: true,
+                    dts: true,
                     ..Default::default()
                 }),
             ),
@@ -36,7 +37,7 @@ impl Default for Parsers {
 }
 
 impl Parsers {
-    pub fn parse_file(&self, file: &Path) -> Option<Module> {
+    pub fn parse_file(&self, file: &Path) -> Option<(Module, Syntax)> {
         let file_name = file.file_name().unwrap().to_string_lossy();
 
         let syntax = self
@@ -72,6 +73,6 @@ impl Parsers {
             .map_err(|e| e.into_diagnostic(&handler).emit())
             .expect("failed to parser module");
 
-        Some(module)
+        Some((module, syntax.to_owned()))
     }
 }
