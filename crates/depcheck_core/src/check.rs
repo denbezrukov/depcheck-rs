@@ -1,3 +1,4 @@
+use regex::{Regex, Captures};
 use std::collections::{BTreeMap, HashSet};
 use std::path::{Component, PathBuf};
 
@@ -79,7 +80,7 @@ impl Checker {
                         let dependency = PathBuf::from(dependency.specifier.to_string());
                         let root = dependency.components().next()?;
                         match root {
-                            Component::Normal(root) => Some(root.to_str()?.to_string()),
+                            Component::Normal(_) => Some(dependency.to_str()?.to_string()),
                             _ => None,
                         }
                     })
