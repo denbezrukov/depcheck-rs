@@ -70,7 +70,7 @@ fn test_package() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
-                String::from("@package"),
+                String::from("@package/first2/src/something2/where"),
                 [
                     RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
@@ -80,19 +80,49 @@ fn test_package() {
                 .collect(),
             ),
             (
-                String::from("@packageRoot"),
+                String::from("@package/first3/src/something2/my"),
+                [
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
+                ]
+                .into_iter()
+                .collect(),
+            ),
+            (
+                String::from("@packageRoot/first1"),
                 [RelativePathBuf::from("src/rootFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
-                String::from("@packageSubDir"),
+                String::from("@packageRoot/first1/src/something1/lol"),
+                [RelativePathBuf::from("src/rootFile.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("@packageSubDir/first1"),
                 [RelativePathBuf::from("src/subDir/subDirFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
-                String::from("@packageSubSubDir"),
+                String::from("@packageSubDir/first1/src/something1/lol"),
+                [RelativePathBuf::from("src/subDir/subDirFile.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("@packageSubSubDir/first1"),
+                [RelativePathBuf::from(
+                    "src/subDir/subSubDir/subSubDirFile.ts",
+                )]
+                .into_iter()
+                .collect(),
+            ),
+            (
+                String::from("@packageSubSubDir/first1/src/something1/lol"),
                 [RelativePathBuf::from(
                     "src/subDir/subSubDir/subSubDirFile.ts",
                 )]
@@ -102,9 +132,9 @@ fn test_package() {
             (
                 String::from("react"),
                 [
-                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                 ]
                 .into_iter()
                 .collect(),

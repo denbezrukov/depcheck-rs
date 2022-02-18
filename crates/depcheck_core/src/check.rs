@@ -1,4 +1,3 @@
-use regex::{Regex, Captures};
 use std::collections::{BTreeMap, HashSet};
 use std::path::{Component, PathBuf};
 
@@ -33,7 +32,7 @@ impl Checker {
 
         let package = Package::from_path(package_path)?;
 
-        let dependencies = self.check_directory(directory);
+        let dependencies = self.check_directory(directory, &package);
 
         let mut using_dependencies = BTreeMap::new();
 
@@ -55,6 +54,7 @@ impl Checker {
     pub fn check_directory(
         &self,
         directory: PathBuf,
+        package: &Package,
     ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
         let mut dependencies = BTreeMap::new();
         let comments = SingleThreadedComments::default();
@@ -92,10 +92,18 @@ impl Checker {
 
                 match syntax {
                     Syntax::Typescript(_) => {
-                        let types_dependencies = file_dependencies
-                            .clone()
-                            .into_iter()
-                            .map(|dependency| "@types/".to_owned() + &dependency);
+                        let types_dependencies =
+                            file_dependencies
+                                .clone()
+                                .into_iter()
+                                .filter_map(|dependency| {
+                                    let type_dependency = "@types/".to_owned() + &dependency;
+                                    package
+                                        .dependencies
+                                        .keys()
+                                        .find(|&key| !key.starts_with(&type_dependency))
+                                        .cloned()
+                                });
 
                         file_dependencies.extend(types_dependencies)
                     }
@@ -130,7 +138,11 @@ impl CheckResult {
 
         package_dependencies
             .into_iter()
-            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
+            .filter(|&dependency| {
+                self.using_dependencies
+                    .keys()
+                    .all(|key| !key.starts_with(dependency))
+            })
             .map(|v| v.as_str())
             .collect()
     }
@@ -141,7 +153,11 @@ impl CheckResult {
 
         package_dev_dependencies
             .into_iter()
-            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
+            .filter(|&dependency| {
+                self.using_dependencies
+                    .keys()
+                    .all(|key| !key.starts_with(dependency))
+            })
             .map(|v| v.as_str())
             .collect()
     }
