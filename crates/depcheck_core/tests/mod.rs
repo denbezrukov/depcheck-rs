@@ -70,6 +70,16 @@ fn test_package() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
+                String::from("@package"),
+                [
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
+                ]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
                 String::from("@package/first2/src/something2/where"),
                 [
                     RelativePathBuf::from("src/subDir/subDirFile.ts"),
