@@ -76,8 +76,8 @@ fn test_package() {
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
                 ]
-                    .into_iter()
-                    .collect(),
+                .into_iter()
+                .collect(),
             ),
             (
                 String::from("@package/first2/src/something2/where"),
