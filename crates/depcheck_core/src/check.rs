@@ -4,12 +4,13 @@ use std::path::{Component, PathBuf};
 use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
 use swc_ecma_dep_graph::analyze_dependencies;
+use swc_ecma_parser::Syntax;
 use walkdir::WalkDir;
 
 use crate::options::CheckerOptions;
 use crate::package::{self, Package};
 use crate::parsers::Parsers;
-use swc_ecma_parser::Syntax;
+use crate::utils::extract_package_name;
 
 pub struct Checker {
     options: CheckerOptions,
@@ -77,12 +78,13 @@ impl Checker {
                 let mut file_dependencies: HashSet<_> = file_dependencies
                     .iter()
                     .flat_map(|dependency| {
-                        let dependency = PathBuf::from(dependency.specifier.to_string());
-                        let root = dependency.components().next()?;
-                        match root {
-                            Component::Normal(_) => Some(dependency.to_str()?.to_string()),
-                            _ => None,
+                        let path = PathBuf::from(&dependency.specifier.to_string());
+                        let root = path.components().next()?;
+
+                        if let Component::Normal(_) = root {
+                            return extract_package_name(&dependency.specifier);
                         }
+                        None
                     })
                     .collect();
 
@@ -123,6 +125,21 @@ pub struct CheckResult {
 
 impl CheckResult {
     pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
+        let mut package_dependencies = self
+            .package
+            .dependencies
+            .keys()
+            .chain(self.package.dev_dependencies.keys());
+
+        let missing = self
+            .using_dependencies
+            .iter()
+            .filter(|(using_dependency, _)| {
+                package_dependencies
+                    .all(|package_dependency| !using_dependency.starts_with(package_dependency))
+            })
+            .collect::<Vec<_>>();
+
         self.using_dependencies
             .iter()
             .filter(|(dependency, _)| {
@@ -138,11 +155,7 @@ impl CheckResult {
 
         package_dependencies
             .into_iter()
-            .filter(|&dependency| {
-                self.using_dependencies
-                    .keys()
-                    .all(|key| !key.starts_with(dependency))
-            })
+            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
             .map(|v| v.as_str())
             .collect()
     }
@@ -153,11 +166,7 @@ impl CheckResult {
 
         package_dev_dependencies
             .into_iter()
-            .filter(|&dependency| {
-                self.using_dependencies
-                    .keys()
-                    .all(|key| !key.starts_with(dependency))
-            })
+            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
             .map(|v| v.as_str())
             .collect()
     }

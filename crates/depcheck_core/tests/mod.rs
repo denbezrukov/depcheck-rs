@@ -1,8 +1,10 @@
-use depckeck_core::check::{CheckResult, Checker};
-use relative_path::RelativePathBuf;
 use std::collections::{BTreeMap, HashSet};
 use std::env;
 use std::path::PathBuf;
+
+use relative_path::RelativePathBuf;
+
+use depckeck_core::check::{CheckResult, Checker};
 
 #[derive(Default)]
 struct ExpectedCheckResult<'a> {
@@ -52,49 +54,72 @@ fn test_package() {
     ]
     .into_iter()
     .collect();
+    let package_first_2_files = [
+        RelativePathBuf::from("src/subDir/subDirFile.ts"),
+        RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+        RelativePathBuf::from("src/rootFile.ts"),
+    ]
+    .into_iter()
+    .collect();
 
-    let package_root_files = [RelativePathBuf::from("src/rootFile.ts")]
+    let package_first_3_files = [
+        RelativePathBuf::from("src/subDir/subDirFile.ts"),
+        RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+        RelativePathBuf::from("src/rootFile.ts"),
+    ]
+    .into_iter()
+    .collect();
+
+    let package_root_first_files = [RelativePathBuf::from("src/rootFile.ts")]
+        .into_iter()
+        .collect();
+    let package_sub_first_files = [RelativePathBuf::from("src/subDir/subDirFile.ts")]
         .into_iter()
         .collect();
 
-    let package_sub_dir_files = [RelativePathBuf::from("src/subDir/subDirFile.ts")]
-        .into_iter()
-        .collect();
-
-    let package_sub_sub_dir_files = [RelativePathBuf::from(
+    let package_sub_sub_first = [RelativePathBuf::from(
         "src/subDir/subSubDir/subSubDirFile.ts",
     )]
     .into_iter()
     .collect();
+
+    let missing_dependencies = BTreeMap::from([
+        ("react", &react_files),
+        ("@package/first2", &package_first_2_files),
+        ("@package/first3", &package_first_3_files),
+        ("@packageRoot/first1", &package_root_first_files),
+        ("@packageSubDir/first1", &package_sub_first_files),
+        ("@packageSubSubDir/first1", &package_sub_sub_first),
+    ]);
 
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
                 String::from("@package"),
                 [
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                ]
+                .into_iter()
+                .collect(),
+            ),
+            (
+                String::from("@package/first2"),
+                [
+                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
             ),
             (
-                String::from("@package/first2/src/something2/where"),
+                String::from("@package/first3"),
                 [
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
-                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     RelativePathBuf::from("src/rootFile.ts"),
-                ]
-                .into_iter()
-                .collect(),
-            ),
-            (
-                String::from("@package/first3/src/something2/my"),
-                [
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                    RelativePathBuf::from("src/rootFile.ts"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
@@ -106,19 +131,7 @@ fn test_package() {
                     .collect(),
             ),
             (
-                String::from("@packageRoot/first1/src/something1/lol"),
-                [RelativePathBuf::from("src/rootFile.ts")]
-                    .into_iter()
-                    .collect(),
-            ),
-            (
                 String::from("@packageSubDir/first1"),
-                [RelativePathBuf::from("src/subDir/subDirFile.ts")]
-                    .into_iter()
-                    .collect(),
-            ),
-            (
-                String::from("@packageSubDir/first1/src/something1/lol"),
                 [RelativePathBuf::from("src/subDir/subDirFile.ts")]
                     .into_iter()
                     .collect(),
@@ -132,30 +145,17 @@ fn test_package() {
                 .collect(),
             ),
             (
-                String::from("@packageSubSubDir/first1/src/something1/lol"),
-                [RelativePathBuf::from(
-                    "src/subDir/subSubDir/subSubDirFile.ts",
-                )]
-                .into_iter()
-                .collect(),
-            ),
-            (
                 String::from("react"),
                 [
-                    RelativePathBuf::from("src/rootFile.ts"),
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    RelativePathBuf::from("src/rootFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
             ),
         ]),
-        missing_dependencies: BTreeMap::from([
-            ("react", &react_files),
-            ("@packageRoot", &package_root_files),
-            ("@packageSubDir", &package_sub_dir_files),
-            ("@packageSubSubDir", &package_sub_sub_dir_files),
-        ]),
+        missing_dependencies,
         unused_dependencies: ["unusedPackage"].into_iter().collect(),
         ..Default::default()
     };
@@ -218,6 +218,7 @@ fn test_import_function_webpack() {
 
     assert_result(actual, expected);
 }
+
 //
 // #[test]
 // fn test_require_resolve_missing() {
