@@ -10,7 +10,7 @@ use walkdir::WalkDir;
 use crate::options::CheckerOptions;
 use crate::package::{self, Package};
 use crate::parsers::Parsers;
-use crate::utils::extract_package_name;
+use crate::utils::{extract_package_name, extract_types_name};
 
 pub struct Checker {
     options: CheckerOptions,
@@ -99,7 +99,7 @@ impl Checker {
                                 .clone()
                                 .into_iter()
                                 .filter_map(|dependency| {
-                                    let type_dependency = "@types/".to_owned() + &dependency;
+                                    let type_dependency = extract_types_name(&dependency);
                                     package
                                         .dependencies
                                         .keys()

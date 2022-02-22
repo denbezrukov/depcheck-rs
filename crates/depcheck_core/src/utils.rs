@@ -1,4 +1,4 @@
-use regex::Regex;
+use regex::{Regex, Captures};
 
 pub fn extract_package_name(path: &str) -> Option<String> {
     let scope_pattern = Regex::new(r"^(?:(@[^/]+)[/]+)([^/]+)[/]?").unwrap();
@@ -16,6 +16,21 @@ pub fn extract_package_name(path: &str) -> Option<String> {
         let captures = base_pattern.captures(path)?;
         captures.get(1).map(|v| v.as_str().to_string())
     }
+}
+
+pub fn extract_types_name(path: &str) -> String {
+    let organization_dependency = Regex::new(r"@(.*?)/(.*)").unwrap();
+
+    let path = match organization_dependency.captures(path) {
+        Some(captures) => {
+            captures.get(1).unwrap().as_str().to_string() + "__" + captures.get(2).unwrap().as_str()
+        }
+        None => {
+            path.to_string()
+        }
+    };
+
+    "@types/".to_string() + path.as_str()
 }
 
 #[cfg(test)]
