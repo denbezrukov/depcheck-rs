@@ -125,21 +125,6 @@ pub struct CheckResult {
 
 impl CheckResult {
     pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
-        let mut package_dependencies = self
-            .package
-            .dependencies
-            .keys()
-            .chain(self.package.dev_dependencies.keys());
-
-        let missing = self
-            .using_dependencies
-            .iter()
-            .filter(|(using_dependency, _)| {
-                package_dependencies
-                    .all(|package_dependency| !using_dependency.starts_with(package_dependency))
-            })
-            .collect::<Vec<_>>();
-
         self.using_dependencies
             .iter()
             .filter(|(dependency, _)| {
