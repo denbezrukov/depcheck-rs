@@ -95,16 +95,6 @@ fn test_package() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
-                String::from("@package"),
-                [
-                    RelativePathBuf::from("src/rootFile.ts"),
-                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
-                ]
-                .into_iter()
-                .collect(),
-            ),
-            (
                 String::from("@package/first2"),
                 [
                     RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
@@ -156,7 +146,7 @@ fn test_package() {
             ),
         ]),
         missing_dependencies,
-        unused_dependencies: ["unusedPackage"].into_iter().collect(),
+        unused_dependencies: ["unusedPackage", "@package/unusedPackage"].into_iter().collect(),
         ..Default::default()
     };
 

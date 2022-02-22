@@ -100,11 +100,10 @@ impl Checker {
                                 .into_iter()
                                 .filter_map(|dependency| {
                                     let type_dependency = extract_types_name(&dependency);
-                                    package
-                                        .dependencies
-                                        .keys()
-                                        .find(|&key| !key.starts_with(&type_dependency))
-                                        .cloned()
+                                    if package.dependencies.contains_key(&type_dependency) {
+                                        return Some(type_dependency);
+                                    }
+                                    None
                                 });
 
                         file_dependencies.extend(types_dependencies)

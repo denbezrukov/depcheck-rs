@@ -2,7 +2,7 @@
   "name": "package",
   "version": "1.0.0",
   "dependencies": {
-    "@package": "1.0.0",
+    "@package/unusedPackage": "1.0.0",
     "unusedPackage": "2.0.0"
   }
 }
