@@ -79,52 +79,44 @@ impl Checker {
                 let file_dependencies = analyze_dependencies(&module, &comments);
                 let mut file_dependencies: HashSet<_> = file_dependencies
                     .iter()
-                    .filter_map(|dependency| {
+                    .flat_map(|dependency| {
                         let path = PathBuf::from(&dependency.specifier.to_string());
-                        let root = path.components().next()?;
+                        let root = path.components().next();
 
-                        if let Component::Normal(_) = root {
-                            let name = extract_package_name(&dependency.specifier)?;
+                        if let Some(Component::Normal(_)) = root {
+                            let name = extract_package_name(&dependency.specifier).unwrap();
 
-                            let name = match dependency.kind {
-                                DependencyKind::ImportType => {
-                                    let type_dependency = "@types/".to_string() + &name;
-                                    if package.dependencies.contains_key(&type_dependency) {
-                                        Some(type_dependency)
-                                    } else {
-                                        None
+                            match syntax {
+                                Syntax::Typescript(_) => {
+                                    if dependency.kind == DependencyKind::ImportType {
+                                        let type_dependency = "@types/".to_string() + &name;
+                                        return if package.dependencies.contains_key(&type_dependency) {
+                                            vec![type_dependency]
+                                        } else {
+                                            vec![]
+                                        }
                                     }
+                                    let type_dependency = extract_type_name(&name);
+                                    if package.dependencies.contains_key(&type_dependency) {
+                                        return vec![name, type_dependency];
+                                    }
+                                    return vec![name];
                                 }
-                                _ => Some(name),
-                            };
-
-                            return name;
+                                _ => {
+                                    return vec![name];
+                                }
+                            }
                         }
-                        None
+                        vec![]
+                    })
+                    .filter(|dependency| {
+                        !is_core_module(dependency)
                     })
                     .collect();
 
                 let relative_file_path =
                     RelativePathBuf::from_path(file.path().strip_prefix(&directory).unwrap())
                         .unwrap();
-
-                match syntax {
-                    Syntax::Typescript(_) => {
-                        let types_dependencies = file_dependencies
-                            .clone() //TODO clone after filter
-                            .into_iter()
-                            .filter_map(|dependency| {
-                                let type_dependency = extract_type_name(&dependency);
-                                if package.dependencies.contains_key(&type_dependency) {
-                                    return Some(type_dependency);
-                                }
-                                None
-                            });
-
-                        file_dependencies.extend(types_dependencies)
-                    }
-                    _ => {}
-                }
 
                 dependencies.insert(relative_file_path.to_owned(), file_dependencies);
             });

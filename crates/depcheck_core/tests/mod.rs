@@ -16,18 +16,18 @@ struct ExpectedCheckResult<'a> {
 
 fn assert_result(actual: CheckResult, expected: ExpectedCheckResult) {
     assert_eq!(actual.using_dependencies, expected.using_dependencies);
-    // assert_eq!(
-    //     actual.get_missing_dependencies(),
-    //     expected.missing_dependencies
-    // );
-    // assert_eq!(
-    //     actual.get_unused_dependencies(),
-    //     expected.unused_dependencies
-    // );
-    // assert_eq!(
-    //     actual.get_unused_dev_dependencies(),
-    //     expected.unused_dev_dependencies
-    // );
+    assert_eq!(
+        actual.get_missing_dependencies(),
+        expected.missing_dependencies
+    );
+    assert_eq!(
+        actual.get_unused_dependencies(),
+        expected.unused_dependencies
+    );
+    assert_eq!(
+        actual.get_unused_dev_dependencies(),
+        expected.unused_dev_dependencies
+    );
 }
 
 fn get_module_path(name: &str) -> PathBuf {
