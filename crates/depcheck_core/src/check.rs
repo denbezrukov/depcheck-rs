@@ -3,14 +3,16 @@ use std::path::{Component, PathBuf};
 
 use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
-use swc_ecma_dep_graph::analyze_dependencies;
+use swc_ecma_dep_graph::{analyze_dependencies, DependencyKind};
 use swc_ecma_parser::Syntax;
 use walkdir::WalkDir;
 
 use crate::options::CheckerOptions;
 use crate::package::{self, Package};
 use crate::parsers::Parsers;
-use crate::utils::{extract_package_name, extract_types_name};
+use crate::util::extract_package_name::extract_package_name;
+use crate::util::extract_type_name::extract_type_name;
+use crate::util::is_core_module::is_core_module;
 
 pub struct Checker {
     options: CheckerOptions,
@@ -77,12 +79,26 @@ impl Checker {
                 let file_dependencies = analyze_dependencies(&module, &comments);
                 let mut file_dependencies: HashSet<_> = file_dependencies
                     .iter()
-                    .flat_map(|dependency| {
+                    .filter_map(|dependency| {
                         let path = PathBuf::from(&dependency.specifier.to_string());
                         let root = path.components().next()?;
 
                         if let Component::Normal(_) = root {
-                            return extract_package_name(&dependency.specifier);
+                            let name = extract_package_name(&dependency.specifier)?;
+
+                            let name = match dependency.kind {
+                                DependencyKind::ImportType => {
+                                    let type_dependency = "@types/".to_string() + &name;
+                                    if package.dependencies.contains_key(&type_dependency) {
+                                        Some(type_dependency)
+                                    } else {
+                                        None
+                                    }
+                                }
+                                _ => Some(name),
+                            };
+
+                            return name;
                         }
                         None
                     })
@@ -94,22 +110,22 @@ impl Checker {
 
                 match syntax {
                     Syntax::Typescript(_) => {
-                        let types_dependencies =
-                            file_dependencies
-                                .clone()
-                                .into_iter()
-                                .filter_map(|dependency| {
-                                    let type_dependency = extract_types_name(&dependency);
-                                    if package.dependencies.contains_key(&type_dependency) {
-                                        return Some(type_dependency);
-                                    }
-                                    None
-                                });
+                        let types_dependencies = file_dependencies
+                            .clone() //TODO clone after filter
+                            .into_iter()
+                            .filter_map(|dependency| {
+                                let type_dependency = extract_type_name(&dependency);
+                                if package.dependencies.contains_key(&type_dependency) {
+                                    return Some(type_dependency);
+                                }
+                                None
+                            });
 
                         file_dependencies.extend(types_dependencies)
                     }
                     _ => {}
                 }
+
                 dependencies.insert(relative_file_path.to_owned(), file_dependencies);
             });
         dependencies

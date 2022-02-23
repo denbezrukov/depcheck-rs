@@ -2,4 +2,4 @@ pub mod check;
 pub mod options;
 pub mod package;
 pub mod parsers;
-pub mod utils;
+pub mod util;
