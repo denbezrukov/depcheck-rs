@@ -59,7 +59,6 @@ impl Checker {
         directory: PathBuf,
         package: &Package,
     ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
-        let mut dependencies = BTreeMap::new();
         let comments = SingleThreadedComments::default();
 
         WalkDir::new(&directory)
@@ -75,52 +74,51 @@ impl Checker {
                     .parse_file(file.path())
                     .map(|(module, syntax)| (file, module, syntax))
             })
-            .for_each(|(file, module, syntax)| {
+            .map(|(file, module, syntax)| {
                 let file_dependencies = analyze_dependencies(&module, &comments);
-                let mut file_dependencies: HashSet<_> = file_dependencies
+                let file_dependencies: HashSet<_> = file_dependencies
                     .iter()
-                    .flat_map(|dependency| {
+                    .filter(|dependency| {
                         let path = PathBuf::from(&dependency.specifier.to_string());
                         let root = path.components().next();
 
-                        if let Some(Component::Normal(_)) = root {
-                            let name = extract_package_name(&dependency.specifier).unwrap();
-
-                            match syntax {
-                                Syntax::Typescript(_) => {
-                                    if dependency.kind == DependencyKind::ImportType {
-                                        let type_dependency = "@types/".to_string() + &name;
-                                        return if package.dependencies.contains_key(&type_dependency) {
-                                            vec![type_dependency]
-                                        } else {
-                                            vec![]
-                                        }
-                                    }
-                                    let type_dependency = extract_type_name(&name);
-                                    if package.dependencies.contains_key(&type_dependency) {
-                                        return vec![name, type_dependency];
-                                    }
-                                    return vec![name];
-                                }
-                                _ => {
-                                    return vec![name];
-                                }
-                            }
+                        match root {
+                            Some(Component::Normal(_)) => true,
+                            _ => false,
                         }
-                        vec![]
                     })
-                    .filter(|dependency| {
-                        !is_core_module(dependency)
+                    .flat_map(|dependency| {
+                        let name = extract_package_name(&dependency.specifier).unwrap();
+
+                        match syntax {
+                            Syntax::Typescript(_) => {
+                                if dependency.kind == DependencyKind::ImportType {
+                                    let type_dependency = "@types/".to_string() + &name;
+                                    return if package.dependencies.contains_key(&type_dependency) {
+                                        vec![type_dependency]
+                                    } else {
+                                        vec![]
+                                    };
+                                }
+                                let type_dependency = extract_type_name(&name);
+                                if package.dependencies.contains_key(&type_dependency) {
+                                    return vec![name, type_dependency];
+                                }
+                                vec![name]
+                            }
+                            _ => vec![name],
+                        }
                     })
+                    .filter(|dependency| !is_core_module(dependency))
                     .collect();
 
                 let relative_file_path =
                     RelativePathBuf::from_path(file.path().strip_prefix(&directory).unwrap())
                         .unwrap();
 
-                dependencies.insert(relative_file_path.to_owned(), file_dependencies);
-            });
-        dependencies
+                (relative_file_path.to_owned(), file_dependencies)
+            })
+            .collect()
     }
 }
 
