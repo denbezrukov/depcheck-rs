@@ -446,12 +446,9 @@ fn test_gatsby() {
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: [
-            String::from("gatsby-plugin-react-helmet"),
-            String::from("gatsby-plugin-sass"),
-        ]
-        .into_iter()
-        .collect(),
+        unused_dependencies: ["gatsby-plugin-react-helmet", "gatsby-plugin-sass"]
+            .into_iter()
+            .collect(),
         ..Default::default()
     };
 
@@ -616,6 +613,59 @@ fn test_vue() {
                     .collect(),
             ),
         ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_vue3() {
+    let path = get_module_path("vue3");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["unused-dep"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("vue"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("vue-dep-1"),
+                [RelativePathBuf::from("component.vue")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("vue-dep-2"),
+                [RelativePathBuf::from("component.vue")]
+                    .into_iter()
+                    .collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_missing() {
+    let path = get_module_path("missing");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let missing_files = [RelativePathBuf::from("index.js")].into_iter().collect();
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("missing-dep"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        missing_dependencies: BTreeMap::from([("missing-dep", &missing_files)]),
         ..Default::default()
     };
 
