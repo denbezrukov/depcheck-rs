@@ -211,57 +211,44 @@ fn test_import_function_webpack() {
     assert_result(actual, expected);
 }
 
-//
-// #[test]
-// fn test_require_resolve_missing() {
-//     let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
-//         "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
-//     ));
-//     path.push("tests");
-//     path.push("fake_modules");
-//     path.push("require_resolve_missing");
-//
-//     let checker = Checker::default();
-//     let actual = checker.check_package(path).unwrap();
-//
-//     let expected = CheckResult {
-//         using_dependencies: BTreeMap::from([(
-//             String::from("anyone"),
-//             [RelativePathBuf::from("index.js")].into_iter().collect(),
-//         )]),
-//         missing_dependencies: BTreeMap::from([(
-//             String::from("anyone"),
-//             [RelativePathBuf::from("index.js")].into_iter().collect(),
-//         )]),
-//         ..Default::default()
-//     };
-//
-//     // assert_eq!(actual, expected); //TODO
-// }
-//
-// #[test]
-// fn test_require_resolve() {
-//     let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
-//         "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
-//     ));
-//     path.push("tests");
-//     path.push("fake_modules");
-//     path.push("require_resolve");
-//
-//     let checker = Checker::default();
-//     let actual = checker.check_package(path).unwrap();
-//
-//     let expected = CheckResult {
-//         using_dependencies: BTreeMap::from([(
-//             String::from("optimist"),
-//             [RelativePathBuf::from("index.js")].into_iter().collect(),
-//         )]),
-//         ..Default::default()
-//     };
-//
-//     //assert_eq!(actual, expected); //TODO
-// }
-//
+#[test]
+fn test_require_resolve_missing() {
+    let path = get_module_path("require_resolve_missing");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let anyone_files = [RelativePathBuf::from("index.js")].into_iter().collect();
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        missing_dependencies: BTreeMap::from([("anyone", &anyone_files)]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_require_resolve() {
+    let path = get_module_path("require_resolve");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("optimist"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
 #[test]
 fn test_bad() {
     let path = get_module_path("bad");
@@ -572,8 +559,6 @@ fn test_typescript() {
         ]),
         ..Default::default()
     };
-
-    println!("{:#?}", actual);
 
     assert_result(actual, expected);
 }
