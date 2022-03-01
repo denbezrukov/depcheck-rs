@@ -31,9 +31,13 @@ fn assert_result(actual: CheckResult, expected: ExpectedCheckResult) {
 }
 
 fn get_module_path(name: &str) -> PathBuf {
-    let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
-        "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
-    ));
+    let mut path = env::var("CARGO_MANIFEST_DIR")
+        .map(PathBuf::from)
+        .map(|p| {
+            p.canonicalize()
+                .expect("failed to canonicalize `CARGO_MANIFEST_DIR`")
+        })
+        .unwrap_or_else(|err| panic!("failed to read `CARGO_MANIFEST_DIR`: {}", err));
     path.push("tests");
     path.push("fake_modules");
     path.push(name);
@@ -433,31 +437,26 @@ fn test_good_es6() {
 
     assert_result(actual, expected);
 }
-//
-// #[test]
-// fn test_gatsby() {
-//     let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
-//         "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
-//     ));
-//     path.push("tests");
-//     path.push("fake_modules");
-//     path.push("gatsby");
-//
-//     let checker = Checker::default();
-//     let actual = checker.check_package(path).unwrap();
-//
-//     let expected = CheckResult {
-//         unused_dependencies: [
-//             String::from("gatsby-plugin-react-helmet"),
-//             String::from("gatsby-plugin-sass"),
-//         ]
-//         .into_iter()
-//         .collect(),
-//         ..Default::default()
-//     };
-//
-//     // assert_eq!(actual, expected);
-// }
+
+#[test]
+fn test_gatsby() {
+    let path = get_module_path("gatsby");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: [
+            String::from("gatsby-plugin-react-helmet"),
+            String::from("gatsby-plugin-sass"),
+        ]
+        .into_iter()
+        .collect(),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
 
 #[test]
 fn test_good_es7() {
@@ -476,29 +475,24 @@ fn test_good_es7() {
 
     assert_result(actual, expected);
 }
-//
-// #[test]
-//fn test_good_es7_flow() {
-// let mut path = PathBuf::from(env::var("CARGO_MANIFEST_DIR").expect(
-//     "test requires CARGO_MANIFEST_DIR because it's relative to cargo manifest directory",
-// ));
-// path.push("tests");
-// path.push("fake_modules");
-// path.push("good_es7_flow");
-//
-// let checker = Checker::default();
-// let actual = checker.check_package(path).unwrap();
-//
-// let expected = CheckResult {
-//     using_dependencies: BTreeMap::from([(
-//         String::from("ecmascript-rest-spread"),
-//         [RelativePathBuf::from("index.js")].into_iter().collect(),
-//     )]),
-//     ..Default::default()
-//     };
-//
-//     // assert_eq!(actual, expected);
-// }
+
+#[test]
+fn test_good_es7_flow() {
+    let path = get_module_path("good_es7_flow");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("ecmascript-rest-spread"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
 
 #[test]
 fn test_typescript() {
@@ -553,6 +547,71 @@ fn test_typescript() {
             (
                 String::from("ts-dep-typedef"),
                 [RelativePathBuf::from("typedef.d.ts")]
+                    .into_iter()
+                    .collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+//
+// {
+// name: 'support SASS/SCSS syntax',
+// module: 'sass',
+// options: {},
+// expected: {
+// dependencies: ['unused-sass-dep'],
+// devDependencies: [],
+// missing: {
+// '@test-dep/aFile': ['sass2.sass'],
+// '@test-dep/aFile2': ['scss2.scss'],
+// '@test-dep/aFile3': ['scss2.scss'],
+// '@test-dep/aFile4': ['scss2.scss'],
+// sass: ['scss2.scss'],
+// },
+// using: {
+// 'sass-dep': ['sass.sass', 'sass2.sass'],
+// 'sass-dep2': ['sass.sass', 'sass2.sass'],
+// '@scss-deps/fonts': ['scss.scss'],
+// 'scss-dep-2': ['scss.scss'],
+// 'scss-dep-3': ['scss.scss'],
+// 'scss-dep': ['scss.scss'],
+// '@test-dep/aFile': ['sass2.sass'],
+// '@test-dep/aFile2': ['scss2.scss'],
+// '@test-dep/aFile3': ['scss2.scss'],
+// '@test-dep/aFile4': ['scss2.scss'],
+// sass: ['scss2.scss'],
+// },
+// },
+// expectedErrorCode: -1,
+// },
+
+#[test]
+fn test_vue() {
+    let path = get_module_path("vue");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["unused-dep"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("vue"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("vue-dep-1"),
+                [RelativePathBuf::from("component.vue")]
+                    .into_iter()
+                    .collect(),
+            ),
+            (
+                String::from("vue-dep-2"),
+                [RelativePathBuf::from("component.vue")]
                     .into_iter()
                     .collect(),
             ),
