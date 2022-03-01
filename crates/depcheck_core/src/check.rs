@@ -139,6 +139,8 @@ impl CheckResult {
             .filter(|(dependency, _)| {
                 !self.package.dependencies.contains_key(*dependency)
                     && !self.package.dev_dependencies.contains_key(*dependency)
+                    && !self.package.peer_dependencies.contains_key(*dependency)
+                    && !self.package.optional_dependencies.contains_key(*dependency)
             })
             .map(|(dependency, files)| (dependency.as_str(), files))
             .collect()

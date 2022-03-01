@@ -700,3 +700,33 @@ fn test_missing_nested() {
 
     assert_result(actual, expected);
 }
+
+#[test]
+fn test_missing_peer_deps() {
+    let path = get_module_path("missing_peer_deps");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let missing_files = [RelativePathBuf::from("index.js")].into_iter().collect();
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("missing-this-dep"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("peer-dep"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("optional-dep"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        missing_dependencies: BTreeMap::from([("missing-this-dep", &missing_files)]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
