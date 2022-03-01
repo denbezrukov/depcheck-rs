@@ -730,3 +730,60 @@ fn test_missing_peer_deps() {
 
     assert_result(actual, expected);
 }
+
+#[test]
+#[ignore]
+fn test_grunt() {
+    let path = get_module_path("grunt");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("grunt-contrib-jshint"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+#[ignore]
+fn test_grunt_tasks() {
+    let path = get_module_path("grunt-tasks");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("grunt-contrib-jshint"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_dev() {
+    let path = get_module_path("dev");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dev_dependencies: ["unused-dev-dep"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([(
+            String::from("used-dep"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
