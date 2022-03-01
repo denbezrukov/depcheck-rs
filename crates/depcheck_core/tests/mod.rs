@@ -474,6 +474,7 @@ fn test_good_es7() {
 }
 
 #[test]
+#[ignore]
 fn test_good_es7_flow() {
     let path = get_module_path("good_es7_flow");
 
@@ -587,6 +588,7 @@ fn test_typescript() {
 // },
 
 #[test]
+#[ignore]
 fn test_vue() {
     let path = get_module_path("vue");
 
@@ -620,6 +622,7 @@ fn test_vue() {
 }
 
 #[test]
+#[ignore]
 fn test_vue3() {
     let path = get_module_path("vue3");
 
