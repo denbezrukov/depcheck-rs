@@ -787,3 +787,236 @@ fn test_dev() {
 
     assert_result(actual, expected);
 }
+
+#[test]
+fn test_peer_dep() {
+    let path = get_module_path("peer_dep");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["unused-dep"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("host"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("peer"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_peer_dep_nested() {
+    let path = get_module_path("peer_dep_nested");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dev_dependencies: ["unused-nested-dep"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("host"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("peer"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_optional_dep() {
+    let path = get_module_path("optional_dep");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dev_dependencies: ["unused-dep"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("host"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("optional"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_nested() {
+    let path = get_module_path("nested");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("optimist"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_empty_file() {
+    let path = get_module_path("empty_file");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["empty-package"].into_iter().collect(),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_shebang() {
+    let path = get_module_path("shebang");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["shebang"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([(
+            String::from("shebang-script"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_empty_dep() {
+    let path = get_module_path("empty_dep");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_bin_js() {
+    let path = get_module_path("bin_js");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_bin_js_ignore_bin_package_false() {
+    let path = get_module_path("bin_js");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["anybin", "upperbin"].into_iter().collect(),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_good_ignore_bin_package_true() {
+    let path = get_module_path("good");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("optimist"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("foo"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_skip_missing_true() {
+    let path = get_module_path("missing");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("missing-dep"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_skip_missing_false() {
+    let path = get_module_path("missing");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let missing_files = [RelativePathBuf::from("index.js")].into_iter().collect();
+
+    let expected = ExpectedCheckResult {
+        missing_dependencies: BTreeMap::from([("missing-dep", &missing_files)]),
+        using_dependencies: BTreeMap::from([(
+            String::from("missing-dep"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
