@@ -13,6 +13,7 @@ use crate::parsers::Parsers;
 use crate::util::extract_package_name::extract_package_name;
 use crate::util::extract_type_name::extract_type_name;
 use crate::util::is_core_module::is_core_module;
+use crate::util::is_module::is_module;
 
 pub struct Checker {
     options: CheckerOptions,
@@ -64,8 +65,11 @@ impl Checker {
         WalkDir::new(&directory)
             .into_iter()
             .filter_entry(|entry| {
+                let is_root_directory = entry.path() == directory;
                 let file_name = entry.file_name().to_string_lossy();
-                !self.options.ignore_patterns.is_match(file_name.as_ref())
+                is_root_directory
+                    || (!self.options.ignore_patterns.is_match(file_name.as_ref())
+                        && !is_module(entry.path()))
             })
             .filter_map(|entry| Result::ok(entry))
             .filter(|dir_entry| dir_entry.file_type().is_file())
