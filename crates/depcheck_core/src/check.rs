@@ -1,5 +1,5 @@
 use std::collections::{BTreeMap, HashSet};
-use std::path::{Component, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
@@ -45,7 +45,7 @@ impl Checker {
 
         let package = Package::from_path(package_path)?;
 
-        let dependencies = self.check_directory(directory, &package);
+        let dependencies = self.check_directory(&directory, &package);
 
         let mut using_dependencies = BTreeMap::new();
 
@@ -67,12 +67,12 @@ impl Checker {
 
     pub fn check_directory(
         &self,
-        directory: PathBuf,
+        directory: &Path,
         package: &Package,
     ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
         let comments = SingleThreadedComments::default();
 
-        WalkDir::new(&directory)
+        WalkDir::new(directory)
             .into_iter()
             .filter_entry(|entry| {
                 let is_root_directory = entry.path() == directory;
@@ -130,12 +130,21 @@ impl Checker {
                     .collect();
 
                 let relative_file_path =
-                    RelativePathBuf::from_path(file.path().strip_prefix(&directory).unwrap())
+                    RelativePathBuf::from_path(file.path().strip_prefix(directory).unwrap())
                         .unwrap();
 
                 (relative_file_path.to_owned(), file_dependencies)
             })
             .collect()
+    }
+}
+
+impl Checker {
+    pub fn load_module(path: &Path) -> package::Result<Package> {
+        let mut package_path = path.to_owned();
+        package_path.push("package.json");
+
+        Package::from_path(package_path)
     }
 }
 

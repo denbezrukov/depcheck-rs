@@ -987,12 +987,10 @@ fn test_good_ignore_bin_package_true() {
 fn test_skip_missing_true() {
     let path = get_module_path("missing");
 
-    let checker = Checker::new(
-        CheckerOptions {
-            skip_missing: true,
-            ..Default::default()
-        }
-    );
+    let checker = Checker::new(CheckerOptions {
+        skip_missing: true,
+        ..Default::default()
+    });
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
