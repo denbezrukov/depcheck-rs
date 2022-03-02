@@ -30,6 +30,15 @@ impl Default for Checker {
 }
 
 impl Checker {
+    pub fn new(options: CheckerOptions) -> Self {
+        Checker {
+            options,
+            ..Default::default()
+        }
+    }
+}
+
+impl Checker {
     pub fn check_package(&self, directory: PathBuf) -> package::Result<CheckResult> {
         let mut package_path = directory.to_owned();
         package_path.push("package.json");
@@ -52,6 +61,7 @@ impl Checker {
         Ok(CheckResult {
             package,
             using_dependencies,
+            options: self.options.clone(),
         })
     }
 
@@ -68,7 +78,10 @@ impl Checker {
                 let is_root_directory = entry.path() == directory;
                 let file_name = entry.file_name().to_string_lossy();
                 is_root_directory
-                    || (!self.options.ignore_patterns.is_match(file_name.as_ref())
+                    || (!self
+                        .options
+                        .get_ignore_patterns()
+                        .is_match(file_name.as_ref())
                         && !is_module(entry.path()))
             })
             .filter_map(|entry| Result::ok(entry))
@@ -130,20 +143,25 @@ impl Checker {
 pub struct CheckResult {
     pub package: Package,
     pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
+    pub options: CheckerOptions,
 }
 
 impl CheckResult {
     pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
-        self.using_dependencies
-            .iter()
-            .filter(|(dependency, _)| {
-                !self.package.dependencies.contains_key(*dependency)
-                    && !self.package.dev_dependencies.contains_key(*dependency)
-                    && !self.package.peer_dependencies.contains_key(*dependency)
-                    && !self.package.optional_dependencies.contains_key(*dependency)
-            })
-            .map(|(dependency, files)| (dependency.as_str(), files))
-            .collect()
+        if self.options.skip_missing {
+            Default::default()
+        } else {
+            self.using_dependencies
+                .iter()
+                .filter(|(dependency, _)| {
+                    !self.package.dependencies.contains_key(*dependency)
+                        && !self.package.dev_dependencies.contains_key(*dependency)
+                        && !self.package.peer_dependencies.contains_key(*dependency)
+                        && !self.package.optional_dependencies.contains_key(*dependency)
+                })
+                .map(|(dependency, files)| (dependency.as_str(), files))
+                .collect()
+        }
     }
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {

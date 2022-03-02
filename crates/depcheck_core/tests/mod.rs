@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use relative_path::RelativePathBuf;
 
 use depckeck_core::check::{CheckResult, Checker};
+use depckeck_core::options::CheckerOptions;
 
 #[derive(Default)]
 struct ExpectedCheckResult<'a> {
@@ -986,7 +987,12 @@ fn test_good_ignore_bin_package_true() {
 fn test_skip_missing_true() {
     let path = get_module_path("missing");
 
-    let checker = Checker::default();
+    let checker = Checker::new(
+        CheckerOptions {
+            skip_missing: true,
+            ..Default::default()
+        }
+    );
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {

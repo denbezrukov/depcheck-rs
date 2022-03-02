@@ -1,12 +1,14 @@
 use regex::RegexSet;
 
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct CheckerOptions {
-    pub ignore_patterns: RegexSet,
+    pub ignore_patterns: Vec<&'static str>,
+    pub skip_missing: bool,
 }
 
 impl Default for CheckerOptions {
     fn default() -> Self {
-        let ignore_patterns = RegexSet::new(&[
+        let ignore_patterns = vec![
             r"\.git$",
             r"\.svn$",
             r"\.hg$",
@@ -31,9 +33,18 @@ impl Default for CheckerOptions {
             r"\.gz$",
             // Videos
             r"\.mp4$",
-        ])
-        .unwrap();
-        CheckerOptions { ignore_patterns }
+        ];
+        let skip_missing = false;
+        CheckerOptions {
+            ignore_patterns,
+            skip_missing,
+        }
+    }
+}
+
+impl CheckerOptions {
+    pub fn get_ignore_patterns(&self) -> RegexSet {
+        RegexSet::new(&self.ignore_patterns).unwrap()
     }
 }
 
@@ -45,13 +56,13 @@ mod tests {
     fn should_ignore_png() {
         let options = CheckerOptions::default();
 
-        let is_match = options.ignore_patterns.is_match("image.png");
+        let is_match = options.get_ignore_patterns().is_match("image.png");
         assert!(is_match);
 
-        let is_match = options.ignore_patterns.is_match("image.png.");
+        let is_match = options.get_ignore_patterns().is_match("image.png.");
         assert!(!is_match);
 
-        let is_match = options.ignore_patterns.is_match("imagepng");
+        let is_match = options.get_ignore_patterns().is_match("imagepng");
         assert!(!is_match);
     }
 
@@ -59,13 +70,13 @@ mod tests {
     fn should_ignore_node_modules() {
         let options = CheckerOptions::default();
 
-        let is_match = options.ignore_patterns.is_match("node_modules");
+        let is_match = options.get_ignore_patterns().is_match("node_modules");
         assert!(is_match);
 
-        let is_match = options.ignore_patterns.is_match("node_module");
+        let is_match = options.get_ignore_patterns().is_match("node_module");
         assert!(!is_match);
 
-        let is_match = options.ignore_patterns.is_match("ode_modules");
+        let is_match = options.get_ignore_patterns().is_match("ode_modules");
         assert!(!is_match);
     }
 
@@ -73,13 +84,13 @@ mod tests {
     fn should_ignore_dist() {
         let options = CheckerOptions::default();
 
-        let is_match = options.ignore_patterns.is_match("dist");
+        let is_match = options.get_ignore_patterns().is_match("dist");
         assert!(is_match);
 
-        let is_match = options.ignore_patterns.is_match("distt");
+        let is_match = options.get_ignore_patterns().is_match("distt");
         assert!(!is_match);
 
-        let is_match = options.ignore_patterns.is_match("ist");
+        let is_match = options.get_ignore_patterns().is_match("ist");
         assert!(!is_match);
     }
 
@@ -87,13 +98,13 @@ mod tests {
     fn should_ignore_build() {
         let options = CheckerOptions::default();
 
-        let is_match = options.ignore_patterns.is_match("build");
+        let is_match = options.get_ignore_patterns().is_match("build");
         assert!(is_match);
 
-        let is_match = options.ignore_patterns.is_match("bbuild");
+        let is_match = options.get_ignore_patterns().is_match("bbuild");
         assert!(!is_match);
 
-        let is_match = options.ignore_patterns.is_match("uild");
+        let is_match = options.get_ignore_patterns().is_match("uild");
         assert!(!is_match);
     }
 }
