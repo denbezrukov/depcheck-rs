@@ -8,12 +8,14 @@ use swc_ecma_parser::Syntax;
 use walkdir::WalkDir;
 
 use crate::options::CheckerOptions;
-use crate::package::{self, Package};
+use crate::package::{self, Error, Package};
 use crate::parsers::Parsers;
 use crate::util::extract_package_name::extract_package_name;
 use crate::util::extract_type_name::extract_type_name;
 use crate::util::is_core_module::is_core_module;
 use crate::util::is_module::is_module;
+use crate::util::load_module::load_module;
+use std::iter;
 
 pub struct Checker {
     options: CheckerOptions,
@@ -40,10 +42,7 @@ impl Checker {
 
 impl Checker {
     pub fn check_package(&self, directory: PathBuf) -> package::Result<CheckResult> {
-        let mut package_path = directory.to_owned();
-        package_path.push("package.json");
-
-        let package = Package::from_path(package_path)?;
+        let package = load_module(&directory)?;
 
         let dependencies = self.check_directory(&directory, &package);
 
@@ -111,14 +110,18 @@ impl Checker {
                             Syntax::Typescript(_) => {
                                 if dependency.kind == DependencyKind::ImportType {
                                     let type_dependency = "@types/".to_string() + &name;
-                                    return if package.dependencies.contains_key(&type_dependency) {
+                                    return if package.dependencies.contains_key(&type_dependency)
+                                        || package.dev_dependencies.contains_key(&type_dependency)
+                                    {
                                         vec![type_dependency]
                                     } else {
                                         vec![]
                                     };
                                 }
                                 let type_dependency = extract_type_name(&name);
-                                if package.dependencies.contains_key(&type_dependency) {
+                                if package.dependencies.contains_key(&type_dependency)
+                                    || package.dev_dependencies.contains_key(&type_dependency)
+                                {
                                     return vec![name, type_dependency];
                                 }
                                 vec![name]
@@ -126,6 +129,44 @@ impl Checker {
                             _ => vec![name],
                         }
                     })
+                    .filter_map(|dependency| {
+                        let dependency_module =
+                            load_module(&directory.join("node_modules").join(&dependency));
+                        let dependencies = match dependency_module {
+                            Ok(dependency_module) => iter::once(dependency)
+                                .chain(
+                                    dependency_module
+                                        .peer_dependencies
+                                        .keys()
+                                        .filter(|peer_dependency| {
+                                            package.dependencies.contains_key(*peer_dependency)
+                                                || package
+                                                    .dev_dependencies
+                                                    .contains_key(*peer_dependency)
+                                        })
+                                        .cloned(),
+                                )
+                                .chain(
+                                    dependency_module
+                                        .optional_dependencies
+                                        .keys()
+                                        .filter(|optional_dependency| {
+                                            package.dependencies.contains_key(*optional_dependency)
+                                                || package
+                                                    .dev_dependencies
+                                                    .contains_key(*optional_dependency)
+                                        })
+                                        .cloned(),
+                                )
+                                .collect(),
+                            Err(_) => {
+                                vec![dependency]
+                            }
+                        };
+
+                        Some(dependencies)
+                    })
+                    .flatten()
                     .filter(|dependency| !is_core_module(dependency))
                     .collect();
 
@@ -136,15 +177,6 @@ impl Checker {
                 (relative_file_path.to_owned(), file_dependencies)
             })
             .collect()
-    }
-}
-
-impl Checker {
-    pub fn load_module(path: &Path) -> package::Result<Package> {
-        let mut package_path = path.to_owned();
-        package_path.push("package.json");
-
-        Package::from_path(package_path)
     }
 }
 

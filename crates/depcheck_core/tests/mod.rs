@@ -32,17 +32,16 @@ fn assert_result(actual: CheckResult, expected: ExpectedCheckResult) {
 }
 
 fn get_module_path(name: &str) -> PathBuf {
-    let mut path = env::var("CARGO_MANIFEST_DIR")
+    env::var("CARGO_MANIFEST_DIR")
         .map(PathBuf::from)
         .map(|p| {
             p.canonicalize()
                 .expect("failed to canonicalize `CARGO_MANIFEST_DIR`")
+                .join("tests")
+                .join("fake_modules")
+                .join(name)
         })
-        .unwrap_or_else(|err| panic!("failed to read `CARGO_MANIFEST_DIR`: {}", err));
-    path.push("tests");
-    path.push("fake_modules");
-    path.push(name);
-    path
+        .unwrap_or_else(|err| panic!("failed to read `CARGO_MANIFEST_DIR`: {}", err))
 }
 
 #[test]
@@ -822,15 +821,19 @@ fn test_peer_dep_nested() {
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dev_dependencies: ["unused-nested-dep"].into_iter().collect(),
+        unused_dependencies: ["unused-nested-dep"].into_iter().collect(),
         using_dependencies: BTreeMap::from([
             (
                 String::from("host"),
-                [RelativePathBuf::from("index.js")].into_iter().collect(),
+                [RelativePathBuf::from("nested/index.js")]
+                    .into_iter()
+                    .collect(),
             ),
             (
                 String::from("peer"),
-                [RelativePathBuf::from("index.js")].into_iter().collect(),
+                [RelativePathBuf::from("nested/index.js")]
+                    .into_iter()
+                    .collect(),
             ),
         ]),
         ..Default::default()
@@ -847,7 +850,7 @@ fn test_optional_dep() {
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dev_dependencies: ["unused-dep"].into_iter().collect(),
+        unused_dependencies: ["unused-dep"].into_iter().collect(),
         using_dependencies: BTreeMap::from([
             (
                 String::from("host"),
