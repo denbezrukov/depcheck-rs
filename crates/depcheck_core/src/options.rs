@@ -2,6 +2,7 @@ use regex::RegexSet;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct CheckerOptions {
+    pub ignore_bin_package: bool,
     pub ignore_patterns: Vec<&'static str>,
     pub skip_missing: bool,
 }
@@ -34,10 +35,11 @@ impl Default for CheckerOptions {
             // Videos
             r"\.mp4$",
         ];
-        let skip_missing = false;
+
         CheckerOptions {
             ignore_patterns,
-            skip_missing,
+            skip_missing: Default::default(),
+            ignore_bin_package: Default::default(),
         }
     }
 }

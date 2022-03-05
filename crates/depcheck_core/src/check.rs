@@ -59,6 +59,7 @@ impl Checker {
 
         Ok(CheckResult {
             package,
+            directory,
             using_dependencies,
             options: self.options.clone(),
         })
@@ -138,11 +139,11 @@ impl Checker {
                                     dependency_module
                                         .peer_dependencies
                                         .keys()
-                                        .filter(|peer_dependency| {
-                                            package.dependencies.contains_key(*peer_dependency)
+                                        .filter(|&peer_dependency| {
+                                            package.dependencies.contains_key(peer_dependency)
                                                 || package
                                                     .dev_dependencies
-                                                    .contains_key(*peer_dependency)
+                                                    .contains_key(peer_dependency)
                                         })
                                         .cloned(),
                                 )
@@ -150,11 +151,11 @@ impl Checker {
                                     dependency_module
                                         .optional_dependencies
                                         .keys()
-                                        .filter(|optional_dependency| {
-                                            package.dependencies.contains_key(*optional_dependency)
+                                        .filter(|&optional_dependency| {
+                                            package.dependencies.contains_key(optional_dependency)
                                                 || package
                                                     .dev_dependencies
-                                                    .contains_key(*optional_dependency)
+                                                    .contains_key(optional_dependency)
                                         })
                                         .cloned(),
                                 )
@@ -168,6 +169,17 @@ impl Checker {
                     })
                     .flatten()
                     .filter(|dependency| !is_core_module(dependency))
+                    .filter(|dependency| {
+                        if self.options.ignore_bin_package {
+                            let dependency_module =
+                                load_module(&directory.join("node_modules").join(&dependency));
+
+                            if let Ok(dependency_module) = dependency_module {
+                                return dependency_module.bin.is_none();
+                            }
+                        }
+                        true
+                    })
                     .collect();
 
                 let relative_file_path =
@@ -183,6 +195,7 @@ impl Checker {
 #[derive(Debug, Default, Eq, PartialEq)]
 pub struct CheckResult {
     pub package: Package,
+    pub directory: PathBuf,
     pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
     pub options: CheckerOptions,
 }
@@ -200,6 +213,17 @@ impl CheckResult {
                         && !self.package.peer_dependencies.contains_key(*dependency)
                         && !self.package.optional_dependencies.contains_key(*dependency)
                 })
+                .filter(|(dependency, _)| {
+                    if self.options.ignore_bin_package {
+                        let dependency_module =
+                            load_module(&self.directory.join("node_modules").join(&dependency));
+
+                        if let Ok(dependency_module) = dependency_module {
+                            return dependency_module.bin.is_none();
+                        }
+                    }
+                    true
+                })
                 .map(|(dependency, files)| (dependency.as_str(), files))
                 .collect()
         }
@@ -211,6 +235,17 @@ impl CheckResult {
         package_dependencies
             .into_iter()
             .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
+            .filter(|&dependency| {
+                if self.options.ignore_bin_package {
+                    let dependency_module =
+                        load_module(&self.directory.join("node_modules").join(&dependency));
+
+                    if let Ok(dependency_module) = dependency_module {
+                        return dependency_module.bin.is_none();
+                    }
+                }
+                true
+            })
             .map(|v| v.as_str())
             .collect()
     }
@@ -222,6 +257,17 @@ impl CheckResult {
         package_dev_dependencies
             .into_iter()
             .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
+            .filter(|&dependency| {
+                if self.options.ignore_bin_package {
+                    let dependency_module =
+                        load_module(&self.directory.join("node_modules").join(dependency));
+
+                    if let Ok(dependency_module) = dependency_module {
+                        return dependency_module.bin.is_none();
+                    }
+                }
+                true
+            })
             .map(|v| v.as_str())
             .collect()
     }

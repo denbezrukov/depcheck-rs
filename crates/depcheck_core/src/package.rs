@@ -8,6 +8,8 @@ use thiserror::Error;
 
 /// An ordered map for `dependencies` entries.
 pub type DepsSet = BTreeMap<String, String>;
+/// An ordered map for `bin` entries.
+pub type BinSet = BTreeMap<String, String>;
 
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -33,6 +35,9 @@ pub struct Package {
     /// The optional list of optional dependencies.
     #[serde(default)]
     pub optional_dependencies: DepsSet,
+    /// The optional set of binary definitions.
+    #[serde(default)]
+    pub bin: Option<BinSet>,
 }
 
 /// The errors that this library can return.

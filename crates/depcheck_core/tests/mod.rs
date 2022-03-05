@@ -937,10 +937,14 @@ fn test_empty_dep() {
 fn test_bin_js() {
     let path = get_module_path("bin_js");
 
-    let checker = Checker::default();
+    let checker = Checker::new(CheckerOptions {
+        ignore_bin_package: true,
+        ..CheckerOptions::default()
+    });
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
+        unused_dependencies: ["nobin"].into_iter().collect(),
         ..Default::default()
     };
 
@@ -955,7 +959,7 @@ fn test_bin_js_ignore_bin_package_false() {
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["anybin", "upperbin"].into_iter().collect(),
+        unused_dependencies: ["anybin", "nobin"].into_iter().collect(),
         ..Default::default()
     };
 
