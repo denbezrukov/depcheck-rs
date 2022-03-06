@@ -208,10 +208,19 @@ impl CheckResult {
             self.using_dependencies
                 .iter()
                 .filter(|(dependency, _)| {
-                    !self.package.dependencies.contains_key(*dependency)
-                        && !self.package.dev_dependencies.contains_key(*dependency)
-                        && !self.package.peer_dependencies.contains_key(*dependency)
-                        && !self.package.optional_dependencies.contains_key(*dependency)
+                    !self.package.dependencies.contains_key(dependency.as_str())
+                        && !self
+                            .package
+                            .dev_dependencies
+                            .contains_key(dependency.as_str())
+                        && !self
+                            .package
+                            .peer_dependencies
+                            .contains_key(dependency.as_str())
+                        && !self
+                            .package
+                            .optional_dependencies
+                            .contains_key(dependency.as_str())
                 })
                 .filter(|(dependency, _)| {
                     if self.options.ignore_bin_package {
@@ -234,11 +243,15 @@ impl CheckResult {
 
         package_dependencies
             .into_iter()
-            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
-            .filter(|&dependency| {
+            .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
+            .filter(|dependency| {
                 if self.options.ignore_bin_package {
-                    let dependency_module =
-                        load_module(&self.directory.join("node_modules").join(&dependency));
+                    let dependency_module = load_module(
+                        &self
+                            .directory
+                            .join("node_modules")
+                            .join(dependency.as_str()),
+                    );
 
                     if let Ok(dependency_module) = dependency_module {
                         return dependency_module.bin.is_none();
@@ -256,11 +269,15 @@ impl CheckResult {
 
         package_dev_dependencies
             .into_iter()
-            .filter(|&dependency| !self.using_dependencies.contains_key(dependency))
-            .filter(|&dependency| {
+            .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
+            .filter(|dependency| {
                 if self.options.ignore_bin_package {
-                    let dependency_module =
-                        load_module(&self.directory.join("node_modules").join(dependency));
+                    let dependency_module = load_module(
+                        &self
+                            .directory
+                            .join("node_modules")
+                            .join(dependency.as_str()),
+                    );
 
                     if let Ok(dependency_module) = dependency_module {
                         return dependency_module.bin.is_none();
