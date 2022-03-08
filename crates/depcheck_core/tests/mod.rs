@@ -1031,3 +1031,38 @@ fn test_skip_missing_false() {
 
     assert_result(actual, expected);
 }
+
+#[test]
+fn test_require_nothing() {
+    let path = get_module_path("require_nothing");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["require-nothing"].into_iter().collect(),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_require_dynamic() {
+    let path = get_module_path("require_dynamic");
+
+    let checker = Checker::default();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("dynamic"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
