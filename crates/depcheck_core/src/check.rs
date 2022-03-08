@@ -170,15 +170,7 @@ impl Checker {
                     .flatten()
                     .filter(|dependency| !is_core_module(dependency))
                     .filter(|dependency| {
-                        if self.options.ignore_bin_package {
-                            let dependency_module =
-                                load_module(&directory.join("node_modules").join(&dependency));
-
-                            if let Ok(dependency_module) = dependency_module {
-                                return dependency_module.bin.is_none();
-                            }
-                        }
-                        true
+                        !self.options.ignore_bin_package || !is_bin_dependency(&directory, dependency)
                     })
                     .collect();
 
@@ -223,15 +215,7 @@ impl CheckResult {
                             .contains_key(dependency.as_str())
                 })
                 .filter(|(dependency, _)| {
-                    if self.options.ignore_bin_package {
-                        let dependency_module =
-                            load_module(&self.directory.join("node_modules").join(&dependency));
-
-                        if let Ok(dependency_module) = dependency_module {
-                            return dependency_module.bin.is_none();
-                        }
-                    }
-                    true
+                    !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
                 })
                 .map(|(dependency, files)| (dependency.as_str(), files))
                 .collect()
@@ -245,19 +229,7 @@ impl CheckResult {
             .into_iter()
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
-                if self.options.ignore_bin_package {
-                    let dependency_module = load_module(
-                        &self
-                            .directory
-                            .join("node_modules")
-                            .join(dependency.as_str()),
-                    );
-
-                    if let Ok(dependency_module) = dependency_module {
-                        return dependency_module.bin.is_none();
-                    }
-                }
-                true
+                !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
             })
             .map(|v| v.as_str())
             .collect()
@@ -271,21 +243,24 @@ impl CheckResult {
             .into_iter()
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
-                if self.options.ignore_bin_package {
-                    let dependency_module = load_module(
-                        &self
-                            .directory
-                            .join("node_modules")
-                            .join(dependency.as_str()),
-                    );
-
-                    if let Ok(dependency_module) = dependency_module {
-                        return dependency_module.bin.is_none();
-                    }
-                }
-                true
+                !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
             })
             .map(|v| v.as_str())
             .collect()
+    }
+}
+
+fn is_bin_dependency(directory: &Path, dependency: &str) -> bool {
+    let dependency_module = load_module(
+        &directory
+            .join("node_modules")
+            .join(dependency),
+    );
+
+    match dependency_module {
+        Ok(dependency_module) => {
+            dependency_module.bin.is_some()
+        }
+        Err(_) => false
     }
 }
