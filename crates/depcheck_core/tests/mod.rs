@@ -1055,12 +1055,10 @@ fn test_require_dynamic() {
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
-        using_dependencies: BTreeMap::from([
-            (
-                String::from("dynamic"),
-                [RelativePathBuf::from("index.js")].into_iter().collect(),
-            ),
-        ]),
+        using_dependencies: BTreeMap::from([(
+            String::from("dynamic"),
+            [RelativePathBuf::from("index.js")].into_iter().collect(),
+        )]),
         ..Default::default()
     };
 
