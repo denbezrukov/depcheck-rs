@@ -4,6 +4,7 @@ use regex::RegexSet;
 pub struct CheckerOptions {
     pub ignore_bin_package: bool,
     pub ignore_patterns: Vec<&'static str>,
+    pub ignore_matches: Vec<&'static str>,
     pub skip_missing: bool,
 }
 
@@ -40,6 +41,7 @@ impl Default for CheckerOptions {
             ignore_patterns,
             skip_missing: Default::default(),
             ignore_bin_package: Default::default(),
+            ignore_matches: Default::default(),
         }
     }
 }
@@ -47,6 +49,10 @@ impl Default for CheckerOptions {
 impl CheckerOptions {
     pub fn get_ignore_patterns(&self) -> RegexSet {
         RegexSet::new(&self.ignore_patterns).unwrap()
+    }
+
+    pub fn get_ignore_matches(&self) -> RegexSet {
+        RegexSet::new(&self.ignore_matches).unwrap()
     }
 }
 

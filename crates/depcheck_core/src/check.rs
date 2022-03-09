@@ -202,6 +202,12 @@ impl CheckResult {
             self.using_dependencies
                 .iter()
                 .filter(|(dependency, _)| {
+                    !self
+                        .options
+                        .get_ignore_matches()
+                        .is_match(dependency.as_str())
+                })
+                .filter(|(dependency, _)| {
                     !self.package.dependencies.contains_key(dependency.as_str())
                         && !self
                             .package
@@ -230,6 +236,12 @@ impl CheckResult {
             .dependencies
             .keys()
             .into_iter()
+            .filter(|dependency| {
+                !self
+                    .options
+                    .get_ignore_matches()
+                    .is_match(dependency.as_str())
+            })
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
                 !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
@@ -243,6 +255,12 @@ impl CheckResult {
             .dev_dependencies
             .keys()
             .into_iter()
+            .filter(|dependency| {
+                !self
+                    .options
+                    .get_ignore_matches()
+                    .is_match(dependency.as_str())
+            })
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
                 !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
