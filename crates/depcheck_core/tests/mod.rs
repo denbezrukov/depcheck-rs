@@ -1087,7 +1087,9 @@ fn test_ignore_matches_for_missing() {
     let path = get_module_path("missing_ignore");
 
     let checker = Checker::new(CheckerOptions {
-        ignore_matches: vec![r"missing-ignore-[^n][^o][^t]", /*r"!missing-ignore-not"*/], //TODO https://github.com/isaacs/minimatch
+        ignore_matches: vec![
+            r"missing-ignore-[^n][^o][^t]", /*r"!missing-ignore-not"*/
+        ], //TODO https://github.com/isaacs/minimatch
         ..Default::default()
     });
     let actual = checker.check_package(path).unwrap();
