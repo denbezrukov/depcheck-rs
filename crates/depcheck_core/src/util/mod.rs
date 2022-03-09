@@ -1,5 +1,6 @@
-pub mod extract_package_name;
-pub mod extract_type_name;
-pub mod is_core_module;
-pub mod is_module;
-pub mod load_module;
+pub(crate) mod extract_package_name;
+pub(crate) mod extract_type_name;
+pub(crate) mod is_bin_dependency;
+pub(crate) mod is_core_module;
+pub(crate) mod is_module;
+pub(crate) mod load_module;

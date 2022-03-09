@@ -12,6 +12,7 @@ use crate::package::{self, Error, Package};
 use crate::parsers::Parsers;
 use crate::util::extract_package_name::extract_package_name;
 use crate::util::extract_type_name::extract_type_name;
+use crate::util::is_bin_dependency::is_bin_dependency;
 use crate::util::is_core_module::is_core_module;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
@@ -225,9 +226,9 @@ impl CheckResult {
     }
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {
-        let package_dependencies: HashSet<&String> = self.package.dependencies.keys().collect();
-
-        package_dependencies
+        self.package
+            .dependencies
+            .keys()
             .into_iter()
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
@@ -238,10 +239,9 @@ impl CheckResult {
     }
 
     pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
-        let package_dev_dependencies: HashSet<&String> =
-            self.package.dev_dependencies.keys().collect();
-
-        package_dev_dependencies
+        self.package
+            .dev_dependencies
+            .keys()
             .into_iter()
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
@@ -249,14 +249,5 @@ impl CheckResult {
             })
             .map(|v| v.as_str())
             .collect()
-    }
-}
-
-fn is_bin_dependency(directory: &Path, dependency: &str) -> bool {
-    let dependency_module = load_module(&directory.join("node_modules").join(dependency));
-
-    match dependency_module {
-        Ok(dependency_module) => dependency_module.bin.is_some(),
-        Err(_) => false,
     }
 }
