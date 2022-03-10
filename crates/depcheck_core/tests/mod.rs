@@ -937,10 +937,8 @@ fn test_empty_dep() {
 fn test_bin_js() {
     let path = get_module_path("bin_js");
 
-    let checker = Checker::new(CheckerOptions {
-        ignore_bin_package: true,
-        ..CheckerOptions::default()
-    });
+    let options = CheckerOptions::default().with_ignore_bin_package(true);
+    let checker = Checker::new(options);
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
@@ -994,10 +992,8 @@ fn test_good_ignore_bin_package_true() {
 fn test_skip_missing_true() {
     let path = get_module_path("missing");
 
-    let checker = Checker::new(CheckerOptions {
-        skip_missing: true,
-        ..Default::default()
-    });
+    let options = CheckerOptions::default().with_skip_missing(true);
+    let checker = Checker::new(options);
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
@@ -1069,10 +1065,8 @@ fn test_require_dynamic() {
 fn test_ignore_matches() {
     let path = get_module_path("bad");
 
-    let checker = Checker::new(CheckerOptions {
-        ignore_matches: vec![r"o*"],
-        ..Default::default()
-    });
+    let options = CheckerOptions::default().with_ignore_patterns(vec![String::from(r"o*")]);
+    let checker = Checker::new(options);
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
@@ -1086,12 +1080,10 @@ fn test_ignore_matches() {
 fn test_ignore_matches_for_missing() {
     let path = get_module_path("missing_ignore");
 
-    let checker = Checker::new(CheckerOptions {
-        ignore_matches: vec![
-            r"missing-ignore-[^n][^o][^t]", /*r"!missing-ignore-not"*/
-        ], //TODO https://github.com/isaacs/minimatch
-        ..Default::default()
-    });
+    let options = CheckerOptions::default().with_ignore_matches(vec![
+        String::from(r"missing-ignore-[^n][^o][^t]"), /*r"!missing-ignore-not"*/ //TODO https://github.com/isaacs/minimatch
+    ]);
+    let checker = Checker::new(options);
     let actual = checker.check_package(path).unwrap();
 
     let missing_files = [RelativePathBuf::from("index.js")].into_iter().collect();

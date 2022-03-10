@@ -53,7 +53,6 @@ const CORE_MODULES: [&str; 52] = [
     "zlib",
 ];
 
-
 pub fn is_core_module(module: &str) -> bool {
     CORE_MODULES.contains(&module)
 }

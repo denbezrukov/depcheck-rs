@@ -3,14 +3,14 @@ use regex::RegexSet;
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct CheckerOptions {
     pub ignore_bin_package: bool,
-    pub ignore_patterns: Vec<&'static str>,
-    pub ignore_matches: Vec<&'static str>,
+    pub ignore_patterns: Vec<String>,
+    pub ignore_matches: Vec<String>,
     pub skip_missing: bool,
 }
 
 impl Default for CheckerOptions {
     fn default() -> Self {
-        let ignore_patterns = vec![
+        let ignore_patterns = [
             r"\.git$",
             r"\.svn$",
             r"\.hg$",
@@ -35,7 +35,10 @@ impl Default for CheckerOptions {
             r"\.gz$",
             // Videos
             r"\.mp4$",
-        ];
+        ]
+        .iter()
+        .to_owned()
+        .collect();
 
         CheckerOptions {
             ignore_patterns,
@@ -43,6 +46,28 @@ impl Default for CheckerOptions {
             ignore_bin_package: Default::default(),
             ignore_matches: Default::default(),
         }
+    }
+}
+
+impl CheckerOptions {
+    pub fn with_ignore_patterns(mut self, ignore_patterns: Vec<String>) -> Self {
+        self.ignore_patterns = ignore_patterns;
+        self
+    }
+
+    pub fn with_skip_missing(mut self, skip_missing: bool) -> Self {
+        self.skip_missing = skip_missing;
+        self
+    }
+
+    pub fn with_ignore_bin_package(mut self, ignore_bin_package: bool) -> Self {
+        self.ignore_bin_package = ignore_bin_package;
+        self
+    }
+
+    pub fn with_ignore_matches(mut self, ignore_matches: Vec<String>) -> Self {
+        self.ignore_matches = ignore_matches;
+        self
     }
 }
 
