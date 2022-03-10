@@ -36,8 +36,8 @@ impl Default for CheckerOptions {
             // Videos
             r"\.mp4$",
         ]
-        .iter()
-        .to_owned()
+        .into_iter()
+        .map(String::from)
         .collect();
 
         CheckerOptions {

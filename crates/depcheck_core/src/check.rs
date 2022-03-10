@@ -8,8 +8,8 @@ use swc_ecma_parser::Syntax;
 use walkdir::WalkDir;
 
 use crate::options::CheckerOptions;
-use crate::package::{self, Error, Package};
-use crate::parsers::Parsers;
+use crate::package::{self, Package};
+use crate::parser::Parser;
 use crate::util::extract_package_name::extract_package_name;
 use crate::util::extract_type_name::extract_type_name;
 use crate::util::is_bin_dependency::is_bin_dependency;
@@ -20,7 +20,7 @@ use std::iter;
 
 pub struct Checker {
     options: CheckerOptions,
-    parsers: Parsers,
+    parsers: Parser,
 }
 
 impl Default for Checker {

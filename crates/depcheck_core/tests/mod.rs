@@ -1065,7 +1065,7 @@ fn test_require_dynamic() {
 fn test_ignore_matches() {
     let path = get_module_path("bad");
 
-    let options = CheckerOptions::default().with_ignore_patterns(vec![String::from(r"o*")]);
+    let options = CheckerOptions::default().with_ignore_matches(vec![String::from(r"o*")]);
     let checker = Checker::new(options);
     let actual = checker.check_package(path).unwrap();
 
