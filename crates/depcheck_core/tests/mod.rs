@@ -6,6 +6,7 @@ use relative_path::RelativePathBuf;
 
 use depckeck_core::check::{CheckResult, Checker};
 use depckeck_core::options::CheckerOptions;
+use pretty_assertions::{assert_eq};
 
 #[derive(Default)]
 struct ExpectedCheckResult<'a> {
