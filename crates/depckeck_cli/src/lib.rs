@@ -1,4 +1,4 @@
-use clap::{crate_version, App, AppSettings, Arg};
+use clap::{crate_version, App, Arg};
 
 pub fn run_cli() {
     let matches = App::new("depcheck")
