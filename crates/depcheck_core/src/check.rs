@@ -18,18 +18,10 @@ use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 use std::iter;
 
+#[derive(Default)]
 pub struct Checker {
     options: CheckerOptions,
     parsers: Parser,
-}
-
-impl Default for Checker {
-    fn default() -> Self {
-        Checker {
-            options: Default::default(),
-            parsers: Default::default(),
-        }
-    }
 }
 
 impl Checker {
@@ -53,7 +45,7 @@ impl Checker {
             dependencies.iter().for_each(|dependency| {
                 let files = using_dependencies
                     .entry(dependency.clone())
-                    .or_insert(HashSet::with_capacity(100));
+                    .or_insert_with(|| HashSet::with_capacity(100));
                 files.insert(path.clone());
             })
         });
@@ -85,7 +77,7 @@ impl Checker {
                         .is_match(file_name.as_ref())
                         && !is_module(entry.path()))
             })
-            .filter_map(|entry| Result::ok(entry))
+            .filter_map(Result::ok)
             .filter(|dir_entry| dir_entry.file_type().is_file())
             .filter_map(|file| {
                 self.parsers
@@ -100,10 +92,7 @@ impl Checker {
                         let path = PathBuf::from(&dependency.specifier.to_string());
                         let root = path.components().next();
 
-                        match root {
-                            Some(Component::Normal(_)) => true,
-                            _ => false,
-                        }
+                        matches!(root, Some(Component::Normal(_)))
                     })
                     .flat_map(|dependency| {
                         let name = extract_package_name(&dependency.specifier).unwrap();
@@ -131,7 +120,7 @@ impl Checker {
                             _ => vec![name],
                         }
                     })
-                    .filter_map(|dependency| {
+                    .flat_map(|dependency| {
                         let dependency_module =
                             load_module(&directory.join("node_modules").join(&dependency));
                         let dependencies = match dependency_module {
@@ -166,13 +155,12 @@ impl Checker {
                             }
                         };
 
-                        Some(dependencies)
+                        dependencies
                     })
-                    .flatten()
                     .filter(|dependency| !is_core_module(dependency))
                     .filter(|dependency| {
                         !self.options.ignore_bin_package
-                            || !is_bin_dependency(&directory, dependency)
+                            || !is_bin_dependency(directory, dependency)
                     })
                     .collect();
 
@@ -180,7 +168,7 @@ impl Checker {
                     RelativePathBuf::from_path(file.path().strip_prefix(directory).unwrap())
                         .unwrap();
 
-                (relative_file_path.to_owned(), file_dependencies)
+                (relative_file_path, file_dependencies)
             })
             .collect()
     }

@@ -32,14 +32,20 @@ jobs:
           profile: minimal
           toolchain: stable
           override: true
-          components: rustfmt
+          components: rustfmt, clippy
 
       - name: cargo fmt --check
         uses: actions-rs/cargo@v1
         with:
           command: fmt
           args: --all -- --check
-          
+
+      - name: cargo clippy
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+          args: --lib --tests --examples --features 'runtime, stream, tcp' -- -D warnings
+
   build:
     name: Build
     runs-on: ubuntu-latest
