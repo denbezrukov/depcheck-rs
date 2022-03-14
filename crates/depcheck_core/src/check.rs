@@ -74,6 +74,7 @@ impl Checker {
                     || (!self
                         .options
                         .get_ignore_patterns()
+                        .unwrap()
                         .is_match(file_name.as_ref())
                         && !is_module(entry.path()))
             })
