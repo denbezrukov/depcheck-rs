@@ -44,7 +44,7 @@ jobs:
         uses: actions-rs/cargo@v1
         with:
           command: clippy
-          args: --lib --tests -- -D warnings
+          args: -D warnings
 
   build:
     name: Build
