@@ -69,7 +69,7 @@ impl Checker {
         WalkDir::new(directory)
             .into_iter()
             .filter_entry(|entry| {
-                let is_root_directory = entry.path() == directory;
+                let is_root_directory = entry.depth() == 0;
                 let file_name = entry.file_name().to_string_lossy();
                 is_root_directory
                     || (!ignore_patterns.is_match(file_name.as_ref()) && !is_module(entry.path()))
