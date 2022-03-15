@@ -939,7 +939,7 @@ fn test_bin_js() {
     let path = get_module_path("bin_js");
 
     let options = CheckerOptions::default().with_ignore_bin_package(true);
-    let checker = Checker::new(options);
+    let checker = Checker::new().with_options(options);
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
@@ -994,7 +994,7 @@ fn test_skip_missing_true() {
     let path = get_module_path("missing");
 
     let options = CheckerOptions::default().with_skip_missing(true);
-    let checker = Checker::new(options);
+    let checker = Checker::new().with_options(options);
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
@@ -1067,7 +1067,7 @@ fn test_ignore_matches() {
     let path = get_module_path("bad");
 
     let options = CheckerOptions::default().with_ignore_matches(vec![String::from(r"o*")]);
-    let checker = Checker::new(options);
+    let checker = Checker::new().with_options(options);
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
@@ -1084,7 +1084,7 @@ fn test_ignore_matches_for_missing() {
     let options = CheckerOptions::default().with_ignore_matches(vec![
         String::from(r"missing-ignore-[^n][^o][^t]"), /*r"!missing-ignore-not"*/ //TODO https://github.com/isaacs/minimatch
     ]);
-    let checker = Checker::new(options);
+    let checker = Checker::new().with_options(options);
     let actual = checker.check_package(path).unwrap();
 
     let missing_files = [RelativePathBuf::from("index.js")].into_iter().collect();
@@ -1106,6 +1106,120 @@ fn test_ignore_matches_for_missing() {
             (
                 String::from("missing-ignore-not"),
                 [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_jsx() {
+    let path = get_module_path("jsx");
+
+    let checker = Checker::new();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([(
+            String::from("react"),
+            [RelativePathBuf::from("index.jsx")].into_iter().collect(),
+        )]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_jsx_js() {
+    let path = get_module_path("jsx_js");
+
+    let checker = Checker::new();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("react"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("jsx-as-js"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_scoped_module() {
+    let path = get_module_path("scoped_module");
+
+    let checker = Checker::new();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["@unused/package"].into_iter().collect(),
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("@owner/package"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("@secondowner/package"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("@org/parent"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("name-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+            (
+                String::from("child-import"),
+                [RelativePathBuf::from("index.js")].into_iter().collect(),
+            ),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_ignore_number() {
+    let path = get_module_path("ignore_number");
+
+    let checker = Checker::new();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        unused_dependencies: ["number"].into_iter().collect(),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
+
+#[test]
+fn test_decorators() {
+    let path = get_module_path("decorators");
+
+    let checker = Checker::new();
+    let actual = checker.check_package(path).unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (
+                String::from("mobx"),
+                [RelativePathBuf::from("index.tsx")].into_iter().collect(),
             ),
         ]),
         ..Default::default()

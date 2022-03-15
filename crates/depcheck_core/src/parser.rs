@@ -19,10 +19,12 @@ impl Parser {
             "ts" | "tsx" => Syntax::Typescript(TsConfig {
                 tsx: true,
                 dts: true,
+                decorators: true,
                 ..Default::default()
             }),
             "js" | "jsx" => Syntax::Es(EsConfig {
                 jsx: true,
+                decorators: true,
                 ..Default::default()
             }),
             _ => return None,

@@ -25,11 +25,13 @@ pub struct Checker {
 }
 
 impl Checker {
-    pub fn new(options: CheckerOptions) -> Self {
-        Checker {
-            options,
-            ..Default::default()
-        }
+    pub fn new() -> Self {
+        Default::default()
+    }
+
+    pub fn with_options(mut self, options: CheckerOptions) -> Self {
+        self.options = options;
+        self
     }
 }
 
