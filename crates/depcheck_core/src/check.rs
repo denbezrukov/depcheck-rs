@@ -64,7 +64,10 @@ impl Checker {
         package: &Package,
     ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
         let comments = SingleThreadedComments::default();
-        let ignore_patterns = self.options.get_ignore_patterns().unwrap();
+        let ignore_patterns = self
+            .options
+            .get_ignore_patterns()
+            .expect("Can't get ignore patterns");
 
         WalkDir::new(directory)
             .into_iter()
@@ -184,7 +187,10 @@ impl CheckResult {
         if self.options.skip_missing() {
             Default::default()
         } else {
-            let ignore_matches = self.options.get_ignore_matches().unwrap();
+            let ignore_matches = self
+                .options
+                .get_ignore_matches()
+                .expect("Can't get ignore matches");
             self.using_dependencies
                 .iter()
                 .filter(|(dependency, _)| !ignore_matches.is_match(dependency.as_str()))
@@ -213,7 +219,10 @@ impl CheckResult {
     }
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {
-        let ignore_matches = self.options.get_ignore_matches().unwrap();
+        let ignore_matches = self
+            .options
+            .get_ignore_matches()
+            .expect("Can't get ignore matches");
         self.package
             .dependencies
             .keys()
@@ -229,7 +238,10 @@ impl CheckResult {
     }
 
     pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
-        let ignore_matches = self.options.get_ignore_matches().unwrap();
+        let ignore_matches = self
+            .options
+            .get_ignore_matches()
+            .expect("Can't get ignore matches");
         self.package
             .dev_dependencies
             .keys()
