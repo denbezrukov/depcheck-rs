@@ -1216,12 +1216,10 @@ fn test_decorators() {
     let actual = checker.check_package(path).unwrap();
 
     let expected = ExpectedCheckResult {
-        using_dependencies: BTreeMap::from([
-            (
-                String::from("mobx"),
-                [RelativePathBuf::from("index.tsx")].into_iter().collect(),
-            ),
-        ]),
+        using_dependencies: BTreeMap::from([(
+            String::from("mobx"),
+            [RelativePathBuf::from("index.tsx")].into_iter().collect(),
+        )]),
         ..Default::default()
     };
 
