@@ -64,6 +64,7 @@ impl Checker {
         package: &Package,
     ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
         let comments = SingleThreadedComments::default();
+        let ignore_patterns = self.options.get_ignore_patterns().unwrap();
 
         WalkDir::new(directory)
             .into_iter()
@@ -71,12 +72,7 @@ impl Checker {
                 let is_root_directory = entry.path() == directory;
                 let file_name = entry.file_name().to_string_lossy();
                 is_root_directory
-                    || (!self
-                        .options
-                        .get_ignore_patterns()
-                        .unwrap()
-                        .is_match(file_name.as_ref())
-                        && !is_module(entry.path()))
+                    || (!ignore_patterns.is_match(file_name.as_ref()) && !is_module(entry.path()))
             })
             .filter_map(Result::ok)
             .filter(|dir_entry| dir_entry.file_type().is_file())
@@ -160,7 +156,7 @@ impl Checker {
                     })
                     .filter(|dependency| !is_core_module(dependency))
                     .filter(|dependency| {
-                        !self.options.ignore_bin_package
+                        !self.options.ignore_bin_package()
                             || !is_bin_dependency(directory, dependency)
                     })
                     .collect();
@@ -185,17 +181,13 @@ pub struct CheckResult {
 
 impl CheckResult {
     pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
-        if self.options.skip_missing {
+        if self.options.skip_missing() {
             Default::default()
         } else {
+            let ignore_matches = self.options.get_ignore_matches().unwrap();
             self.using_dependencies
                 .iter()
-                .filter(|(dependency, _)| {
-                    !self
-                        .options
-                        .get_ignore_matches()
-                        .is_match(dependency.as_str())
-                })
+                .filter(|(dependency, _)| !ignore_matches.is_match(dependency.as_str()))
                 .filter(|(dependency, _)| {
                     !self.package.dependencies.contains_key(dependency.as_str())
                         && !self
@@ -212,7 +204,7 @@ impl CheckResult {
                             .contains_key(dependency.as_str())
                 })
                 .filter(|(dependency, _)| {
-                    !self.options.ignore_bin_package
+                    !self.options.ignore_bin_package()
                         || !is_bin_dependency(&self.directory, dependency)
                 })
                 .map(|(dependency, files)| (dependency.as_str(), files))
@@ -221,38 +213,32 @@ impl CheckResult {
     }
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {
+        let ignore_matches = self.options.get_ignore_matches().unwrap();
         self.package
             .dependencies
             .keys()
             .into_iter()
-            .filter(|dependency| {
-                !self
-                    .options
-                    .get_ignore_matches()
-                    .is_match(dependency.as_str())
-            })
+            .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
-                !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
+                !self.options.ignore_bin_package()
+                    || !is_bin_dependency(&self.directory, dependency)
             })
             .map(|v| v.as_str())
             .collect()
     }
 
     pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
+        let ignore_matches = self.options.get_ignore_matches().unwrap();
         self.package
             .dev_dependencies
             .keys()
             .into_iter()
-            .filter(|dependency| {
-                !self
-                    .options
-                    .get_ignore_matches()
-                    .is_match(dependency.as_str())
-            })
+            .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
-                !self.options.ignore_bin_package || !is_bin_dependency(&self.directory, dependency)
+                !self.options.ignore_bin_package()
+                    || !is_bin_dependency(&self.directory, dependency)
             })
             .map(|v| v.as_str())
             .collect()

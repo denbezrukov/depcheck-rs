@@ -1,12 +1,11 @@
 use globset::{self, Glob, GlobSet, GlobSetBuilder};
-use regex::RegexSet;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct CheckerOptions {
-    pub ignore_bin_package: bool,
-    pub ignore_patterns: Vec<String>,
-    pub ignore_matches: Vec<String>,
-    pub skip_missing: bool,
+    ignore_bin_package: bool,
+    ignore_patterns: Vec<String>,
+    ignore_matches: Vec<String>,
+    skip_missing: bool,
 }
 
 impl Default for CheckerOptions {
@@ -70,6 +69,14 @@ impl CheckerOptions {
         self.ignore_matches = ignore_matches;
         self
     }
+
+    pub fn ignore_bin_package(&self) -> bool {
+        self.ignore_bin_package
+    }
+
+    pub fn skip_missing(&self) -> bool {
+        self.skip_missing
+    }
 }
 
 impl CheckerOptions {
@@ -83,8 +90,14 @@ impl CheckerOptions {
         builder.build()
     }
 
-    pub fn get_ignore_matches(&self) -> RegexSet {
-        RegexSet::new(&self.ignore_matches).unwrap()
+    pub fn get_ignore_matches(&self) -> Result<GlobSet, globset::Error> {
+        let mut builder = GlobSetBuilder::new();
+
+        for pattern in &self.ignore_matches {
+            builder.add(Glob::new(pattern.as_str())?);
+        }
+
+        builder.build()
     }
 }
 
