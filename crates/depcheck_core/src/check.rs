@@ -1,11 +1,12 @@
 use std::collections::{BTreeMap, HashSet};
+use std::iter;
 use std::path::{Component, Path, PathBuf};
 
+use ignore::{self, WalkBuilder};
 use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
 use swc_ecma_dep_graph::{analyze_dependencies, DependencyKind};
 use swc_ecma_parser::Syntax;
-use walkdir::WalkDir;
 
 use crate::options::CheckerOptions;
 use crate::package::{self, Package};
@@ -16,7 +17,6 @@ use crate::util::is_bin_dependency::is_bin_dependency;
 use crate::util::is_core_module::is_core_module;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
-use std::iter;
 
 #[derive(Default)]
 pub struct Checker {
@@ -71,16 +71,35 @@ impl Checker {
             .get_ignore_patterns()
             .expect("Can't get ignore patterns");
 
-        WalkDir::new(directory)
+        let mut walker = WalkBuilder::new(directory);
+
+        walker.filter_entry(move |entry| {
+            let is_root_directory = entry.depth() == 0;
+            let file_name = entry.file_name().to_string_lossy();
+            is_root_directory
+                || (!ignore_patterns.is_match(file_name.as_ref()) && !is_module(entry.path()))
+        });
+        // walker
+        // .hidden(config.ignore_hidden)
+        // .ignore(config.read_fdignore)
+        // .parents(config.read_parent_ignore && (config.read_fdignore || config.read_vcsignore))
+        // .git_ignore(config.read_vcsignore)
+        // .git_global(config.read_vcsignore)
+        // .git_exclude(config.read_vcsignore)
+        // .overrides(overrides)
+        // .follow_links(config.follow_links)
+        // .same_file_system(config.one_file_system)
+        // .max_depth(config.max_depth);
+
+        let walker = walker.build();
+
+        walker
             .into_iter()
-            .filter_entry(|entry| {
-                let is_root_directory = entry.depth() == 0;
-                let file_name = entry.file_name().to_string_lossy();
-                is_root_directory
-                    || (!ignore_patterns.is_match(file_name.as_ref()) && !is_module(entry.path()))
+            .filter_map(|entry| Result::ok(entry))
+            .filter(|entry| match entry.file_type() {
+                Some(file_type) => file_type.is_file(),
+                _ => false,
             })
-            .filter_map(Result::ok)
-            .filter(|dir_entry| dir_entry.file_type().is_file())
             .filter_map(|file| {
                 self.parsers
                     .parse_file(file.path())
