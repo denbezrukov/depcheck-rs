@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, HashSet};
 use std::iter;
-use std::path::{Component, Path, PathBuf};
+use std::path::{Component, PathBuf};
 
 use ignore::overrides::OverrideBuilder;
 use ignore::{self, WalkBuilder};
@@ -19,28 +19,25 @@ use crate::util::is_core_module::is_core_module;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 
-#[derive(Default)]
 pub struct Checker {
     options: CheckerOptions,
     parsers: Parser,
 }
 
 impl Checker {
-    pub fn new() -> Self {
-        Default::default()
-    }
-
-    pub fn with_options(mut self, options: CheckerOptions) -> Self {
-        self.options = options;
-        self
+    pub fn new(options: CheckerOptions) -> Self {
+        Checker {
+            options,
+            parsers: Default::default(),
+        }
     }
 }
 
 impl Checker {
-    pub fn check_package(&self, directory: PathBuf) -> package::Result<CheckResult> {
-        let package = load_module(&directory)?;
+    pub fn check_package(&self) -> package::Result<CheckResult> {
+        let package = load_module(self.options.get_directory())?;
 
-        let dependencies = self.check_directory(&directory, &package);
+        let dependencies = self.check_directory(&package);
 
         let mut using_dependencies = BTreeMap::new();
 
@@ -55,17 +52,14 @@ impl Checker {
 
         Ok(CheckResult {
             package,
-            directory,
+            directory: self.options.get_directory().to_path_buf(),
             using_dependencies,
             options: self.options.clone(),
         })
     }
 
-    pub fn check_directory(
-        &self,
-        directory: &Path,
-        package: &Package,
-    ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
+    pub fn check_directory(&self, package: &Package) -> BTreeMap<RelativePathBuf, HashSet<String>> {
+        let directory = self.options.get_directory();
         let comments = SingleThreadedComments::default();
         let mut override_builder = OverrideBuilder::new(directory);
 
@@ -202,7 +196,7 @@ impl Checker {
     }
 }
 
-#[derive(Debug, Default, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub struct CheckResult {
     pub package: Package,
     pub directory: PathBuf,

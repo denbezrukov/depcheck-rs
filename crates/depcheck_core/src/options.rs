@@ -1,15 +1,17 @@
 use globset::{self, Glob, GlobSet, GlobSetBuilder};
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct CheckerOptions {
+    directory: PathBuf,
     ignore_bin_package: bool,
     ignore_patterns: Vec<String>,
     ignore_matches: Vec<String>,
     skip_missing: bool,
 }
 
-impl Default for CheckerOptions {
-    fn default() -> Self {
+impl CheckerOptions {
+    pub fn new(directory: PathBuf) -> Self {
         let ignore_patterns = [
             r".git",
             r".svn",
@@ -41,6 +43,7 @@ impl Default for CheckerOptions {
         .collect();
 
         CheckerOptions {
+            directory,
             ignore_patterns,
             skip_missing: Default::default(),
             ignore_bin_package: Default::default(),
@@ -92,5 +95,9 @@ impl CheckerOptions {
         }
 
         builder.build()
+    }
+
+    pub fn get_directory(&self) -> &Path {
+        &self.directory
     }
 }
