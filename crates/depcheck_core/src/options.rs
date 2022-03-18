@@ -80,14 +80,8 @@ impl CheckerOptions {
 }
 
 impl CheckerOptions {
-    pub fn get_ignore_patterns(&self) -> Result<GlobSet, globset::Error> {
-        let mut builder = GlobSetBuilder::new();
-
-        for pattern in &self.ignore_patterns {
-            builder.add(Glob::new(pattern.as_str())?);
-        }
-
-        builder.build()
+    pub fn get_ignore_patterns(&self) -> &Vec<String> {
+        &self.ignore_patterns
     }
 
     pub fn get_ignore_matches(&self) -> Result<GlobSet, globset::Error> {
@@ -98,78 +92,5 @@ impl CheckerOptions {
         }
 
         builder.build()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::CheckerOptions;
-
-    #[test]
-    fn should_ignore_png() {
-        let options = CheckerOptions::default();
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("image.png");
-        assert!(is_match);
-
-        let is_match = options
-            .get_ignore_patterns()
-            .unwrap()
-            .is_match("image.png.");
-        assert!(!is_match);
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("imagepng");
-        assert!(!is_match);
-    }
-
-    #[test]
-    fn should_ignore_node_modules() {
-        let options = CheckerOptions::default();
-
-        let is_match = options
-            .get_ignore_patterns()
-            .unwrap()
-            .is_match("node_modules");
-        assert!(is_match);
-
-        let is_match = options
-            .get_ignore_patterns()
-            .unwrap()
-            .is_match("node_module");
-        assert!(!is_match);
-
-        let is_match = options
-            .get_ignore_patterns()
-            .unwrap()
-            .is_match("ode_modules");
-        assert!(!is_match);
-    }
-
-    #[test]
-    fn should_ignore_dist() {
-        let options = CheckerOptions::default();
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("dist");
-        assert!(is_match);
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("distt");
-        assert!(!is_match);
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("ist");
-        assert!(!is_match);
-    }
-
-    #[test]
-    fn should_ignore_build() {
-        let options = CheckerOptions::default();
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("build");
-        assert!(is_match);
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("bbuild");
-        assert!(!is_match);
-
-        let is_match = options.get_ignore_patterns().unwrap().is_match("uild");
-        assert!(!is_match);
     }
 }

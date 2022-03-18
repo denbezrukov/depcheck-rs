@@ -2,6 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::iter;
 use std::path::{Component, Path, PathBuf};
 
+use ignore::overrides::OverrideBuilder;
 use ignore::{self, WalkBuilder};
 use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
@@ -66,19 +67,25 @@ impl Checker {
         package: &Package,
     ) -> BTreeMap<RelativePathBuf, HashSet<String>> {
         let comments = SingleThreadedComments::default();
-        let ignore_patterns = self
-            .options
-            .get_ignore_patterns()
-            .expect("Can't get ignore patterns");
+        let mut override_builder = OverrideBuilder::new(directory);
 
+        for pattern in self.options.get_ignore_patterns() {
+            override_builder
+                .add(&format!("!{}", pattern))
+                .map_err(|e| format!("Malformed exclude pattern: {}", e))
+                .unwrap();
+        }
+
+        let overrides = override_builder
+            .build()
+            .expect("Mismatch in exclude patterns");
         let mut walker = WalkBuilder::new(directory);
 
-        walker.filter_entry(move |entry| {
+        walker.overrides(overrides).filter_entry(move |entry| {
             let is_root_directory = entry.depth() == 0;
-            let file_name = entry.file_name().to_string_lossy();
-            is_root_directory
-                || (!ignore_patterns.is_match(file_name.as_ref()) && !is_module(entry.path()))
+            is_root_directory || !is_module(entry.path())
         });
+
         // walker
         // .hidden(config.ignore_hidden)
         // .ignore(config.read_fdignore)
@@ -95,7 +102,7 @@ impl Checker {
 
         walker
             .into_iter()
-            .filter_map(|entry| Result::ok(entry))
+            .filter_map(Result::ok)
             .filter(|entry| match entry.file_type() {
                 Some(file_type) => file_type.is_file(),
                 _ => false,
