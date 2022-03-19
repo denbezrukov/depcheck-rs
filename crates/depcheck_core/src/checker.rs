@@ -10,7 +10,7 @@ use swc_ecma_dep_graph::{analyze_dependencies, DependencyKind};
 use swc_ecma_parser::Syntax;
 
 use crate::config::Config;
-use crate::package::{self, Package};
+use crate::package::{self, DepsSet, Package};
 use crate::parser::Parser;
 use crate::util::extract_package_name::extract_package_name;
 use crate::util::extract_type_name::extract_type_name;
@@ -233,30 +233,19 @@ impl CheckResult {
     }
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {
-        let ignore_matches = self
-            .config
-            .get_ignore_matches()
-            .expect("Can't get ignore matches");
-        self.package
-            .dependencies
-            .keys()
-            .into_iter()
-            .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
-            .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
-            .filter(|dependency| {
-                !self.config.ignore_bin_package() || !is_bin_dependency(&self.directory, dependency)
-            })
-            .map(|v| v.as_str())
-            .collect()
+        self.filter_dependencies(&self.package.dependencies)
     }
 
     pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
+        self.filter_dependencies(&self.package.dev_dependencies)
+    }
+
+    fn filter_dependencies<'a>(&self, dependencies: &'a DepsSet) -> HashSet<&'a str> {
         let ignore_matches = self
             .config
             .get_ignore_matches()
             .expect("Can't get ignore matches");
-        self.package
-            .dev_dependencies
+        dependencies
             .keys()
             .into_iter()
             .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
