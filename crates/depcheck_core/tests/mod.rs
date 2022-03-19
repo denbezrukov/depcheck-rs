@@ -4,7 +4,7 @@ use std::path::PathBuf;
 
 use relative_path::RelativePathBuf;
 
-use depckeck_core::check::{CheckResult, Checker};
+use depckeck_core::checker::{CheckResult, Checker};
 use depckeck_core::config::Config;
 use pretty_assertions::assert_eq;
 

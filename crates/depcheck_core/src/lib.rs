@@ -1,4 +1,4 @@
-pub mod check;
+pub mod checker;
 pub mod config;
 pub mod package;
 pub mod parser;

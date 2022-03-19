@@ -27,7 +27,7 @@ pub struct Checker {
 impl Checker {
     pub fn new(config: Config) -> Self {
         Checker {
-            config: config,
+            config,
             parsers: Default::default(),
         }
     }
