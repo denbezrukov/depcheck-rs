@@ -233,27 +233,27 @@ impl CheckResult {
     }
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {
-        self.filter_dependencies(&self.package.dependencies)
+        self.filter_unused_dependencies(&self.package.dependencies)
     }
 
     pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
-        self.filter_dependencies(&self.package.dev_dependencies)
+        self.filter_unused_dependencies(&self.package.dev_dependencies)
     }
 
-    fn filter_dependencies<'a>(&self, dependencies: &'a DepsSet) -> HashSet<&'a str> {
+    fn filter_unused_dependencies<'a>(&self, dependencies: &'a DepsSet) -> HashSet<&'a str> {
         let ignore_matches = self
             .config
             .get_ignore_matches()
             .expect("Can't get ignore matches");
+
         dependencies
-            .keys()
-            .into_iter()
-            .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
-            .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
-            .filter(|dependency| {
+            .iter()
+            .filter(|(dependency, _)| !ignore_matches.is_match(dependency.as_str()))
+            .filter(|(dependency, _)| !self.using_dependencies.contains_key(dependency.as_str()))
+            .filter(|(dependency, _)| {
                 !self.config.ignore_bin_package() || !is_bin_dependency(&self.directory, dependency)
             })
-            .map(|v| v.as_str())
+            .map(|(dependency, _)| dependency.as_str())
             .collect()
     }
 }
