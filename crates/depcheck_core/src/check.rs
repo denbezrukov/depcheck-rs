@@ -9,7 +9,7 @@ use swc_common::comments::SingleThreadedComments;
 use swc_ecma_dep_graph::{analyze_dependencies, DependencyKind};
 use swc_ecma_parser::Syntax;
 
-use crate::options::CheckerOptions;
+use crate::config::Config;
 use crate::package::{self, Package};
 use crate::parser::Parser;
 use crate::util::extract_package_name::extract_package_name;
@@ -20,14 +20,14 @@ use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 
 pub struct Checker {
-    options: CheckerOptions,
+    config: Config,
     parsers: Parser,
 }
 
 impl Checker {
-    pub fn new(options: CheckerOptions) -> Self {
+    pub fn new(config: Config) -> Self {
         Checker {
-            options,
+            config: config,
             parsers: Default::default(),
         }
     }
@@ -35,7 +35,7 @@ impl Checker {
 
 impl Checker {
     pub fn check_package(&self) -> package::Result<CheckResult> {
-        let package = load_module(self.options.get_directory())?;
+        let package = load_module(self.config.get_directory())?;
 
         let dependencies = self.check_directory(&package);
 
@@ -52,18 +52,18 @@ impl Checker {
 
         Ok(CheckResult {
             package,
-            directory: self.options.get_directory().to_path_buf(),
+            directory: self.config.get_directory().to_path_buf(),
             using_dependencies,
-            options: self.options.clone(),
+            config: self.config.clone(),
         })
     }
 
     pub fn check_directory(&self, package: &Package) -> BTreeMap<RelativePathBuf, HashSet<String>> {
-        let directory = self.options.get_directory();
+        let directory = self.config.get_directory();
         let comments = SingleThreadedComments::default();
         let mut override_builder = OverrideBuilder::new(directory);
 
-        for pattern in self.options.get_ignore_patterns() {
+        for pattern in self.config.get_ignore_patterns() {
             override_builder
                 .add(&format!("!{}", pattern))
                 .map_err(|e| format!("Malformed exclude pattern: {}", e))
@@ -80,17 +80,9 @@ impl Checker {
             is_root_directory || !is_module(entry.path())
         });
 
-        // walker
-        // .hidden(config.ignore_hidden)
-        // .ignore(config.read_fdignore)
-        // .parents(config.read_parent_ignore && (config.read_fdignore || config.read_vcsignore))
-        // .git_ignore(config.read_vcsignore)
-        // .git_global(config.read_vcsignore)
-        // .git_exclude(config.read_vcsignore)
-        // .overrides(overrides)
-        // .follow_links(config.follow_links)
-        // .same_file_system(config.one_file_system)
-        // .max_depth(config.max_depth);
+        if self.config.read_depcheckignore() {
+            walker.add_custom_ignore_filename(".depcheckignore");
+        }
 
         let walker = walker.build();
 
@@ -181,7 +173,7 @@ impl Checker {
                     })
                     .filter(|dependency| !is_core_module(dependency))
                     .filter(|dependency| {
-                        !self.options.ignore_bin_package()
+                        !self.config.ignore_bin_package()
                             || !is_bin_dependency(directory, dependency)
                     })
                     .collect();
@@ -201,16 +193,16 @@ pub struct CheckResult {
     pub package: Package,
     pub directory: PathBuf,
     pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
-    pub options: CheckerOptions,
+    pub config: Config,
 }
 
 impl CheckResult {
     pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
-        if self.options.skip_missing() {
+        if self.config.skip_missing() {
             Default::default()
         } else {
             let ignore_matches = self
-                .options
+                .config
                 .get_ignore_matches()
                 .expect("Can't get ignore matches");
             self.using_dependencies
@@ -232,7 +224,7 @@ impl CheckResult {
                             .contains_key(dependency.as_str())
                 })
                 .filter(|(dependency, _)| {
-                    !self.options.ignore_bin_package()
+                    !self.config.ignore_bin_package()
                         || !is_bin_dependency(&self.directory, dependency)
                 })
                 .map(|(dependency, files)| (dependency.as_str(), files))
@@ -242,7 +234,7 @@ impl CheckResult {
 
     pub fn get_unused_dependencies(&self) -> HashSet<&str> {
         let ignore_matches = self
-            .options
+            .config
             .get_ignore_matches()
             .expect("Can't get ignore matches");
         self.package
@@ -252,8 +244,7 @@ impl CheckResult {
             .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
-                !self.options.ignore_bin_package()
-                    || !is_bin_dependency(&self.directory, dependency)
+                !self.config.ignore_bin_package() || !is_bin_dependency(&self.directory, dependency)
             })
             .map(|v| v.as_str())
             .collect()
@@ -261,7 +252,7 @@ impl CheckResult {
 
     pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
         let ignore_matches = self
-            .options
+            .config
             .get_ignore_matches()
             .expect("Can't get ignore matches");
         self.package
@@ -271,8 +262,7 @@ impl CheckResult {
             .filter(|dependency| !ignore_matches.is_match(dependency.as_str()))
             .filter(|dependency| !self.using_dependencies.contains_key(dependency.as_str()))
             .filter(|dependency| {
-                !self.options.ignore_bin_package()
-                    || !is_bin_dependency(&self.directory, dependency)
+                !self.config.ignore_bin_package() || !is_bin_dependency(&self.directory, dependency)
             })
             .map(|v| v.as_str())
             .collect()

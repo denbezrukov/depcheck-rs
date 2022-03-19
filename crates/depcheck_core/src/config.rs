@@ -2,15 +2,16 @@ use globset::{self, Glob, GlobSet, GlobSetBuilder};
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
-pub struct CheckerOptions {
+pub struct Config {
     directory: PathBuf,
     ignore_bin_package: bool,
     ignore_patterns: Vec<String>,
     ignore_matches: Vec<String>,
     skip_missing: bool,
+    read_depcheckignore: bool,
 }
 
-impl CheckerOptions {
+impl Config {
     pub fn new(directory: PathBuf) -> Self {
         let ignore_patterns = [
             r".git",
@@ -42,17 +43,18 @@ impl CheckerOptions {
         .map(String::from)
         .collect();
 
-        CheckerOptions {
+        Config {
             directory,
             ignore_patterns,
-            skip_missing: Default::default(),
-            ignore_bin_package: Default::default(),
-            ignore_matches: Default::default(),
+            skip_missing: false,
+            ignore_bin_package: false,
+            ignore_matches: Vec::new(),
+            read_depcheckignore: false,
         }
     }
 }
 
-impl CheckerOptions {
+impl Config {
     pub fn with_ignore_patterns(mut self, ignore_patterns: Vec<String>) -> Self {
         self.ignore_patterns = ignore_patterns;
         self
@@ -73,6 +75,11 @@ impl CheckerOptions {
         self
     }
 
+    pub fn with_read_depcheckignore(mut self, read_depcheckignore: bool) -> Self {
+        self.read_depcheckignore = read_depcheckignore;
+        self
+    }
+
     pub fn ignore_bin_package(&self) -> bool {
         self.ignore_bin_package
     }
@@ -80,9 +87,13 @@ impl CheckerOptions {
     pub fn skip_missing(&self) -> bool {
         self.skip_missing
     }
+
+    pub fn read_depcheckignore(&self) -> bool {
+        self.read_depcheckignore
+    }
 }
 
-impl CheckerOptions {
+impl Config {
     pub fn get_ignore_patterns(&self) -> &Vec<String> {
         &self.ignore_patterns
     }
