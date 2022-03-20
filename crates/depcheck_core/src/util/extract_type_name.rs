@@ -14,6 +14,5 @@ pub fn extract_type_name(path: &str) -> String {
         }
         None => path.to_string(),
     };
-
-    "@types/".to_string() + path.as_str()
+    format!("@types/{path}")
 }

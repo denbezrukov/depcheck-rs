@@ -1,21 +1,17 @@
 use std::collections::{BTreeMap, HashSet};
-use std::iter;
-use std::path::{Component, PathBuf};
+use std::path::PathBuf;
 
 use ignore::overrides::OverrideBuilder;
 use ignore::{self, WalkBuilder};
 use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
-use swc_ecma_dep_graph::{analyze_dependencies, DependencyKind};
-use swc_ecma_parser::Syntax;
+use swc_ecma_dep_graph::analyze_dependencies;
 
 use crate::config::Config;
+use crate::dependency::Dependency;
 use crate::package::{self, DepsSet, Package};
 use crate::parser::Parser;
-use crate::util::extract_package_name::extract_package_name;
-use crate::util::extract_type_name::extract_type_name;
 use crate::util::is_bin_dependency::is_bin_dependency;
-use crate::util::is_core_module::is_core_module;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 
@@ -103,76 +99,11 @@ impl Checker {
             .map(|(relative_file_path, module, syntax)| {
                 let file_dependencies = analyze_dependencies(&module, &comments);
                 let file_dependencies = file_dependencies
-                    .iter()
-                    .filter(|dependency| {
-                        let path = PathBuf::from(&dependency.specifier.to_string());
-                        let root = path.components().next();
-
-                        matches!(root, Some(Component::Normal(_)))
-                    })
+                    .into_iter()
+                    .map(Dependency::new)
+                    .filter(|dependency| dependency.is_external())
                     .flat_map(|dependency| {
-                        let name = extract_package_name(&dependency.specifier).unwrap();
-
-                        match syntax {
-                            Syntax::Typescript(_) => {
-                                if dependency.kind == DependencyKind::ImportType {
-                                    let type_dependency = "@types/".to_string() + &name;
-                                    return if package.is_dependency(&type_dependency)
-                                        || package.is_dev_dependency(&type_dependency)
-                                    {
-                                        vec![type_dependency]
-                                    } else {
-                                        vec![]
-                                    };
-                                }
-                                let type_dependency = extract_type_name(&name);
-                                if package.is_dependency(&type_dependency)
-                                    || package.is_dev_dependency(&type_dependency)
-                                {
-                                    return vec![name, type_dependency];
-                                }
-                                vec![name]
-                            }
-                            _ => vec![name],
-                        }
-                    })
-                    .filter(|dependency| !is_core_module(dependency))
-                    .filter(|dependency| {
-                        !self.config.ignore_bin_package()
-                            || !is_bin_dependency(directory, dependency)
-                    })
-                    .flat_map(|dependency| {
-                        let dependency_module =
-                            load_module(&directory.join("node_modules").join(&dependency));
-                        let dependencies = match dependency_module {
-                            Ok(dependency_module) => iter::once(dependency)
-                                .chain(
-                                    dependency_module
-                                        .peer_dependencies
-                                        .keys()
-                                        .filter(|&peer_dependency| {
-                                            package.is_dependency(peer_dependency)
-                                                || package.is_dev_dependency(peer_dependency)
-                                        })
-                                        .cloned(),
-                                )
-                                .chain(
-                                    dependency_module
-                                        .optional_dependencies
-                                        .keys()
-                                        .filter(|&optional_dependency| {
-                                            package.is_dependency(optional_dependency)
-                                                || package.is_dev_dependency(optional_dependency)
-                                        })
-                                        .cloned(),
-                                )
-                                .collect(),
-                            Err(_) => {
-                                vec![dependency]
-                            }
-                        };
-
-                        dependencies
+                        dependency.extract_dependencies(&syntax, package, &self.config)
                     })
                     .collect();
 
