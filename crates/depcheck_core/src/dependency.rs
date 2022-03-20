@@ -78,11 +78,11 @@ impl Dependency {
                             vec![]
                         }
                     } else {
-                        let dependency_type_name = extract_type_name(&dependency);
-                        if package.is_dependency(&dependency_type_name)
-                            || package.is_dev_dependency(&dependency_type_name)
+                        let dependency_type = extract_type_name(&dependency);
+                        if package.is_dependency(&dependency_type)
+                            || package.is_dev_dependency(&dependency_type)
                         {
-                            vec![dependency, dependency_type_name]
+                            vec![dependency, dependency_type]
                         } else {
                             vec![dependency]
                         }
