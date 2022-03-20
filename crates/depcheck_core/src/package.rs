@@ -84,3 +84,28 @@ impl FromStr for Package {
         Ok(serde_json::from_str(s)?)
     }
 }
+
+impl Package {
+    pub fn is_dependency(&self, dependency: &str) -> bool {
+        self.dependencies.contains_key(dependency)
+    }
+
+    pub fn is_dev_dependency(&self, dependency: &str) -> bool {
+        self.dev_dependencies.contains_key(dependency)
+    }
+
+    pub fn is_peer_dependency(&self, dependency: &str) -> bool {
+        self.peer_dependencies.contains_key(dependency)
+    }
+
+    pub fn is_optional_dependency(&self, dependency: &str) -> bool {
+        self.optional_dependencies.contains_key(dependency)
+    }
+
+    pub fn is_any_dependency(&self, dependency: &str) -> bool {
+        self.is_dependency(dependency)
+            || self.is_dev_dependency(dependency)
+            || self.is_peer_dependency(dependency)
+            || self.is_optional_dependency(dependency)
+    }
+}

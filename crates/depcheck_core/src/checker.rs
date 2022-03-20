@@ -65,8 +65,8 @@ impl Checker {
 
         for pattern in self.config.get_ignore_patterns() {
             override_builder
-                .add(&format!("!{}", pattern))
-                .map_err(|e| format!("Malformed exclude pattern: {}", e))
+                .add(&format!("!{pattern}"))
+                .map_err(|e| format!("Malformed exclude pattern: {e}"))
                 .unwrap();
         }
 
@@ -94,13 +94,15 @@ impl Checker {
                 _ => false,
             })
             .filter_map(|file| {
+                let path = file.path().strip_prefix(directory).ok()?;
+                let relative_file_path = RelativePathBuf::from_path(path).ok()?;
                 self.parsers
                     .parse_file(file.path())
-                    .map(|(module, syntax)| (file, module, syntax))
+                    .map(|(module, syntax)| (relative_file_path, module, syntax))
             })
-            .map(|(file, module, syntax)| {
+            .map(|(relative_file_path, module, syntax)| {
                 let file_dependencies = analyze_dependencies(&module, &comments);
-                let file_dependencies: HashSet<_> = file_dependencies
+                let file_dependencies = file_dependencies
                     .iter()
                     .filter(|dependency| {
                         let path = PathBuf::from(&dependency.specifier.to_string());
@@ -115,8 +117,8 @@ impl Checker {
                             Syntax::Typescript(_) => {
                                 if dependency.kind == DependencyKind::ImportType {
                                     let type_dependency = "@types/".to_string() + &name;
-                                    return if package.dependencies.contains_key(&type_dependency)
-                                        || package.dev_dependencies.contains_key(&type_dependency)
+                                    return if package.is_dependency(&type_dependency)
+                                        || package.is_dev_dependency(&type_dependency)
                                     {
                                         vec![type_dependency]
                                     } else {
@@ -124,8 +126,8 @@ impl Checker {
                                     };
                                 }
                                 let type_dependency = extract_type_name(&name);
-                                if package.dependencies.contains_key(&type_dependency)
-                                    || package.dev_dependencies.contains_key(&type_dependency)
+                                if package.is_dependency(&type_dependency)
+                                    || package.is_dev_dependency(&type_dependency)
                                 {
                                     return vec![name, type_dependency];
                                 }
@@ -133,6 +135,11 @@ impl Checker {
                             }
                             _ => vec![name],
                         }
+                    })
+                    .filter(|dependency| !is_core_module(dependency))
+                    .filter(|dependency| {
+                        !self.config.ignore_bin_package()
+                            || !is_bin_dependency(directory, dependency)
                     })
                     .flat_map(|dependency| {
                         let dependency_module =
@@ -144,10 +151,8 @@ impl Checker {
                                         .peer_dependencies
                                         .keys()
                                         .filter(|&peer_dependency| {
-                                            package.dependencies.contains_key(peer_dependency)
-                                                || package
-                                                    .dev_dependencies
-                                                    .contains_key(peer_dependency)
+                                            package.is_dependency(peer_dependency)
+                                                || package.is_dev_dependency(peer_dependency)
                                         })
                                         .cloned(),
                                 )
@@ -156,10 +161,8 @@ impl Checker {
                                         .optional_dependencies
                                         .keys()
                                         .filter(|&optional_dependency| {
-                                            package.dependencies.contains_key(optional_dependency)
-                                                || package
-                                                    .dev_dependencies
-                                                    .contains_key(optional_dependency)
+                                            package.is_dependency(optional_dependency)
+                                                || package.is_dev_dependency(optional_dependency)
                                         })
                                         .cloned(),
                                 )
@@ -171,16 +174,7 @@ impl Checker {
 
                         dependencies
                     })
-                    .filter(|dependency| !is_core_module(dependency))
-                    .filter(|dependency| {
-                        !self.config.ignore_bin_package()
-                            || !is_bin_dependency(directory, dependency)
-                    })
                     .collect();
-
-                let relative_file_path =
-                    RelativePathBuf::from_path(file.path().strip_prefix(directory).unwrap())
-                        .unwrap();
 
                 (relative_file_path, file_dependencies)
             })
@@ -208,21 +202,7 @@ impl CheckResult {
             self.using_dependencies
                 .iter()
                 .filter(|(dependency, _)| !ignore_matches.is_match(dependency.as_str()))
-                .filter(|(dependency, _)| {
-                    !self.package.dependencies.contains_key(dependency.as_str())
-                        && !self
-                            .package
-                            .dev_dependencies
-                            .contains_key(dependency.as_str())
-                        && !self
-                            .package
-                            .peer_dependencies
-                            .contains_key(dependency.as_str())
-                        && !self
-                            .package
-                            .optional_dependencies
-                            .contains_key(dependency.as_str())
-                })
+                .filter(|(dependency, _)| !self.package.is_any_dependency(dependency))
                 .filter(|(dependency, _)| {
                     !self.config.ignore_bin_package()
                         || !is_bin_dependency(&self.directory, dependency)
