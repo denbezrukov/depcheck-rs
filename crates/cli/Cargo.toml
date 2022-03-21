@@ -1,5 +1,5 @@
 [package]
-name = "depcheck_cli"
+name = "depcheck-rs-cli"
 version = "0.1.0"
 authors = ["awesome author"]
 edition = "2021"

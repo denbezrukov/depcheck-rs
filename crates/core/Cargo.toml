@@ -1,5 +1,5 @@
 [package]
-name = "depckeck_core"
+name = "depckeck-rs-core"
 version = "0.0.0"
 edition = "2021"
 
