@@ -4,8 +4,8 @@ use std::path::PathBuf;
 
 use relative_path::RelativePathBuf;
 
-use depckeck_core::checker::{CheckResult, Checker};
-use depckeck_core::config::Config;
+use depckeck_rs_core::checker::{CheckResult, Checker};
+use depckeck_rs_core::config::Config;
 use pretty_assertions::assert_eq;
 
 #[derive(Default)]
