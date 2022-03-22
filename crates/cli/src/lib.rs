@@ -1,18 +1,17 @@
-use clap::{crate_version, App, Arg};
+use clap::{crate_version, Arg, Command};
 
 pub fn run_cli() {
-    let matches = App::new("depcheck")
+    let app = Command::new("depcheck-rs")
         .about("The dependency check CLI")
-        .bin_name("depcheck")
+        .bin_name("depcheck-rs")
         .version(crate_version!())
         .arg(
             Arg::new("directory")
                 .short('d')
                 .takes_value(true)
-                .default_value("src")
                 .value_name("DIRECTORY")
                 .help("Provide a directory"),
         );
 
-    println!("{:?}", matches);
+    println!("{:#?}", app.get_matches());
 }
