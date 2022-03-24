@@ -1,5 +1,7 @@
-use clap::{crate_authors, crate_version, Arg, Command};
 use std::env;
+use std::path::PathBuf;
+
+use clap::{Arg, Command, crate_authors, crate_version};
 
 pub fn run_cli() {
     let app = Command::new("depcheck-rs")
@@ -33,11 +35,14 @@ pub fn run_cli() {
         .arg(
             Arg::new("ignore-path")
                 .long("ignore-path")
-                .help("Path to a file with patterns describing files to ignore")
+                .takes_value(true)
+                .help("Path to a file with patterns describing files to ignore"),
         );
 
     let matches = app.get_matches();
-    let ignore_bin_package: bool = matches.value_of_t("ignore-bin-package").unwrap();
-    let skip_missing: bool = matches.value_of_t("skip-missing").unwrap();
-    println!("{:#?} {:#?}", ignore_bin_package, skip_missing);
+    let ignore_bin_package = matches.value_of_t::<bool>("ignore-bin-package").unwrap_or(false);
+    let skip_missing = matches.value_of_t::<bool>("skip-missing").unwrap_or(false);
+    let ignore_path = matches.value_of_t::<PathBuf>("ignore-path").ok();
+
+    println!("{:#?} {:#?} {:#?}", ignore_bin_package, skip_missing, ignore_path);
 }
