@@ -1,5 +1,5 @@
+use clap::{crate_authors, crate_version, Arg, Command};
 use std::env;
-use clap::{crate_version, crate_authors, Arg, Command};
 
 pub fn run_cli() {
     let app = Command::new("depcheck-rs")
@@ -12,16 +12,32 @@ pub fn run_cli() {
                 .long("directory")
                 .short('d')
                 .takes_value(true)
+                .default_value(".")
                 .value_name("DIRECTORY")
-                .help("Provide a directory"),
+                .help("The directory argument is the root directory of your project"),
         )
         .arg(
             Arg::new("ignore-bin-package")
                 .long("ignore-bin-package")
-                .default_value("false"),
+                .takes_value(true)
+                .default_value("false")
+                .help("A flag to indicate if depcheck ignores the packages containing bin entry"),
+        )
+        .arg(
+            Arg::new("skip-missing")
+                .long("skip-missing")
+                .takes_value(true)
+                .default_value("false")
+                .help("A flag to indicate if depcheck skips calculation of missing dependencies"),
+        )
+        .arg(
+            Arg::new("ignore-path")
+                .long("ignore-path")
+                .help("Path to a file with patterns describing files to ignore")
         );
 
     let matches = app.get_matches();
-    let a: bool = matches.value_of_t("ignore-bin-package").unwrap();
-    println!("{:#?}", a);
+    let ignore_bin_package: bool = matches.value_of_t("ignore-bin-package").unwrap();
+    let skip_missing: bool = matches.value_of_t("skip-missing").unwrap();
+    println!("{:#?} {:#?}", ignore_bin_package, skip_missing);
 }

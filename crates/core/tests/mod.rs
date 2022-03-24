@@ -1269,7 +1269,7 @@ fn test_decorators() {
 fn test_depcheckignore() {
     let path = get_module_path("depcheckignore");
 
-    let config = Config::new(path).with_read_depcheckignore(true);
+    let config = Config::new(path).with_ignore_path(Some(PathBuf::from(".depcheckignore")));
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 

@@ -76,8 +76,8 @@ impl Checker {
             is_root_directory || !is_module(entry.path())
         });
 
-        if self.config.read_depcheckignore() {
-            walker.add_custom_ignore_filename(".depcheckignore");
+        if let Some(path) = self.config.ignore_path() {
+            walker.add_custom_ignore_filename(path);
         }
 
         let walker = walker.build();

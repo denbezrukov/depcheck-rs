@@ -8,7 +8,7 @@ pub struct Config {
     ignore_patterns: Vec<String>,
     ignore_matches: Vec<String>,
     skip_missing: bool,
-    read_depcheckignore: bool,
+    ignore_path: Option<PathBuf>,
 }
 
 impl Config {
@@ -49,7 +49,7 @@ impl Config {
             skip_missing: false,
             ignore_bin_package: false,
             ignore_matches: Vec::new(),
-            read_depcheckignore: false,
+            ignore_path: None,
         }
     }
 }
@@ -75,8 +75,8 @@ impl Config {
         self
     }
 
-    pub fn with_read_depcheckignore(mut self, read_depcheckignore: bool) -> Self {
-        self.read_depcheckignore = read_depcheckignore;
+    pub fn with_ignore_path(mut self, ignore_path: Option<PathBuf>) -> Self {
+        self.ignore_path = ignore_path;
         self
     }
 
@@ -88,8 +88,8 @@ impl Config {
         self.skip_missing
     }
 
-    pub fn read_depcheckignore(&self) -> bool {
-        self.read_depcheckignore
+    pub fn ignore_path(&self) -> Option<&Path> {
+        self.ignore_path.as_deref()
     }
 }
 
