@@ -30,7 +30,7 @@ impl Checker {
 }
 
 impl Checker {
-    pub fn check_package(&self) -> package::Result<CheckResult> {
+    pub fn check_package(self) -> package::Result<CheckResult> {
         let package = load_module(self.config.get_directory())?;
 
         let dependencies = self.check_directory(&package);
@@ -50,7 +50,7 @@ impl Checker {
             package,
             directory: self.config.get_directory().to_path_buf(),
             using_dependencies,
-            config: self.config.clone(),
+            config: self.config,
         })
     }
 

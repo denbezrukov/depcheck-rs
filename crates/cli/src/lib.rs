@@ -1,9 +1,6 @@
-use std::env;
-use std::path::PathBuf;
+use clap::{crate_authors, crate_version, Arg, Command};
 
-use clap::{Arg, Command, crate_authors, crate_version};
-
-pub fn run_cli() {
+pub fn build_app() -> Command<'static> {
     let app = Command::new("depcheck-rs")
         .author(crate_authors!())
         .version(crate_version!())
@@ -38,11 +35,15 @@ pub fn run_cli() {
                 .takes_value(true)
                 .help("Path to a file with patterns describing files to ignore"),
         );
+    app
+}
 
-    let matches = app.get_matches();
-    let ignore_bin_package = matches.value_of_t::<bool>("ignore-bin-package").unwrap_or(false);
-    let skip_missing = matches.value_of_t::<bool>("skip-missing").unwrap_or(false);
-    let ignore_path = matches.value_of_t::<PathBuf>("ignore-path").ok();
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn verify_app() {
+        use super::build_app;
 
-    println!("{:#?} {:#?} {:#?}", ignore_bin_package, skip_missing, ignore_path);
+        build_app().debug_assert();
+    }
 }
