@@ -45,7 +45,7 @@ impl Checker {
                 let files = using_dependencies
                     .entry(dependency.clone())
                     .or_insert_with(|| HashSet::with_capacity(100));
-                files.insert(path.clone());
+                files.insert(path.to_string());
             })
         });
 
@@ -120,12 +120,12 @@ impl Checker {
 pub struct CheckResult {
     pub package: Package,
     pub directory: PathBuf,
-    pub using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
+    pub using_dependencies: BTreeMap<String, HashSet<String>>,
     pub config: Config,
 }
 
 impl CheckResult {
-    pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<RelativePathBuf>> {
+    pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<String>> {
         if self.config.skip_missing() {
             Default::default()
         } else {

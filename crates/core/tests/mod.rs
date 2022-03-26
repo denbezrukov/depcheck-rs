@@ -2,16 +2,14 @@ use std::collections::{BTreeMap, HashSet};
 use std::env;
 use std::path::PathBuf;
 
-use relative_path::RelativePathBuf;
-
 use depckeck_rs_core::checker::{CheckResult, Checker};
 use depckeck_rs_core::config::Config;
 use pretty_assertions::assert_eq;
 
 #[derive(Default)]
 struct ExpectedCheckResult<'a> {
-    using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
-    missing_dependencies: BTreeMap<&'a str, &'a HashSet<RelativePathBuf>>,
+    using_dependencies: BTreeMap<String, HashSet<String>>,
+    missing_dependencies: BTreeMap<&'a str, &'a HashSet<String>>,
     unused_dependencies: HashSet<&'a str>,
     unused_dev_dependencies: HashSet<&'a str>,
 }
@@ -54,40 +52,36 @@ fn test_package() {
     let actual = checker.check_package().unwrap();
 
     let react_files = [
-        RelativePathBuf::from("src/subDir/subDirFile.ts"),
-        RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-        RelativePathBuf::from("src/rootFile.ts"),
+        String::from("src/subDir/subDirFile.ts"),
+        String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+        String::from("src/rootFile.ts"),
     ]
     .into_iter()
     .collect();
     let package_first_2_files = [
-        RelativePathBuf::from("src/subDir/subDirFile.ts"),
-        RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-        RelativePathBuf::from("src/rootFile.ts"),
+        String::from("src/subDir/subDirFile.ts"),
+        String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+        String::from("src/rootFile.ts"),
     ]
     .into_iter()
     .collect();
 
     let package_first_3_files = [
-        RelativePathBuf::from("src/subDir/subDirFile.ts"),
-        RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-        RelativePathBuf::from("src/rootFile.ts"),
+        String::from("src/subDir/subDirFile.ts"),
+        String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+        String::from("src/rootFile.ts"),
     ]
     .into_iter()
     .collect();
 
-    let package_root_first_files = [RelativePathBuf::from("src/rootFile.ts")]
-        .into_iter()
-        .collect();
-    let package_sub_first_files = [RelativePathBuf::from("src/subDir/subDirFile.ts")]
+    let package_root_first_files = [String::from("src/rootFile.ts")].into_iter().collect();
+    let package_sub_first_files = [String::from("src/subDir/subDirFile.ts")]
         .into_iter()
         .collect();
 
-    let package_sub_sub_first = [RelativePathBuf::from(
-        "src/subDir/subSubDir/subSubDirFile.ts",
-    )]
-    .into_iter()
-    .collect();
+    let package_sub_sub_first = [String::from("src/subDir/subSubDir/subSubDirFile.ts")]
+        .into_iter()
+        .collect();
 
     let missing_dependencies = BTreeMap::from([
         ("react", &react_files),
@@ -103,9 +97,9 @@ fn test_package() {
             (
                 String::from("@package/first2"),
                 [
-                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
-                    RelativePathBuf::from("src/rootFile.ts"),
+                    String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    String::from("src/subDir/subDirFile.ts"),
+                    String::from("src/rootFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
@@ -113,39 +107,35 @@ fn test_package() {
             (
                 String::from("@package/first3"),
                 [
-                    RelativePathBuf::from("src/rootFile.ts"),
-                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
+                    String::from("src/rootFile.ts"),
+                    String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    String::from("src/subDir/subDirFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
             ),
             (
                 String::from("@packageRoot/first1"),
-                [RelativePathBuf::from("src/rootFile.ts")]
-                    .into_iter()
-                    .collect(),
+                [String::from("src/rootFile.ts")].into_iter().collect(),
             ),
             (
                 String::from("@packageSubDir/first1"),
-                [RelativePathBuf::from("src/subDir/subDirFile.ts")]
+                [String::from("src/subDir/subDirFile.ts")]
                     .into_iter()
                     .collect(),
             ),
             (
                 String::from("@packageSubSubDir/first1"),
-                [RelativePathBuf::from(
-                    "src/subDir/subSubDir/subSubDirFile.ts",
-                )]
-                .into_iter()
-                .collect(),
+                [String::from("src/subDir/subSubDir/subSubDirFile.ts")]
+                    .into_iter()
+                    .collect(),
             ),
             (
                 String::from("react"),
                 [
-                    RelativePathBuf::from("src/subDir/subSubDir/subSubDirFile.ts"),
-                    RelativePathBuf::from("src/subDir/subDirFile.ts"),
-                    RelativePathBuf::from("src/rootFile.ts"),
+                    String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                    String::from("src/subDir/subDirFile.ts"),
+                    String::from("src/rootFile.ts"),
                 ]
                 .into_iter()
                 .collect(),
@@ -169,11 +159,11 @@ fn test_import_function_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let anyone_files = [RelativePathBuf::from("index.js")].into();
+    let anyone_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("anyone"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         missing_dependencies: BTreeMap::from([("anyone", &anyone_files)]),
         ..Default::default()
@@ -193,7 +183,7 @@ fn test_import_function() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("optimist"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -212,7 +202,7 @@ fn test_import_function_webpack() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("optimist"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -228,11 +218,11 @@ fn test_require_resolve_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let anyone_files = [RelativePathBuf::from("index.js")].into();
+    let anyone_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("anyone"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         missing_dependencies: BTreeMap::from([("anyone", &anyone_files)]),
         ..Default::default()
@@ -252,7 +242,7 @@ fn test_require_resolve() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("optimist"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -286,61 +276,58 @@ fn test_bad_es6() {
 
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
-            (
-                String::from("find-me"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("find-me"), [String::from("index.js")].into()),
             (
                 String::from("default-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("default-member-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("member-alias-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("member-alias-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("member-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("mixed-default-star-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("mixed-member-alias-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("mixed-name-memeber-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("multiple-member-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("named-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("name-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("star-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("star-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
         ]),
         unused_dependencies: ["dont-find-me"].into(),
@@ -360,14 +347,8 @@ fn test_good() {
 
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
-            (
-                String::from("optimist"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
-            (
-                String::from("foo"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("optimist"), [String::from("index.js")].into()),
+            (String::from("foo"), [String::from("index.js")].into()),
         ]),
         ..Default::default()
     };
@@ -387,59 +368,59 @@ fn test_good_es6() {
         using_dependencies: BTreeMap::from([
             (
                 String::from("basic-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("default-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("default-member-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("member-alias-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("member-alias-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("member-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("mixed-default-star-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("mixed-member-alias-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("mixed-name-memeber-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("multiple-member-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("named-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("name-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("star-export"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("star-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
         ]),
         unused_dependencies: ["unsupported-syntax"].into(),
@@ -478,7 +459,7 @@ fn test_good_es7() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("ecmascript-rest-spread"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -498,7 +479,7 @@ fn test_good_es7_flow() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("ecmascript-rest-spread"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -519,49 +500,37 @@ fn test_typescript() {
         using_dependencies: BTreeMap::from([
             (
                 String::from("react"),
-                [RelativePathBuf::from("component.tsx")]
-                    .into_iter()
-                    .collect(),
+                [String::from("component.tsx")].into_iter().collect(),
             ),
             (
                 String::from("@types/react"),
-                [RelativePathBuf::from("component.tsx")]
-                    .into_iter()
-                    .collect(),
+                [String::from("component.tsx")].into_iter().collect(),
             ),
             (
                 String::from("@types/node"),
-                [RelativePathBuf::from("esnext.ts")].into(),
+                [String::from("esnext.ts")].into(),
             ),
             (
                 String::from("@types/org__org-pkg"),
-                [RelativePathBuf::from("esnext.ts")].into(),
+                [String::from("esnext.ts")].into(),
             ),
             (
                 String::from("@types/typeless-module"),
-                [RelativePathBuf::from("typeOnly.ts")].into(),
+                [String::from("typeOnly.ts")].into(),
             ),
             (
                 String::from("@org/org-pkg"),
-                [RelativePathBuf::from("esnext.ts")].into(),
+                [String::from("esnext.ts")].into(),
             ),
-            (
-                String::from("ts-dep-1"),
-                [RelativePathBuf::from("index.ts")].into(),
-            ),
-            (
-                String::from("ts-dep-2"),
-                [RelativePathBuf::from("index.ts")].into(),
-            ),
+            (String::from("ts-dep-1"), [String::from("index.ts")].into()),
+            (String::from("ts-dep-2"), [String::from("index.ts")].into()),
             (
                 String::from("ts-dep-esnext"),
-                [RelativePathBuf::from("esnext.ts")].into(),
+                [String::from("esnext.ts")].into(),
             ),
             (
                 String::from("ts-dep-typedef"),
-                [RelativePathBuf::from("typedef.d.ts")]
-                    .into_iter()
-                    .collect(),
+                [String::from("typedef.d.ts")].into_iter().collect(),
             ),
         ]),
         ..Default::default()
@@ -614,21 +583,14 @@ fn test_vue() {
     let expected = ExpectedCheckResult {
         unused_dependencies: ["unused-dep"].into(),
         using_dependencies: BTreeMap::from([
-            (
-                String::from("vue"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("vue"), [String::from("index.js")].into()),
             (
                 String::from("vue-dep-1"),
-                [RelativePathBuf::from("component.vue")]
-                    .into_iter()
-                    .collect(),
+                [String::from("component.vue")].into_iter().collect(),
             ),
             (
                 String::from("vue-dep-2"),
-                [RelativePathBuf::from("component.vue")]
-                    .into_iter()
-                    .collect(),
+                [String::from("component.vue")].into_iter().collect(),
             ),
         ]),
         ..Default::default()
@@ -649,21 +611,14 @@ fn test_vue3() {
     let expected = ExpectedCheckResult {
         unused_dependencies: ["unused-dep"].into(),
         using_dependencies: BTreeMap::from([
-            (
-                String::from("vue"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("vue"), [String::from("index.js")].into()),
             (
                 String::from("vue-dep-1"),
-                [RelativePathBuf::from("component.vue")]
-                    .into_iter()
-                    .collect(),
+                [String::from("component.vue")].into_iter().collect(),
             ),
             (
                 String::from("vue-dep-2"),
-                [RelativePathBuf::from("component.vue")]
-                    .into_iter()
-                    .collect(),
+                [String::from("component.vue")].into_iter().collect(),
             ),
         ]),
         ..Default::default()
@@ -680,11 +635,11 @@ fn test_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [RelativePathBuf::from("index.js")].into();
+    let missing_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("missing-dep"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         missing_dependencies: BTreeMap::from([("missing-dep", &missing_files)]),
         ..Default::default()
@@ -701,17 +656,14 @@ fn test_missing_nested() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [RelativePathBuf::from("index.js")].into();
+    let missing_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
                 String::from("outer-missing-dep"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
-            (
-                String::from("used-dep"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("used-dep"), [String::from("index.js")].into()),
         ]),
         missing_dependencies: BTreeMap::from([("outer-missing-dep", &missing_files)]),
         ..Default::default()
@@ -728,20 +680,17 @@ fn test_missing_peer_deps() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [RelativePathBuf::from("index.js")].into();
+    let missing_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
                 String::from("missing-this-dep"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
-            (
-                String::from("peer-dep"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("peer-dep"), [String::from("index.js")].into()),
             (
                 String::from("optional-dep"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
         ]),
         missing_dependencies: BTreeMap::from([("missing-this-dep", &missing_files)]),
@@ -763,7 +712,7 @@ fn test_grunt() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("grunt-contrib-jshint"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -783,7 +732,7 @@ fn test_grunt_tasks() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("grunt-contrib-jshint"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -803,7 +752,7 @@ fn test_dev() {
         unused_dev_dependencies: ["unused-dev-dep"].into(),
         using_dependencies: BTreeMap::from([(
             String::from("used-dep"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -822,14 +771,8 @@ fn test_peer_dep() {
     let expected = ExpectedCheckResult {
         unused_dependencies: ["unused-dep"].into(),
         using_dependencies: BTreeMap::from([
-            (
-                String::from("host"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
-            (
-                String::from("peer"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("host"), [String::from("index.js")].into()),
+            (String::from("peer"), [String::from("index.js")].into()),
         ]),
         ..Default::default()
     };
@@ -850,15 +793,11 @@ fn test_peer_dep_nested() {
         using_dependencies: BTreeMap::from([
             (
                 String::from("host"),
-                [RelativePathBuf::from("nested/index.js")]
-                    .into_iter()
-                    .collect(),
+                [String::from("nested/index.js")].into_iter().collect(),
             ),
             (
                 String::from("peer"),
-                [RelativePathBuf::from("nested/index.js")]
-                    .into_iter()
-                    .collect(),
+                [String::from("nested/index.js")].into_iter().collect(),
             ),
         ]),
         ..Default::default()
@@ -878,14 +817,8 @@ fn test_optional_dep() {
     let expected = ExpectedCheckResult {
         unused_dependencies: ["unused-dep"].into(),
         using_dependencies: BTreeMap::from([
-            (
-                String::from("host"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
-            (
-                String::from("optional"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("host"), [String::from("index.js")].into()),
+            (String::from("optional"), [String::from("index.js")].into()),
         ]),
         ..Default::default()
     };
@@ -904,7 +837,7 @@ fn test_nested() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("optimist"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -940,7 +873,7 @@ fn test_shebang() {
         unused_dependencies: ["shebang"].into(),
         using_dependencies: BTreeMap::from([(
             String::from("shebang-script"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -1005,14 +938,8 @@ fn test_good_ignore_bin_package_true() {
 
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
-            (
-                String::from("optimist"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
-            (
-                String::from("foo"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("optimist"), [String::from("index.js")].into()),
+            (String::from("foo"), [String::from("index.js")].into()),
         ]),
         ..Default::default()
     };
@@ -1031,7 +958,7 @@ fn test_skip_missing_true() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("missing-dep"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -1047,13 +974,13 @@ fn test_skip_missing_false() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [RelativePathBuf::from("index.js")].into();
+    let missing_files = [String::from("index.js")].into();
 
     let expected = ExpectedCheckResult {
         missing_dependencies: BTreeMap::from([("missing-dep", &missing_files)]),
         using_dependencies: BTreeMap::from([(
             String::from("missing-dep"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -1088,7 +1015,7 @@ fn test_require_dynamic() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("dynamic"),
-            [RelativePathBuf::from("index.js")].into(),
+            [String::from("index.js")].into(),
         )]),
         ..Default::default()
     };
@@ -1121,7 +1048,7 @@ fn test_ignore_matches_for_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [RelativePathBuf::from("index.js")].into();
+    let missing_files = [String::from("index.js")].into();
 
     let expected = ExpectedCheckResult {
         missing_dependencies: BTreeMap::from([
@@ -1131,15 +1058,15 @@ fn test_ignore_matches_for_missing() {
         using_dependencies: BTreeMap::from([
             (
                 String::from("missing-dep"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("missing-ignore-dep"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("missing-ignore-not"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
         ]),
         ..Default::default()
@@ -1159,7 +1086,7 @@ fn test_jsx() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("react"),
-            [RelativePathBuf::from("index.jsx")].into(),
+            [String::from("index.jsx")].into(),
         )]),
         ..Default::default()
     };
@@ -1177,14 +1104,8 @@ fn test_jsx_js() {
 
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
-            (
-                String::from("react"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
-            (
-                String::from("jsx-as-js"),
-                [RelativePathBuf::from("index.js")].into(),
-            ),
+            (String::from("react"), [String::from("index.js")].into()),
+            (String::from("jsx-as-js"), [String::from("index.js")].into()),
         ]),
         ..Default::default()
     };
@@ -1205,23 +1126,23 @@ fn test_scoped_module() {
         using_dependencies: BTreeMap::from([
             (
                 String::from("@owner/package"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("@secondowner/package"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("@org/parent"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("name-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
             (
                 String::from("child-import"),
-                [RelativePathBuf::from("index.js")].into(),
+                [String::from("index.js")].into(),
             ),
         ]),
         ..Default::default()
@@ -1257,7 +1178,7 @@ fn test_decorators() {
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("mobx"),
-            [RelativePathBuf::from("index.tsx")].into(),
+            [String::from("index.tsx")].into(),
         )]),
         ..Default::default()
     };
@@ -1273,20 +1194,14 @@ fn test_depcheckignore() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [RelativePathBuf::from("used.js")].into();
+    let missing_files = [String::from("used.js")].into();
 
     let expected = ExpectedCheckResult {
         unused_dev_dependencies: ["debug"].into(),
         missing_dependencies: BTreeMap::from([("react", &missing_files)]),
         using_dependencies: BTreeMap::from([
-            (
-                String::from("lodash"),
-                [RelativePathBuf::from("used.js")].into(),
-            ),
-            (
-                String::from("react"),
-                [RelativePathBuf::from("used.js")].into(),
-            ),
+            (String::from("lodash"), [String::from("used.js")].into()),
+            (String::from("react"), [String::from("used.js")].into()),
         ]),
         ..Default::default()
     };
