@@ -10,6 +10,7 @@ pub fn build_app() -> Command<'static> {
             Arg::new("directory")
                 .long("directory")
                 .short('d')
+                .allow_invalid_utf8(true)
                 .takes_value(true)
                 .default_value(".")
                 .value_name("DIRECTORY")

@@ -14,6 +14,9 @@ use crate::parser::Parser;
 use crate::util::is_bin_dependency::is_bin_dependency;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
+use serde::ser::SerializeStruct;
+use serde::{Serialize, Serializer};
+use serde_json;
 
 pub struct Checker {
     config: Config,
@@ -166,5 +169,52 @@ impl CheckResult {
             })
             .map(|(dependency, _)| dependency.as_str())
             .collect()
+    }
+}
+
+impl CheckResult {
+    pub fn to_json(&self) -> serde_json::Result<String> {
+        serde_json::to_string(self)
+    }
+
+    pub fn to_pretty_json(&self) -> serde_json::Result<String> {
+        serde_json::to_string_pretty(self)
+    }
+}
+
+impl Serialize for CheckResult {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut state = serializer.serialize_struct("CheckResult", 3)?;
+
+        let using_dependencies: BTreeMap<&str, HashSet<&str>> = self
+            .using_dependencies
+            .iter()
+            .map(|(dependency, files)| {
+                let files = files.iter().map(|path| path.as_str()).collect();
+                (dependency.as_str(), files)
+            })
+            .collect();
+
+        let missing_dependencies: BTreeMap<&str, HashSet<&str>> = self
+            .get_missing_dependencies()
+            .iter()
+            .map(|(&dependency, files)| {
+                let files = files.iter().map(|path| path.as_str()).collect();
+                (dependency, files)
+            })
+            .collect();
+
+        state.serialize_field("using_dependencies", &using_dependencies)?;
+        state.serialize_field("unused_dependencies", &self.get_unused_dependencies())?;
+        state.serialize_field(
+            "unused_dev_dependencies",
+            &self.get_unused_dev_dependencies(),
+        )?;
+        state.serialize_field("missing_dependencies", &missing_dependencies)?;
+
+        state.end()
     }
 }

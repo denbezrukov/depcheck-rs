@@ -18,8 +18,11 @@ pub enum Error {
     #[error("failed to parse arguments")]
     Clap(#[from] clap::Error),
 
-    #[error("failed to parse package")]
+    #[error("failed to read package")]
     Package(#[from] package::Error),
+
+    #[error("failed to serialize result")]
+    SerializeResult(#[from] serde_json::Error),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -39,7 +42,11 @@ fn main() -> Result<()> {
         .with_skip_missing(skip_missing)
         .with_ignore_path(ignore_path);
 
-    let _result = Checker::new(config).check_package()?;
+    let result = Checker::new(config).check_package()?;
+
+    let json = result.to_json()?;
+
+    println!("{:#?}", json);
 
     Ok(())
 }
@@ -85,3 +92,22 @@ fn extract_ignore_path(matches: &clap::ArgMatches) -> Result<Option<PathBuf>> {
 fn is_existing_file(path: &Path) -> bool {
     path.is_file() && (path.file_name().is_some() || path.canonicalize().is_ok())
 }
+
+// impl From<CheckResult> for CliResult {
+//     fn from(check_result: CheckResult) -> Self {
+//         // let a: BTreeMap<String, HashSet<String>> = check_result.using_dependencies.into();
+//         todo!();
+//         // CliResult {
+//         //     using_dependencies: check_result.using_dependencies.into(),
+//         // }
+//     }
+// }
+
+// #[derive(Debug, Serialize)]
+// #[serde(rename_all = "camelCase")]
+// struct CliResult<'a> {
+//     using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
+//     missing_dependencies: BTreeMap<&'a str, &'a HashSet<RelativePathBuf>>,
+//     unused_dependencies: HashSet<&'a str>,
+//     unused_dev_dependencies: HashSet<&'a str>,
+// }
