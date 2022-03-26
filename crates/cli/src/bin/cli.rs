@@ -92,22 +92,3 @@ fn extract_ignore_path(matches: &clap::ArgMatches) -> Result<Option<PathBuf>> {
 fn is_existing_file(path: &Path) -> bool {
     path.is_file() && (path.file_name().is_some() || path.canonicalize().is_ok())
 }
-
-// impl From<CheckResult> for CliResult {
-//     fn from(check_result: CheckResult) -> Self {
-//         // let a: BTreeMap<String, HashSet<String>> = check_result.using_dependencies.into();
-//         todo!();
-//         // CliResult {
-//         //     using_dependencies: check_result.using_dependencies.into(),
-//         // }
-//     }
-// }
-
-// #[derive(Debug, Serialize)]
-// #[serde(rename_all = "camelCase")]
-// struct CliResult<'a> {
-//     using_dependencies: BTreeMap<String, HashSet<RelativePathBuf>>,
-//     missing_dependencies: BTreeMap<&'a str, &'a HashSet<RelativePathBuf>>,
-//     unused_dependencies: HashSet<&'a str>,
-//     unused_dev_dependencies: HashSet<&'a str>,
-// }
