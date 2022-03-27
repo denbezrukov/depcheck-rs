@@ -1,5 +1,4 @@
 use std::collections::{BTreeMap, HashSet};
-use std::path::PathBuf;
 
 use ignore::overrides::OverrideBuilder;
 use ignore::{self, WalkBuilder};
@@ -7,16 +6,13 @@ use relative_path::RelativePathBuf;
 use swc_common::comments::SingleThreadedComments;
 use swc_ecma_dep_graph::analyze_dependencies;
 
+use crate::checker_result::CheckerResult;
 use crate::config::Config;
 use crate::dependency::Dependency;
-use crate::package::{self, DepsSet, Package};
+use crate::package::{self, Package};
 use crate::parser::Parser;
-use crate::util::is_bin_dependency::is_bin_dependency;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
-use serde::ser::SerializeStruct;
-use serde::{Serialize, Serializer};
-use serde_json;
 
 pub struct Checker {
     config: Config,
@@ -33,7 +29,7 @@ impl Checker {
 }
 
 impl Checker {
-    pub fn check_package(self) -> package::Result<CheckResult> {
+    pub fn check_package(self) -> package::Result<CheckerResult> {
         let package = load_module(self.config.get_directory())?;
 
         let dependencies = self.check_directory(&package);
@@ -49,7 +45,7 @@ impl Checker {
             })
         });
 
-        Ok(CheckResult {
+        Ok(CheckerResult {
             package,
             directory: self.config.get_directory().to_path_buf(),
             using_dependencies,
@@ -113,108 +109,5 @@ impl Checker {
                 (relative_file_path, file_dependencies)
             })
             .collect()
-    }
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub struct CheckResult {
-    pub package: Package,
-    pub directory: PathBuf,
-    pub using_dependencies: BTreeMap<String, HashSet<String>>,
-    pub config: Config,
-}
-
-impl CheckResult {
-    pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<String>> {
-        if self.config.skip_missing() {
-            Default::default()
-        } else {
-            let ignore_matches = self
-                .config
-                .get_ignore_matches()
-                .expect("Can't get ignore matches");
-            self.using_dependencies
-                .iter()
-                .filter(|(dependency, _)| !ignore_matches.is_match(dependency.as_str()))
-                .filter(|(dependency, _)| !self.package.is_any_dependency(dependency))
-                .filter(|(dependency, _)| {
-                    !self.config.ignore_bin_package()
-                        || !is_bin_dependency(&self.directory, dependency)
-                })
-                .map(|(dependency, files)| (dependency.as_str(), files))
-                .collect()
-        }
-    }
-
-    pub fn get_unused_dependencies(&self) -> HashSet<&str> {
-        self.filter_unused_dependencies(&self.package.dependencies)
-    }
-
-    pub fn get_unused_dev_dependencies(&self) -> HashSet<&str> {
-        self.filter_unused_dependencies(&self.package.dev_dependencies)
-    }
-
-    fn filter_unused_dependencies<'a>(&self, dependencies: &'a DepsSet) -> HashSet<&'a str> {
-        let ignore_matches = self
-            .config
-            .get_ignore_matches()
-            .expect("Can't get ignore matches");
-
-        dependencies
-            .iter()
-            .filter(|(dependency, _)| !ignore_matches.is_match(dependency.as_str()))
-            .filter(|(dependency, _)| !self.using_dependencies.contains_key(dependency.as_str()))
-            .filter(|(dependency, _)| {
-                !self.config.ignore_bin_package() || !is_bin_dependency(&self.directory, dependency)
-            })
-            .map(|(dependency, _)| dependency.as_str())
-            .collect()
-    }
-}
-
-impl CheckResult {
-    pub fn to_json(&self) -> serde_json::Result<String> {
-        serde_json::to_string(self)
-    }
-
-    pub fn to_pretty_json(&self) -> serde_json::Result<String> {
-        serde_json::to_string_pretty(self)
-    }
-}
-
-impl Serialize for CheckResult {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let mut state = serializer.serialize_struct("CheckResult", 3)?;
-
-        let using_dependencies: BTreeMap<&str, HashSet<&str>> = self
-            .using_dependencies
-            .iter()
-            .map(|(dependency, files)| {
-                let files = files.iter().map(|path| path.as_str()).collect();
-                (dependency.as_str(), files)
-            })
-            .collect();
-
-        let missing_dependencies: BTreeMap<&str, HashSet<&str>> = self
-            .get_missing_dependencies()
-            .iter()
-            .map(|(&dependency, files)| {
-                let files = files.iter().map(|path| path.as_str()).collect();
-                (dependency, files)
-            })
-            .collect();
-
-        state.serialize_field("using_dependencies", &using_dependencies)?;
-        state.serialize_field("unused_dependencies", &self.get_unused_dependencies())?;
-        state.serialize_field(
-            "unused_dev_dependencies",
-            &self.get_unused_dev_dependencies(),
-        )?;
-        state.serialize_field("missing_dependencies", &missing_dependencies)?;
-
-        state.end()
     }
 }

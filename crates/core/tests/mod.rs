@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, HashSet};
 use std::env;
 use std::path::PathBuf;
 
-use depckeck_rs_core::checker::{CheckResult, Checker};
+use depckeck_rs_core::checker::{Checker, CheckerResult};
 use depckeck_rs_core::config::Config;
 use pretty_assertions::assert_eq;
 
@@ -14,7 +14,7 @@ struct ExpectedCheckResult<'a> {
     unused_dev_dependencies: HashSet<&'a str>,
 }
 
-fn assert_result(actual: CheckResult, expected: ExpectedCheckResult) {
+fn assert_result(actual: CheckerResult, expected: ExpectedCheckResult) {
     assert_eq!(actual.using_dependencies, expected.using_dependencies);
     assert_eq!(
         actual.get_missing_dependencies(),
