@@ -30,6 +30,10 @@ pub struct Args {
     #[clap(takes_value = true)]
     #[clap(allow_invalid_utf8 = true)]
     pub ignore_path: Option<PathBuf>,
+
+    #[clap(long = "ignore-patterns")]
+    #[clap(help = "Comma separated patterns describing files to ignore")]
+    pub ignore_patterns: Option<Vec<String>>,
 }
 
 #[derive(Debug, Error)]

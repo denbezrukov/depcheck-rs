@@ -23,12 +23,18 @@ fn main() -> Result<()> {
         ignore_bin_package,
         skip_missing,
         ignore_path,
+        ignore_patterns,
     } = Args::parse();
 
-    let config = Config::new(directory)
+    let mut config = Config::new(directory)
         .with_ignore_bin_package(ignore_bin_package)
         .with_skip_missing(skip_missing)
         .with_ignore_path(ignore_path);
+
+    if let Some(ignore_patterns) = ignore_patterns {
+        println!("{:#?}", ignore_patterns);
+        config = config.with_ignore_patterns(ignore_patterns);
+    }
 
     let result = Checker::new(config).check_package()?;
 
