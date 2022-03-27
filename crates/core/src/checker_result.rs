@@ -17,7 +17,7 @@ pub struct CheckerResult {
 impl CheckerResult {
     pub fn get_missing_dependencies(&self) -> BTreeMap<&str, &HashSet<String>> {
         if self.config.skip_missing() {
-            Default::default()
+            BTreeMap::new()
         } else {
             let ignore_matches = self
                 .config

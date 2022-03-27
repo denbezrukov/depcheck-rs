@@ -2,7 +2,8 @@ use std::collections::{BTreeMap, HashSet};
 use std::env;
 use std::path::PathBuf;
 
-use depckeck_rs_core::checker::{Checker, CheckerResult};
+use depckeck_rs_core::checker::Checker;
+use depckeck_rs_core::checker_result::CheckerResult;
 use depckeck_rs_core::config::Config;
 use pretty_assertions::assert_eq;
 
