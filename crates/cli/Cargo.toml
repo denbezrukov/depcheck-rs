@@ -12,3 +12,4 @@ depckeck-rs-core = { version = "0.0.0", path = "../core" }
 serde_json = "1.0.78"
 clap = {version = "3.1.6", features = ["cargo", "derive"]}
 thiserror = "1.0"
+human-panic = "1.0.3"

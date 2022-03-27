@@ -1,50 +1,52 @@
-use clap::{crate_authors, crate_version, Arg, Command};
+use std::path::{Path, PathBuf};
+use thiserror::Error;
 
-pub fn build_app() -> Command<'static> {
-    let app = Command::new("depcheck-rs")
-        .author(crate_authors!())
-        .version(crate_version!())
-        .about("The dependency check CLI")
-        .bin_name("depcheck-rs")
-        .arg(
-            Arg::new("directory")
-                .long("directory")
-                .short('d')
-                .allow_invalid_utf8(true)
-                .takes_value(true)
-                .default_value(".")
-                .value_name("DIRECTORY")
-                .help("The directory argument is the root directory of your project"),
-        )
-        .arg(
-            Arg::new("ignore-bin-package")
-                .long("ignore-bin-package")
-                .takes_value(true)
-                .default_value("false")
-                .help("A flag to indicate if depcheck ignores the packages containing bin entry"),
-        )
-        .arg(
-            Arg::new("skip-missing")
-                .long("skip-missing")
-                .takes_value(true)
-                .default_value("false")
-                .help("A flag to indicate if depcheck skips calculation of missing dependencies"),
-        )
-        .arg(
-            Arg::new("ignore-path")
-                .long("ignore-path")
-                .takes_value(true)
-                .help("Path to a file with patterns describing files to ignore"),
-        );
-    app
+#[derive(Debug, clap::Parser)]
+#[clap(bin_name = "depcheck-rs")]
+#[clap(about = "The dependency check CLI")]
+#[clap(author = clap::crate_authors!())]
+#[clap(version = clap::crate_version!())]
+pub struct Args {
+    #[clap(long, short = 'd')]
+    #[clap(help = "The directory argument is the root directory of your project")]
+    #[clap(default_value = ".")]
+    #[clap(parse(from_os_str))]
+    #[clap(takes_value = true)]
+    #[clap(allow_invalid_utf8 = true)]
+    #[clap(validator = validate_directory)]
+    pub directory: PathBuf,
+
+    #[clap(long = "ignore-bin-package")]
+    #[clap(help = "A flag to indicate if depcheck ignores the packages containing bin entry")]
+    pub ignore_bin_package: bool,
+
+    #[clap(long = "skip-missing")]
+    #[clap(help = "A flag to indicate if depcheck skips calculation of missing dependencies")]
+    pub skip_missing: bool,
+
+    #[clap(long = "ignore-path")]
+    #[clap(help = "Path to a file with patterns describing files to ignore")]
+    #[clap(parse(from_os_str))]
+    #[clap(takes_value = true)]
+    #[clap(allow_invalid_utf8 = true)]
+    pub ignore_path: Option<PathBuf>,
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn verify_app() {
-        use super::build_app;
+#[derive(Debug, Error)]
+pub enum Error {
+    #[error("directory not found")]
+    DirectoryNotFound,
+}
 
-        build_app().debug_assert();
+fn is_existing_directory(path: &Path) -> bool {
+    path.is_dir() && (path.file_name().is_some() || path.canonicalize().is_ok())
+}
+
+fn validate_directory(path: &str) -> Result<(), Error> {
+    let path = PathBuf::from(path);
+    if is_existing_directory(&path) {
+        Ok(())
+    } else {
+        Err(Error::DirectoryNotFound)
     }
 }
