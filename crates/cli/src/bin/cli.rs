@@ -24,6 +24,7 @@ fn main() -> Result<()> {
         skip_missing,
         ignore_path,
         ignore_patterns,
+        ignore_matches,
     } = Args::parse();
 
     let mut config = Config::new(directory)
@@ -32,8 +33,11 @@ fn main() -> Result<()> {
         .with_ignore_path(ignore_path);
 
     if let Some(ignore_patterns) = ignore_patterns {
-        println!("{:#?}", ignore_patterns);
         config = config.with_ignore_patterns(ignore_patterns);
+    }
+
+    if let Some(ignore_matches) = ignore_matches {
+        config = config.with_ignore_matches(ignore_matches);
     }
 
     let result = Checker::new(config).check_package()?;

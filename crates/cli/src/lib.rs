@@ -32,8 +32,14 @@ pub struct Args {
     pub ignore_path: Option<PathBuf>,
 
     #[clap(long = "ignore-patterns")]
-    #[clap(help = "Comma separated patterns describing files to ignore")]
+    #[clap(help = "Comma separated patterns describing files or directories to ignore")]
+    #[clap(use_value_delimiter = true)]
     pub ignore_patterns: Option<Vec<String>>,
+
+    #[clap(long = "ignore_matches")]
+    #[clap(help = "A comma separated array containing package names to ignore")]
+    #[clap(use_value_delimiter = true)]
+    pub ignore_matches: Option<Vec<String>>,
 }
 
 #[derive(Debug, Error)]

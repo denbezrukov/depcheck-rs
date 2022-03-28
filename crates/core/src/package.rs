@@ -60,7 +60,7 @@ impl Package {
     }
 
     /// Deserializes a `Package` from a file path.
-    pub fn from_path(path: impl AsRef<Path>) -> Result<Self> {
+    pub fn from_path<T: AsRef<Path>>(path: T) -> Result<Self> {
         let content = fs::read(path.as_ref())?;
         Self::from_slice(content.as_slice())
     }
