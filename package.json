@@ -1,0 +1,37 @@
+{
+  "name": "@depcheck-rs/core",
+  "version": "0.0.0",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "napi": {
+    "name": "depcheck-rs",
+    "triples": {
+      "additional": [
+        "aarch64-apple-darwin",
+        "aarch64-linux-android",
+        "aarch64-unknown-linux-gnu",
+        "aarch64-unknown-linux-musl",
+        "aarch64-pc-windows-msvc",
+        "armv7-unknown-linux-gnueabihf",
+        "x86_64-unknown-linux-musl",
+        "x86_64-unknown-freebsd",
+        "i686-pc-windows-msvc",
+        "armv7-linux-androideabi"
+      ]
+    }
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@napi-rs/cli": "^2.5.0"
+  },
+  "engines": {
+    "node": ">= 10"
+  },
+  "scripts": {
+    "artifacts": "napi artifacts --dist scripts/npm",
+    "build": "napi build --platform --cargo-name depckeck-rs-node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depckeck-rs-node --release",
+    "build:debug": "napi build --platform --cargo-name depckeck-rs-node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depckeck-rs-node",
+    "prepublishOnly": "napi prepublish -p scripts/npm --tagstyle npm",
+    "version": "napi version -p scripts/npm"
+  }
+}
