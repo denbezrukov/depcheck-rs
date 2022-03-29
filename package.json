@@ -1,8 +1,6 @@
 {
   "name": "@depcheck-rs/core",
   "version": "0.0.0",
-  "main": "index.js",
-  "types": "index.d.ts",
   "napi": {
     "name": "depcheck-rs",
     "triples": {
@@ -22,16 +20,18 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "@napi-rs/cli": "^2.5.0"
+    "@napi-rs/cli": "^2.5.0",
+    "jest": "^27.5.1"
   },
   "engines": {
     "node": ">= 10"
   },
   "scripts": {
     "artifacts": "napi artifacts --dist scripts/npm",
-    "build": "napi build --platform --cargo-name depckeck-rs-node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depckeck-rs-node --release",
-    "build:debug": "napi build --platform --cargo-name depckeck-rs-node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depckeck-rs-node",
+    "build": "napi build --platform --cargo-name depckeck_rs_node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depcheck-rs-node --release",
+    "build:debug": "napi build --platform --cargo-name depckeck_rs_node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depcheck-rs-node",
     "prepublishOnly": "napi prepublish -p scripts/npm --tagstyle npm",
-    "version": "napi version -p scripts/npm"
+    "version": "napi version -p scripts/npm",
+    "test": "jest"
   }
 }

@@ -262,6 +262,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "depcheck-rs-node"
+version = "0.0.0"
+dependencies = [
+ "napi",
+ "napi-build",
+ "napi-derive",
+]
+
+[[package]]
 name = "depckeck-rs-core"
 version = "0.0.0"
 dependencies = [
@@ -279,15 +288,6 @@ dependencies = [
  "swc_ecma_parser",
  "thiserror",
  "walkdir",
-]
-
-[[package]]
-name = "depckeck-rs-node"
-version = "0.0.0"
-dependencies = [
- "napi",
- "napi-build",
- "napi-derive",
 ]
 
 [[package]]

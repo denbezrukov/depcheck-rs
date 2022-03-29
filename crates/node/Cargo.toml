@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "depckeck-rs-node"
+name = "depcheck-rs-node"
 version = "0.0.0"
 
 [lib]
