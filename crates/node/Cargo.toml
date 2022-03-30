@@ -5,6 +5,7 @@ version = "0.0.0"
 
 [lib]
 crate-type = ["cdylib"]
+name = "depcheck_rs_node"
 
 [dependencies]
 depckeck-rs-core = { version = "0.0.0", path = "../core" }

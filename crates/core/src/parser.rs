@@ -17,15 +17,21 @@ impl Parser {
 
         let syntax = match extension {
             "ts" | "tsx" => Syntax::Typescript(TsConfig {
-                tsx: true,
-                dts: true,
+                dts: file.ends_with(".d.ts"),
+                tsx: extension == "tsx",
                 decorators: true,
-                ..Default::default()
+                no_early_errors: true,
             }),
             "js" | "jsx" => Syntax::Es(EsConfig {
                 jsx: true,
+                fn_bind: true,
                 decorators: true,
-                ..Default::default()
+                decorators_before_export: true,
+                export_default_from: true,
+                import_assertions: true,
+                static_blocks: true,
+                private_in_object: true,
+                allow_super_outside_method: true,
             }),
             _ => return None,
         };

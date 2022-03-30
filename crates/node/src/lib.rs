@@ -18,7 +18,12 @@ pub struct Options {
 }
 
 #[napi]
-fn depcheck(path: String, options: Options) -> String {
+pub fn sum(v: i32) -> String {
+    String::from("12321")
+}
+
+#[napi]
+pub fn depcheck(path: String, options: Options) -> String {
     let path = PathBuf::from(path);
 
     let mut config = config::Config::new(path);

@@ -236,6 +236,7 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { depcheck } = nativeBinding
+const { sum, depcheck } = nativeBinding
 
+module.exports.sum = sum
 module.exports.depcheck = depcheck
