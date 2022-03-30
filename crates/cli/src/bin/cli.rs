@@ -2,7 +2,7 @@ use clap::Parser;
 use depcheck_rs_cli::Args;
 use depckeck_rs_core::checker::Checker;
 use depckeck_rs_core::config::Config;
-use depckeck_rs_core::package::{self};
+use depckeck_rs_core::package;
 use thiserror::Error;
 
 #[derive(Debug, Error)]

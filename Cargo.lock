@@ -265,6 +265,7 @@ dependencies = [
 name = "depcheck-rs-node"
 version = "0.0.0"
 dependencies = [
+ "depckeck-rs-core",
  "napi",
  "napi-build",
  "napi-derive",

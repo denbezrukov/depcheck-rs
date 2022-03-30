@@ -236,7 +236,6 @@ if (!nativeBinding) {
   throw new Error(`Failed to load native binding`)
 }
 
-const { sum, MyStruct } = nativeBinding
+const { depcheck } = nativeBinding
 
-module.exports.sum = sum
-module.exports.MyStruct = MyStruct
+module.exports.depcheck = depcheck

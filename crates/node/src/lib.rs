@@ -3,26 +3,46 @@
 #[macro_use]
 extern crate napi_derive;
 
-#[napi]
-fn sum(a: i32, b: i32) -> i32 {
-    a + b
+use std::path::PathBuf;
+
+use depckeck_rs_core::checker::Checker;
+use depckeck_rs_core::config;
+
+#[napi(object)]
+pub struct Options {
+    pub ignore_bin_package: Option<bool>,
+    pub ignore_patterns: Option<Vec<String>>,
+    pub ignore_matches: Option<Vec<String>>,
+    pub skip_missing: Option<bool>,
+    pub ignore_path: Option<String>,
 }
 
 #[napi]
-pub struct MyStruct {
-    pub field: i32,
-    pub field1: f64,
-}
+fn depcheck(path: String, options: Options) -> String {
+    let path = PathBuf::from(path);
 
-#[napi]
-impl MyStruct {
-    #[napi(factory)]
-    pub fn with_field(field: i32) -> Self {
-        MyStruct { field, field1: 0. }
+    let mut config = config::Config::new(path);
+
+    if let Some(ignore_bin_package) = options.ignore_bin_package {
+        config = config.with_ignore_bin_package(ignore_bin_package);
     }
 
-    #[napi]
-    pub fn get_field(&self) -> i32 {
-        self.field
+    if let Some(ignore_patterns) = options.ignore_patterns {
+        config = config.with_ignore_patterns(ignore_patterns);
     }
+
+    if let Some(ignore_matches) = options.ignore_matches {
+        config = config.with_ignore_matches(ignore_matches);
+    }
+
+    if let Some(skip_missing) = options.skip_missing {
+        config = config.with_skip_missing(skip_missing);
+    }
+
+    let ignore_path = options.ignore_path.map(PathBuf::from);
+    config = config.with_ignore_path(ignore_path);
+
+    let result = Checker::new(config).check_package().unwrap();
+
+    result.to_json().unwrap()
 }
