@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./node-depcheck/",
+    "baseUrl": "./__tests__/",
     "target": "es6",
     "module": "CommonJS",
     "moduleResolution": "node",
@@ -42,7 +42,7 @@
   "buildOnSave": false,
   "compileOnSave": false,
   "include": [
-    "./node-depcheck/**/*",
+    "./__tests__/**/*",
   ],
   "exclude": [
     "node_modules"

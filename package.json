@@ -1,8 +1,8 @@
 {
   "name": "@depcheck-rs/core",
   "version": "0.0.0",
-  "main": "./node-depcheck/src/index.js",
-  "types": "./node-depckeck/src/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "napi": {
     "name": "depcheck-rs",
     "triples": {
@@ -25,11 +25,11 @@
     "node": ">= 10"
   },
   "scripts": {
-    "artifacts": "napi artifacts --dist scripts/npm",
-    "build": "napi build --platform --cargo-name depcheck_rs_node --js ./node-depcheck/src/index.js --dts ./node-depcheck/src/index.d.ts -p depcheck-rs-node --release",
-    "build:debug": "napi build --platform --cargo-name depcheck_rs_node --js ./node-depcheck/src/index.js --dts ./node-depcheck/src/index.d.ts -p depcheck-rs-node",
-    "prepublishOnly": "napi prepublish -p scripts/npm --tagstyle npm",
-    "version": "napi version -p scripts/npm",
+    "artifacts": "napi artifacts",
+    "build": "napi build --platform --cargo-name depcheck_rs_node -p depcheck-rs-node --release",
+    "build:debug": "napi build --platform --cargo-name depcheck_rs_node -p depcheck-rs-node",
+    "prepublishOnly": "napi prepublish -t npm",
+    "version": "napi version",
     "test": "jest",
     "compile": "tsc --noEmit"
   },
