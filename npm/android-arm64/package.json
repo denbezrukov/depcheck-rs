@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-node-rs/core-android-arm64",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "os": [
     "android"
   ],
