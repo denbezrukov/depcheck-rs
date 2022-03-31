@@ -1,4 +1,4 @@
-name: CI
+name: NodeCI
 env:
   DEBUG: napi:*
   APP_NAME: depcheck
