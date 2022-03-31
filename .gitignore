@@ -8,8 +8,6 @@ Profile-*.json
 **/target
 # Ignore test files that contributors could create locally
 /test.*
-# Ignore lockfiles
-yarn.lock
 npm-shrinkwrap.json
 pnpm-lock.yaml
 **/dist
