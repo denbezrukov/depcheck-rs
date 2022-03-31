@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs/core-win32-arm64-msvc",
+  "name": "@depcheckrs/core-win32-arm64-msvc",
   "version": "0.0.1",
   "os": [
     "win32"

@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs/core-freebsd-x64",
+  "name": "@depcheckrs/core-freebsd-x64",
   "version": "0.0.1",
   "os": [
     "freebsd"

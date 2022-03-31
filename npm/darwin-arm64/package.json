@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs/core-darwin-arm64",
+  "name": "@depcheckrs/core-darwin-arm64",
   "version": "0.0.1",
   "os": [
     "darwin"

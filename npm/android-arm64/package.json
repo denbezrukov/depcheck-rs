@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs/core-android-arm64",
+  "name": "@depcheckrs/core-android-arm64",
   "version": "0.0.1",
   "os": [
     "android"

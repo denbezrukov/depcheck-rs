@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs/core-linux-x64-gnu",
+  "name": "@depcheckrs/core-linux-x64-gnu",
   "version": "0.0.1",
   "os": [
     "linux"
