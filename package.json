@@ -28,8 +28,8 @@
   },
   "scripts": {
     "artifacts": "napi artifacts --dist scripts/npm",
-    "build": "napi build --platform --cargo-name depckeck_rs_node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depcheck-rs-node --release",
-    "build:debug": "napi build --platform --cargo-name depckeck_rs_node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depcheck-rs-node",
+    "build": "napi build --platform --cargo-name depcheck_rs_node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depcheck-rs-node --release",
+    "build:debug": "napi build --platform --cargo-name depcheck_rs_node --js ./node-depcheck/src/binding.js --dts ./node-depcheck/src/binding.d.ts -p depcheck-rs-node",
     "prepublishOnly": "napi prepublish -p scripts/npm --tagstyle npm",
     "version": "napi version -p scripts/npm",
     "test": "jest"

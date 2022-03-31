@@ -10,5 +10,4 @@ export interface Options {
   skipMissing?: boolean | undefined | null
   ignorePath?: string | undefined | null
 }
-export function sum(): string
-export function depcheck(path: string, options: Options): string
+export function depcheck(path: string, options?: Options | undefined | null): string
