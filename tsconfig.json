@@ -1,0 +1,50 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./node-depcheck/",
+    "target": "es6",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "strict": true,
+    "alwaysStrict": true,
+    "useUnknownInCatchVariables": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "strictBindCallApply": true,
+    "experimentalDecorators": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noUncheckedIndexedAccess": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "noImplicitThis": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "preserveConstEnums": true,
+    "types": [
+      "node",
+      "jest"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "dom",
+      "es2019",
+      "webworker"
+    ],
+    "skipLibCheck": true
+  },
+  "buildOnSave": false,
+  "compileOnSave": false,
+  "include": [
+    "./node-depcheck/**/*",
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
