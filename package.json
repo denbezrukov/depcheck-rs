@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-rs/core",
-  "repository": "https://github.com/Dominionys/depcheck-rs",
+  "repository": "https://github.com/Dominionys/depcheck-rs.git",
   "version": "0.0.0",
   "main": "index.js",
   "types": "index.d.ts",
