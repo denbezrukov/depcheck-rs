@@ -7,14 +7,15 @@
   "cpu": [
     "arm64"
   ],
-  "main": "core.linux-arm64-gnu.node",
+  "main": "depcheck-rs.linux-arm64-gnu.node",
   "files": [
-    "core.linux-arm64-gnu.node"
+    "depcheck-rs.linux-arm64-gnu.node"
   ],
   "license": "MIT",
   "engines": {
     "node": ">= 10"
   },
+  "repository": "https://github.com/Dominionys/depcheck-rs",
   "libc": [
     "glibc"
   ]

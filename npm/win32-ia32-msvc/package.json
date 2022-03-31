@@ -7,12 +7,13 @@
   "cpu": [
     "ia32"
   ],
-  "main": "core.win32-ia32-msvc.node",
+  "main": "depcheck-rs.win32-ia32-msvc.node",
   "files": [
-    "core.win32-ia32-msvc.node"
+    "depcheck-rs.win32-ia32-msvc.node"
   ],
   "license": "MIT",
   "engines": {
     "node": ">= 10"
-  }
+  },
+  "repository": "https://github.com/Dominionys/depcheck-rs"
 }

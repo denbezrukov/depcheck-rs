@@ -7,12 +7,13 @@
   "cpu": [
     "arm"
   ],
-  "main": "core.android-arm-eabi.node",
+  "main": "depcheck-rs.android-arm-eabi.node",
   "files": [
-    "core.android-arm-eabi.node"
+    "depcheck-rs.android-arm-eabi.node"
   ],
   "license": "MIT",
   "engines": {
     "node": ">= 10"
-  }
+  },
+  "repository": "https://github.com/Dominionys/depcheck-rs"
 }

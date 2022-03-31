@@ -1,7 +1,7 @@
 name: NodeCI
 env:
   DEBUG: napi:*
-  APP_NAME: depcheck
+  APP_NAME: depcheck-rs
   MACOSX_DEPLOYMENT_TARGET: '10.13'
 'on':
   push:

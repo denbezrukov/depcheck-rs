@@ -7,14 +7,15 @@
   "cpu": [
     "x64"
   ],
-  "main": "core.linux-x64-musl.node",
+  "main": "depcheck-rs.linux-x64-musl.node",
   "files": [
-    "core.linux-x64-musl.node"
+    "depcheck-rs.linux-x64-musl.node"
   ],
   "license": "MIT",
   "engines": {
     "node": ">= 10"
   },
+  "repository": "https://github.com/Dominionys/depcheck-rs",
   "libc": [
     "musl"
   ]

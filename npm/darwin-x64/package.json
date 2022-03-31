@@ -7,12 +7,13 @@
   "cpu": [
     "x64"
   ],
-  "main": "core.darwin-x64.node",
+  "main": "depcheck-rs.darwin-x64.node",
   "files": [
-    "core.darwin-x64.node"
+    "depcheck-rs.darwin-x64.node"
   ],
   "license": "MIT",
   "engines": {
     "node": ">= 10"
-  }
+  },
+  "repository": "https://github.com/Dominionys/depcheck-rs"
 }
