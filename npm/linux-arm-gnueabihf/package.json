@@ -1,5 +1,5 @@
 {
-  "name": "@depcheckrs/core-linux-arm-gnueabihf",
+  "name": "@depcheck-node-rs/core-linux-arm-gnueabihf",
   "version": "0.0.2",
   "os": [
     "linux"

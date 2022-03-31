@@ -1,5 +1,5 @@
 {
-  "name": "@depcheckrs/core-linux-arm64-musl",
+  "name": "@depcheck-node-rs/core-linux-arm64-musl",
   "version": "0.0.2",
   "os": [
     "linux"

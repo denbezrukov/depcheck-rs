@@ -1,5 +1,5 @@
 {
-  "name": "@depcheckrs/core",
+  "name": "@depcheck-node-rs/core",
   "repository": "https://github.com/Dominionys/depcheck-rs.git",
   "version": "0.0.2",
   "main": "index.js",
