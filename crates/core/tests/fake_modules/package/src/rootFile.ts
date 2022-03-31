@@ -13,5 +13,5 @@ import {Some} from './subDir/subDirFile';
 // for some reason swc panic for ts parse with dts option
 function test() {
   let pathname = '/';
-  pathname = /${pathname}
+  pathname = `/${pathname}`;
 }
