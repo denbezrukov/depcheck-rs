@@ -77,7 +77,7 @@ impl Serialize for CheckerResult {
     where
         S: Serializer,
     {
-        let mut state = serializer.serialize_struct("CheckResult", 3)?;
+        let mut state = serializer.serialize_struct("CheckResult", 4)?;
 
         let using_dependencies: BTreeMap<&str, HashSet<&str>> = self
             .using_dependencies

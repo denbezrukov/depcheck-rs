@@ -10,4 +10,10 @@ export interface Options {
   skipMissing?: boolean | undefined | null
   ignorePath?: string | undefined | null
 }
-export function depcheck(path: string, options?: Options | undefined | null): string
+export interface DepcheckResult {
+  usingDependencies: Record<string, Array<string>>
+  missingDependencies: Record<string, Array<string>>
+  unusedDependencies: Array<string>
+  unusedDevDependencies: Array<string>
+}
+export function depcheck(path: string, options?: Options | undefined | null): DepcheckResult

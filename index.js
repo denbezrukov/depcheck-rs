@@ -25,24 +25,24 @@ switch (platform) {
   case 'android':
     switch (arch) {
       case 'arm64':
-        localFileExisted = existsSync(join(__dirname, 'depcheck-rs.android-arm64.node'))
+        localFileExisted = existsSync(join(__dirname, 'depcheck-rs-node.android-arm64.node'))
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.android-arm64.node')
+            nativeBinding = require('./depcheck-rs-node.android-arm64.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-android-arm64')
+            nativeBinding = require('@depcheck-rs-node/core-android-arm64')
           }
         } catch (e) {
           loadError = e
         }
         break
       case 'arm':
-        localFileExisted = existsSync(join(__dirname, 'depcheck-rs.android-arm-eabi.node'))
+        localFileExisted = existsSync(join(__dirname, 'depcheck-rs-node.android-arm-eabi.node'))
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.android-arm-eabi.node')
+            nativeBinding = require('./depcheck-rs-node.android-arm-eabi.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-android-arm-eabi')
+            nativeBinding = require('@depcheck-rs-node/core-android-arm-eabi')
           }
         } catch (e) {
           loadError = e
@@ -56,13 +56,13 @@ switch (platform) {
     switch (arch) {
       case 'x64':
         localFileExisted = existsSync(
-          join(__dirname, 'depcheck-rs.win32-x64-msvc.node')
+          join(__dirname, 'depcheck-rs-node.win32-x64-msvc.node')
         )
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.win32-x64-msvc.node')
+            nativeBinding = require('./depcheck-rs-node.win32-x64-msvc.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-win32-x64-msvc')
+            nativeBinding = require('@depcheck-rs-node/core-win32-x64-msvc')
           }
         } catch (e) {
           loadError = e
@@ -70,13 +70,13 @@ switch (platform) {
         break
       case 'ia32':
         localFileExisted = existsSync(
-          join(__dirname, 'depcheck-rs.win32-ia32-msvc.node')
+          join(__dirname, 'depcheck-rs-node.win32-ia32-msvc.node')
         )
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.win32-ia32-msvc.node')
+            nativeBinding = require('./depcheck-rs-node.win32-ia32-msvc.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-win32-ia32-msvc')
+            nativeBinding = require('@depcheck-rs-node/core-win32-ia32-msvc')
           }
         } catch (e) {
           loadError = e
@@ -84,13 +84,13 @@ switch (platform) {
         break
       case 'arm64':
         localFileExisted = existsSync(
-          join(__dirname, 'depcheck-rs.win32-arm64-msvc.node')
+          join(__dirname, 'depcheck-rs-node.win32-arm64-msvc.node')
         )
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.win32-arm64-msvc.node')
+            nativeBinding = require('./depcheck-rs-node.win32-arm64-msvc.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-win32-arm64-msvc')
+            nativeBinding = require('@depcheck-rs-node/core-win32-arm64-msvc')
           }
         } catch (e) {
           loadError = e
@@ -103,12 +103,12 @@ switch (platform) {
   case 'darwin':
     switch (arch) {
       case 'x64':
-        localFileExisted = existsSync(join(__dirname, 'depcheck-rs.darwin-x64.node'))
+        localFileExisted = existsSync(join(__dirname, 'depcheck-rs-node.darwin-x64.node'))
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.darwin-x64.node')
+            nativeBinding = require('./depcheck-rs-node.darwin-x64.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-darwin-x64')
+            nativeBinding = require('@depcheck-rs-node/core-darwin-x64')
           }
         } catch (e) {
           loadError = e
@@ -116,13 +116,13 @@ switch (platform) {
         break
       case 'arm64':
         localFileExisted = existsSync(
-          join(__dirname, 'depcheck-rs.darwin-arm64.node')
+          join(__dirname, 'depcheck-rs-node.darwin-arm64.node')
         )
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.darwin-arm64.node')
+            nativeBinding = require('./depcheck-rs-node.darwin-arm64.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-darwin-arm64')
+            nativeBinding = require('@depcheck-rs-node/core-darwin-arm64')
           }
         } catch (e) {
           loadError = e
@@ -136,12 +136,12 @@ switch (platform) {
     if (arch !== 'x64') {
       throw new Error(`Unsupported architecture on FreeBSD: ${arch}`)
     }
-    localFileExisted = existsSync(join(__dirname, 'depcheck-rs.freebsd-x64.node'))
+    localFileExisted = existsSync(join(__dirname, 'depcheck-rs-node.freebsd-x64.node'))
     try {
       if (localFileExisted) {
-        nativeBinding = require('./depcheck-rs.freebsd-x64.node')
+        nativeBinding = require('./depcheck-rs-node.freebsd-x64.node')
       } else {
-        nativeBinding = require('@depcheck-node-rs/core-freebsd-x64')
+        nativeBinding = require('@depcheck-rs-node/core-freebsd-x64')
       }
     } catch (e) {
       loadError = e
@@ -152,26 +152,26 @@ switch (platform) {
       case 'x64':
         if (isMusl()) {
           localFileExisted = existsSync(
-            join(__dirname, 'depcheck-rs.linux-x64-musl.node')
+            join(__dirname, 'depcheck-rs-node.linux-x64-musl.node')
           )
           try {
             if (localFileExisted) {
-              nativeBinding = require('./depcheck-rs.linux-x64-musl.node')
+              nativeBinding = require('./depcheck-rs-node.linux-x64-musl.node')
             } else {
-              nativeBinding = require('@depcheck-node-rs/core-linux-x64-musl')
+              nativeBinding = require('@depcheck-rs-node/core-linux-x64-musl')
             }
           } catch (e) {
             loadError = e
           }
         } else {
           localFileExisted = existsSync(
-            join(__dirname, 'depcheck-rs.linux-x64-gnu.node')
+            join(__dirname, 'depcheck-rs-node.linux-x64-gnu.node')
           )
           try {
             if (localFileExisted) {
-              nativeBinding = require('./depcheck-rs.linux-x64-gnu.node')
+              nativeBinding = require('./depcheck-rs-node.linux-x64-gnu.node')
             } else {
-              nativeBinding = require('@depcheck-node-rs/core-linux-x64-gnu')
+              nativeBinding = require('@depcheck-rs-node/core-linux-x64-gnu')
             }
           } catch (e) {
             loadError = e
@@ -181,26 +181,26 @@ switch (platform) {
       case 'arm64':
         if (isMusl()) {
           localFileExisted = existsSync(
-            join(__dirname, 'depcheck-rs.linux-arm64-musl.node')
+            join(__dirname, 'depcheck-rs-node.linux-arm64-musl.node')
           )
           try {
             if (localFileExisted) {
-              nativeBinding = require('./depcheck-rs.linux-arm64-musl.node')
+              nativeBinding = require('./depcheck-rs-node.linux-arm64-musl.node')
             } else {
-              nativeBinding = require('@depcheck-node-rs/core-linux-arm64-musl')
+              nativeBinding = require('@depcheck-rs-node/core-linux-arm64-musl')
             }
           } catch (e) {
             loadError = e
           }
         } else {
           localFileExisted = existsSync(
-            join(__dirname, 'depcheck-rs.linux-arm64-gnu.node')
+            join(__dirname, 'depcheck-rs-node.linux-arm64-gnu.node')
           )
           try {
             if (localFileExisted) {
-              nativeBinding = require('./depcheck-rs.linux-arm64-gnu.node')
+              nativeBinding = require('./depcheck-rs-node.linux-arm64-gnu.node')
             } else {
-              nativeBinding = require('@depcheck-node-rs/core-linux-arm64-gnu')
+              nativeBinding = require('@depcheck-rs-node/core-linux-arm64-gnu')
             }
           } catch (e) {
             loadError = e
@@ -209,13 +209,13 @@ switch (platform) {
         break
       case 'arm':
         localFileExisted = existsSync(
-          join(__dirname, 'depcheck-rs.linux-arm-gnueabihf.node')
+          join(__dirname, 'depcheck-rs-node.linux-arm-gnueabihf.node')
         )
         try {
           if (localFileExisted) {
-            nativeBinding = require('./depcheck-rs.linux-arm-gnueabihf.node')
+            nativeBinding = require('./depcheck-rs-node.linux-arm-gnueabihf.node')
           } else {
-            nativeBinding = require('@depcheck-node-rs/core-linux-arm-gnueabihf')
+            nativeBinding = require('@depcheck-rs-node/core-linux-arm-gnueabihf')
           }
         } catch (e) {
           loadError = e

@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-node-rs/core-win32-x64-msvc",
+  "name": "@depcheck-rs-node/core-win32-x64-msvc",
   "version": "0.0.3",
   "os": [
     "win32"

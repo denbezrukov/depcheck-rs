@@ -1,11 +1,11 @@
 {
-  "name": "@depcheck-node-rs/core",
+  "name": "@depcheck-rs-node/core",
   "repository": "https://github.com/Dominionys/depcheck-rs.git",
   "version": "0.0.3",
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
-    "name": "depcheck-rs",
+    "name": "depcheck-rs-node",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",

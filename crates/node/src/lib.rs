@@ -3,9 +3,11 @@
 #[macro_use]
 extern crate napi_derive;
 
+use std::collections::HashMap;
 use std::path::PathBuf;
 
 use depckeck_rs_core::checker::Checker;
+use depckeck_rs_core::checker_result::CheckerResult;
 use depckeck_rs_core::config;
 
 #[napi(object)]
@@ -17,8 +19,66 @@ pub struct Options {
     pub ignore_path: Option<String>,
 }
 
+#[napi(object)]
+pub struct DepcheckResult {
+    pub using_dependencies: HashMap<String, Vec<String>>,
+    pub missing_dependencies: HashMap<String, Vec<String>>,
+    pub unused_dependencies: Vec<String>,
+    pub unused_dev_dependencies: Vec<String>,
+}
+
+impl From<CheckerResult> for DepcheckResult {
+    fn from(result: CheckerResult) -> Self {
+        let using_dependencies = result
+            .using_dependencies
+            .iter()
+            .map(|(file, dependencies)| {
+                (
+                    file.to_string(),
+                    dependencies
+                        .iter()
+                        .map(|dependency| dependency.to_string())
+                        .collect(),
+                )
+            })
+            .collect();
+
+        let missing_dependencies = result
+            .get_missing_dependencies()
+            .iter()
+            .map(|(file, dependencies)| {
+                (
+                    file.to_string(),
+                    dependencies
+                        .iter()
+                        .map(|dependency| dependency.to_string())
+                        .collect(),
+                )
+            })
+            .collect();
+
+        let unused_dependencies = result
+            .get_unused_dependencies()
+            .iter()
+            .map(|dependency| dependency.to_string())
+            .collect();
+        let unused_dev_dependencies = result
+            .get_unused_dev_dependencies()
+            .iter()
+            .map(|dependency| dependency.to_string())
+            .collect();
+
+        DepcheckResult {
+            using_dependencies,
+            missing_dependencies,
+            unused_dependencies,
+            unused_dev_dependencies,
+        }
+    }
+}
+
 #[napi]
-pub fn depcheck(path: String, options: Option<Options>) -> String {
+pub fn depcheck(path: String, options: Option<Options>) -> DepcheckResult {
     let path = PathBuf::from(path);
 
     let mut config = config::Config::new(path);
@@ -46,5 +106,5 @@ pub fn depcheck(path: String, options: Option<Options>) -> String {
 
     let result = Checker::new(config).check_package().unwrap();
 
-    result.to_json().unwrap()
+    result.into()
 }
