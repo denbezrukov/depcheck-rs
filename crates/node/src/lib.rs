@@ -29,44 +29,25 @@ pub struct DepcheckResult {
 
 impl From<CheckerResult> for DepcheckResult {
     fn from(result: CheckerResult) -> Self {
-        let using_dependencies = result
-            .using_dependencies
-            .iter()
-            .map(|(file, dependencies)| {
-                (
-                    file.to_string(),
-                    dependencies
-                        .iter()
-                        .map(|dependency| dependency.to_string())
-                        .collect(),
-                )
-            })
+        let CheckerResult {
+            using_dependencies,
+            missing_dependencies,
+            unused_dependencies,
+            unused_dev_dependencies,
+        } = result;
+
+        let using_dependencies = using_dependencies
+            .into_iter()
+            .map(|(dependency, files)| (dependency, files.into_iter().collect()))
             .collect();
 
-        let missing_dependencies = result
-            .get_missing_dependencies()
-            .iter()
-            .map(|(file, dependencies)| {
-                (
-                    file.to_string(),
-                    dependencies
-                        .iter()
-                        .map(|dependency| dependency.to_string())
-                        .collect(),
-                )
-            })
+        let missing_dependencies = missing_dependencies
+            .into_iter()
+            .map(|(dependency, files)| (dependency, files.into_iter().collect()))
             .collect();
 
-        let unused_dependencies = result
-            .get_unused_dependencies()
-            .iter()
-            .map(|dependency| dependency.to_string())
-            .collect();
-        let unused_dev_dependencies = result
-            .get_unused_dev_dependencies()
-            .iter()
-            .map(|dependency| dependency.to_string())
-            .collect();
+        let unused_dependencies = unused_dependencies.into_iter().collect();
+        let unused_dev_dependencies = unused_dev_dependencies.into_iter().collect();
 
         DepcheckResult {
             using_dependencies,

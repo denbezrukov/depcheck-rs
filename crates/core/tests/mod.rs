@@ -8,25 +8,19 @@ use depckeck_rs_core::config::Config;
 use pretty_assertions::assert_eq;
 
 #[derive(Default)]
-struct ExpectedCheckResult<'a> {
+struct ExpectedCheckResult {
     using_dependencies: BTreeMap<String, HashSet<String>>,
-    missing_dependencies: BTreeMap<&'a str, &'a HashSet<String>>,
-    unused_dependencies: HashSet<&'a str>,
-    unused_dev_dependencies: HashSet<&'a str>,
+    missing_dependencies: BTreeMap<String, HashSet<String>>,
+    unused_dependencies: HashSet<String>,
+    unused_dev_dependencies: HashSet<String>,
 }
 
 fn assert_result(actual: CheckerResult, expected: ExpectedCheckResult) {
     assert_eq!(actual.using_dependencies, expected.using_dependencies);
+    assert_eq!(actual.missing_dependencies, expected.missing_dependencies);
+    assert_eq!(actual.unused_dependencies, expected.unused_dependencies);
     assert_eq!(
-        actual.get_missing_dependencies(),
-        expected.missing_dependencies
-    );
-    assert_eq!(
-        actual.get_unused_dependencies(),
-        expected.unused_dependencies
-    );
-    assert_eq!(
-        actual.get_unused_dev_dependencies(),
+        actual.unused_dev_dependencies,
         expected.unused_dev_dependencies
     );
 }
@@ -52,45 +46,46 @@ fn test_package() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let react_files = [
-        String::from("src/subDir/subDirFile.ts"),
-        String::from("src/subDir/subSubDir/subSubDirFile.ts"),
-        String::from("src/rootFile.ts"),
-    ]
-    .into_iter()
-    .collect();
-    let package_first_2_files = [
-        String::from("src/subDir/subDirFile.ts"),
-        String::from("src/subDir/subSubDir/subSubDirFile.ts"),
-        String::from("src/rootFile.ts"),
-    ]
-    .into_iter()
-    .collect();
-
-    let package_first_3_files = [
-        String::from("src/subDir/subDirFile.ts"),
-        String::from("src/subDir/subSubDir/subSubDirFile.ts"),
-        String::from("src/rootFile.ts"),
-    ]
-    .into_iter()
-    .collect();
-
-    let package_root_first_files = [String::from("src/rootFile.ts")].into_iter().collect();
-    let package_sub_first_files = [String::from("src/subDir/subDirFile.ts")]
-        .into_iter()
-        .collect();
-
-    let package_sub_sub_first = [String::from("src/subDir/subSubDir/subSubDirFile.ts")]
-        .into_iter()
-        .collect();
-
     let missing_dependencies = BTreeMap::from([
-        ("react", &react_files),
-        ("@package/first2", &package_first_2_files),
-        ("@package/first3", &package_first_3_files),
-        ("@packageRoot/first1", &package_root_first_files),
-        ("@packageSubDir/first1", &package_sub_first_files),
-        ("@packageSubSubDir/first1", &package_sub_sub_first),
+        (
+            String::from("react"),
+            [
+                String::from("src/subDir/subDirFile.ts"),
+                String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                String::from("src/rootFile.ts"),
+            ]
+            .into(),
+        ),
+        (
+            String::from("@package/first2"),
+            [
+                String::from("src/subDir/subDirFile.ts"),
+                String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                String::from("src/rootFile.ts"),
+            ]
+            .into(),
+        ),
+        (
+            String::from("@package/first3"),
+            [
+                String::from("src/subDir/subDirFile.ts"),
+                String::from("src/subDir/subSubDir/subSubDirFile.ts"),
+                String::from("src/rootFile.ts"),
+            ]
+            .into(),
+        ),
+        (
+            String::from("@packageRoot/first1"),
+            [String::from("src/rootFile.ts")].into_iter().collect(),
+        ),
+        (
+            String::from("@packageSubDir/first1"),
+            [String::from("src/subDir/subDirFile.ts")].into(),
+        ),
+        (
+            String::from("@packageSubSubDir/first1"),
+            [String::from("src/subDir/subSubDir/subSubDirFile.ts")].into(),
+        ),
     ]);
 
     let expected = ExpectedCheckResult {
@@ -102,8 +97,7 @@ fn test_package() {
                     String::from("src/subDir/subDirFile.ts"),
                     String::from("src/rootFile.ts"),
                 ]
-                .into_iter()
-                .collect(),
+                .into(),
             ),
             (
                 String::from("@package/first3"),
@@ -112,8 +106,7 @@ fn test_package() {
                     String::from("src/subDir/subSubDir/subSubDirFile.ts"),
                     String::from("src/subDir/subDirFile.ts"),
                 ]
-                .into_iter()
-                .collect(),
+                .into(),
             ),
             (
                 String::from("@packageRoot/first1"),
@@ -121,9 +114,7 @@ fn test_package() {
             ),
             (
                 String::from("@packageSubDir/first1"),
-                [String::from("src/subDir/subDirFile.ts")]
-                    .into_iter()
-                    .collect(),
+                [String::from("src/subDir/subDirFile.ts")].into(),
             ),
             (
                 String::from("@packageSubSubDir/first1"),
@@ -138,14 +129,15 @@ fn test_package() {
                     String::from("src/subDir/subDirFile.ts"),
                     String::from("src/rootFile.ts"),
                 ]
-                .into_iter()
-                .collect(),
+                .into(),
             ),
         ]),
         missing_dependencies,
-        unused_dependencies: ["unusedPackage", "@package/unusedPackage"]
-            .into_iter()
-            .collect(),
+        unused_dependencies: [
+            String::from("unusedPackage"),
+            String::from("@package/unusedPackage"),
+        ]
+        .into(),
         ..Default::default()
     };
 
@@ -160,13 +152,15 @@ fn test_import_function_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let anyone_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("anyone"),
             [String::from("index.js")].into(),
         )]),
-        missing_dependencies: BTreeMap::from([("anyone", &anyone_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            [String::from("index.js")].into(),
+        )]),
         ..Default::default()
     };
 
@@ -219,13 +213,15 @@ fn test_require_resolve_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let anyone_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("anyone"),
             [String::from("index.js")].into(),
         )]),
-        missing_dependencies: BTreeMap::from([("anyone", &anyone_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("anyone"),
+            [String::from("index.js")].into(),
+        )]),
         ..Default::default()
     };
 
@@ -636,13 +632,15 @@ fn test_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([(
             String::from("missing-dep"),
             [String::from("index.js")].into(),
         )]),
-        missing_dependencies: BTreeMap::from([("missing-dep", &missing_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("missing-dep"),
+            [String::from("index.js")].into(),
+        )]),
         ..Default::default()
     };
 
@@ -657,7 +655,6 @@ fn test_missing_nested() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
@@ -666,7 +663,10 @@ fn test_missing_nested() {
             ),
             (String::from("used-dep"), [String::from("index.js")].into()),
         ]),
-        missing_dependencies: BTreeMap::from([("outer-missing-dep", &missing_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("outer-missing-dep"),
+            [String::from("index.js")].into(),
+        )]),
         ..Default::default()
     };
 
@@ -681,7 +681,6 @@ fn test_missing_peer_deps() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [String::from("index.js")].into();
     let expected = ExpectedCheckResult {
         using_dependencies: BTreeMap::from([
             (
@@ -694,7 +693,10 @@ fn test_missing_peer_deps() {
                 [String::from("index.js")].into(),
             ),
         ]),
-        missing_dependencies: BTreeMap::from([("missing-this-dep", &missing_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("missing-this-dep"),
+            [String::from("index.js")].into(),
+        )]),
         ..Default::default()
     };
 
@@ -975,10 +977,11 @@ fn test_skip_missing_false() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [String::from("index.js")].into();
-
     let expected = ExpectedCheckResult {
-        missing_dependencies: BTreeMap::from([("missing-dep", &missing_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("missing-dep"),
+            [String::from("index.js")].into(),
+        )]),
         using_dependencies: BTreeMap::from([(
             String::from("missing-dep"),
             [String::from("index.js")].into(),
@@ -1049,12 +1052,16 @@ fn test_ignore_matches_for_missing() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [String::from("index.js")].into();
-
     let expected = ExpectedCheckResult {
         missing_dependencies: BTreeMap::from([
-            ("missing-dep", &missing_files),
-            ("missing-ignore-not", &missing_files),
+            (
+                String::from("missing-dep"),
+                [String::from("index.js")].into(),
+            ),
+            (
+                String::from("missing-ignore-not"),
+                [String::from("index.js")].into(),
+            ),
         ]),
         using_dependencies: BTreeMap::from([
             (
@@ -1195,11 +1202,12 @@ fn test_depcheckignore() {
     let checker = Checker::new(config);
     let actual = checker.check_package().unwrap();
 
-    let missing_files = [String::from("used.js")].into();
-
     let expected = ExpectedCheckResult {
         unused_dev_dependencies: ["debug"].into(),
-        missing_dependencies: BTreeMap::from([("react", &missing_files)]),
+        missing_dependencies: BTreeMap::from([(
+            String::from("react"),
+            [String::from("used.js")].into(),
+        )]),
         using_dependencies: BTreeMap::from([
             (String::from("lodash"), [String::from("used.js")].into()),
             (String::from("react"), [String::from("used.js")].into()),

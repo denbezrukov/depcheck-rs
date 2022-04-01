@@ -45,12 +45,9 @@ impl Checker {
             })
         });
 
-        Ok(CheckerResult {
-            package,
-            directory: self.config.get_directory().to_path_buf(),
-            using_dependencies,
-            config: self.config,
-        })
+        let result = CheckerResult::new(using_dependencies, package, &self.config);
+
+        Ok(result)
     }
 
     pub fn check_directory(&self, package: &Package) -> BTreeMap<RelativePathBuf, HashSet<String>> {
