@@ -21,6 +21,8 @@ pub struct Checker {
 
 impl Checker {
     pub fn new(config: Config) -> Self {
+        log::trace!("init checker with config {:#?}", config);
+
         Checker {
             config,
             parsers: Default::default(),
@@ -30,7 +32,13 @@ impl Checker {
 
 impl Checker {
     pub fn check_package(self) -> package::Result<CheckerResult> {
-        let package = load_module(self.config.get_directory())?;
+        let directory = self.config.get_directory();
+
+        log::debug!("checking directory {:#?}", directory);
+
+        let package = load_module(directory)?;
+
+        log::debug!("loaded package json {:#?}", package);
 
         let dependencies = self.check_directory(&package);
 
@@ -80,7 +88,15 @@ impl Checker {
 
         walker
             .into_iter()
-            .filter_map(Result::ok)
+            .filter_map(|entry| {
+                log::debug!("walk entry {:#?}", entry);
+
+                entry
+                    .map_err(|error| {
+                        log::error!("walk error {:#?}", error);
+                    })
+                    .ok()
+            })
             .filter(|entry| match entry.file_type() {
                 Some(file_type) => file_type.is_file(),
                 _ => false,
@@ -94,6 +110,9 @@ impl Checker {
             })
             .map(|(relative_file_path, module, syntax)| {
                 let file_dependencies = analyze_dependencies(&module, &comments);
+
+                log::debug!("analyzed dependencies {:#?}", file_dependencies);
+
                 let file_dependencies = file_dependencies
                     .into_iter()
                     .map(Dependency::new)
@@ -102,6 +121,8 @@ impl Checker {
                         dependency.extract_dependencies(&syntax, package, &self.config)
                     })
                     .collect();
+
+                log::debug!("extracted dependencies {:#?}", file_dependencies);
 
                 (relative_file_path, file_dependencies)
             })

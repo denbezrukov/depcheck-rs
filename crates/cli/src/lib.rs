@@ -40,6 +40,9 @@ pub struct Args {
     #[clap(help = "A comma separated array containing package names to ignore")]
     #[clap(use_value_delimiter = true)]
     pub ignore_matches: Option<Vec<String>>,
+
+    #[clap(flatten)]
+    pub verbose: clap_verbosity_flag::Verbosity,
 }
 
 #[derive(Debug, Error)]

@@ -18,6 +18,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 fn main() -> Result<()> {
     human_panic::setup_panic!();
+
     let Args {
         directory,
         ignore_bin_package,
@@ -25,7 +26,12 @@ fn main() -> Result<()> {
         ignore_path,
         ignore_patterns,
         ignore_matches,
+        verbose,
     } = Args::parse();
+
+    env_logger::Builder::new()
+        .filter_level(verbose.log_level_filter())
+        .init();
 
     let mut config = Config::new(directory)
         .with_ignore_bin_package(ignore_bin_package)
@@ -42,7 +48,7 @@ fn main() -> Result<()> {
 
     let result = Checker::new(config).check_package()?;
 
-    println!("{:#?}", result.to_json()?);
+    println!("{:#?}", result);
 
     Ok(())
 }

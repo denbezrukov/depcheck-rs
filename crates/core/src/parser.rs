@@ -15,6 +15,8 @@ impl Parser {
     pub fn parse_file(&self, file: &Path) -> Option<(Module, Syntax)> {
         let extension = file.extension()?.to_str()?;
 
+        log::debug!("parse file {:#?}", file);
+
         let syntax = match extension {
             "ts" | "tsx" => Syntax::Typescript(TsConfig {
                 dts: file.ends_with(".d.ts"),
@@ -39,7 +41,12 @@ impl Parser {
         let cm: Lrc<SourceMap> = Default::default();
         let handler = Handler::with_tty_emitter(ColorConfig::Auto, true, false, Some(cm.clone()));
 
-        let fm = cm.load_file(file).expect("failed to load");
+        let fm = cm
+            .load_file(file)
+            .map_err(|error| {
+                log::error!("failed to load {:#?}", error);
+            })
+            .ok()?;
 
         let comments = SingleThreadedComments::default();
         let lexer = Lexer::new(
@@ -58,7 +65,10 @@ impl Parser {
         let module = parser
             .parse_module()
             .map_err(|e| e.into_diagnostic(&handler).emit())
-            .expect("failed to parser module");
+            .map_err(|error| {
+                log::error!("failed to parser module {:#?}", error);
+            })
+            .ok()?;
 
         Some((module, syntax.to_owned()))
     }

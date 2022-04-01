@@ -25,6 +25,10 @@ fn assert_result(actual: CheckerResult, expected: ExpectedCheckResult) {
     );
 }
 
+fn init() {
+    let _ = env_logger::builder().is_test(true).try_init();
+}
+
 fn get_module_path(name: &str) -> PathBuf {
     env::var("CARGO_MANIFEST_DIR")
         .map(PathBuf::from)
@@ -40,6 +44,7 @@ fn get_module_path(name: &str) -> PathBuf {
 
 #[test]
 fn test_package() {
+    init();
     let path = get_module_path("package");
 
     let config = Config::new(path);
@@ -146,6 +151,7 @@ fn test_package() {
 
 #[test]
 fn test_import_function_missing() {
+    init();
     let path = get_module_path("import_function_missing");
 
     let config = Config::new(path);
@@ -169,6 +175,7 @@ fn test_import_function_missing() {
 
 #[test]
 fn test_import_function() {
+    init();
     let path = get_module_path("import_function");
 
     let config = Config::new(path);
@@ -188,6 +195,7 @@ fn test_import_function() {
 
 #[test]
 fn test_import_function_webpack() {
+    init();
     let path = get_module_path("import_function_webpack");
 
     let config = Config::new(path);
@@ -207,6 +215,7 @@ fn test_import_function_webpack() {
 
 #[test]
 fn test_require_resolve_missing() {
+    init();
     let path = get_module_path("require_resolve_missing");
 
     let config = Config::new(path);
@@ -230,6 +239,7 @@ fn test_require_resolve_missing() {
 
 #[test]
 fn test_require_resolve() {
+    init();
     let path = get_module_path("require_resolve");
 
     let config = Config::new(path);
@@ -249,6 +259,7 @@ fn test_require_resolve() {
 
 #[test]
 fn test_bad() {
+    init();
     let path = get_module_path("bad");
 
     let config = Config::new(path);
@@ -265,6 +276,7 @@ fn test_bad() {
 
 #[test]
 fn test_bad_es6() {
+    init();
     let path = get_module_path("bad_es6");
 
     let config = Config::new(path);
@@ -336,6 +348,7 @@ fn test_bad_es6() {
 
 #[test]
 fn test_good() {
+    init();
     let path = get_module_path("good");
 
     let config = Config::new(path);
@@ -355,6 +368,7 @@ fn test_good() {
 
 #[test]
 fn test_good_es6() {
+    init();
     let path = get_module_path("good_es6");
 
     let config = Config::new(path);
@@ -429,6 +443,7 @@ fn test_good_es6() {
 
 #[test]
 fn test_gatsby() {
+    init();
     let path = get_module_path("gatsby");
 
     let config = Config::new(path);
@@ -449,6 +464,7 @@ fn test_gatsby() {
 
 #[test]
 fn test_good_es7() {
+    init();
     let path = get_module_path("good_es7");
 
     let config = Config::new(path);
@@ -469,6 +485,7 @@ fn test_good_es7() {
 #[test]
 #[ignore]
 fn test_good_es7_flow() {
+    init();
     let path = get_module_path("good_es7_flow");
 
     let config = Config::new(path);
@@ -488,6 +505,7 @@ fn test_good_es7_flow() {
 
 #[test]
 fn test_typescript() {
+    init();
     let path = get_module_path("typescript");
 
     let config = Config::new(path);
@@ -573,6 +591,7 @@ fn test_typescript() {
 #[test]
 #[ignore]
 fn test_vue() {
+    init();
     let path = get_module_path("vue");
 
     let config = Config::new(path);
@@ -601,6 +620,7 @@ fn test_vue() {
 #[test]
 #[ignore]
 fn test_vue3() {
+    init();
     let path = get_module_path("vue3");
 
     let config = Config::new(path);
@@ -628,6 +648,7 @@ fn test_vue3() {
 
 #[test]
 fn test_missing() {
+    init();
     let path = get_module_path("missing");
 
     let config = Config::new(path);
@@ -651,6 +672,7 @@ fn test_missing() {
 
 #[test]
 fn test_missing_nested() {
+    init();
     let path = get_module_path("missing_nested");
 
     let config = Config::new(path);
@@ -677,6 +699,7 @@ fn test_missing_nested() {
 
 #[test]
 fn test_missing_peer_deps() {
+    init();
     let path = get_module_path("missing_peer_deps");
 
     let config = Config::new(path);
@@ -708,6 +731,7 @@ fn test_missing_peer_deps() {
 #[test]
 #[ignore]
 fn test_grunt() {
+    init();
     let path = get_module_path("grunt");
 
     let config = Config::new(path);
@@ -728,6 +752,7 @@ fn test_grunt() {
 #[test]
 #[ignore]
 fn test_grunt_tasks() {
+    init();
     let path = get_module_path("grunt-tasks");
 
     let config = Config::new(path);
@@ -747,6 +772,7 @@ fn test_grunt_tasks() {
 
 #[test]
 fn test_dev() {
+    init();
     let path = get_module_path("dev");
 
     let config = Config::new(path);
@@ -767,6 +793,7 @@ fn test_dev() {
 
 #[test]
 fn test_peer_dep() {
+    init();
     let path = get_module_path("peer_dep");
 
     let config = Config::new(path);
@@ -787,6 +814,7 @@ fn test_peer_dep() {
 
 #[test]
 fn test_peer_dep_nested() {
+    init();
     let path = get_module_path("peer_dep_nested");
 
     let config = Config::new(path);
@@ -813,6 +841,7 @@ fn test_peer_dep_nested() {
 
 #[test]
 fn test_optional_dep() {
+    init();
     let path = get_module_path("optional_dep");
 
     let config = Config::new(path);
@@ -833,6 +862,7 @@ fn test_optional_dep() {
 
 #[test]
 fn test_nested() {
+    init();
     let path = get_module_path("nested");
 
     let config = Config::new(path);
@@ -852,6 +882,7 @@ fn test_nested() {
 
 #[test]
 fn test_empty_file() {
+    init();
     let path = get_module_path("empty_file");
 
     let config = Config::new(path);
@@ -868,6 +899,7 @@ fn test_empty_file() {
 
 #[test]
 fn test_shebang() {
+    init();
     let path = get_module_path("shebang");
 
     let config = Config::new(path);
@@ -888,6 +920,7 @@ fn test_shebang() {
 
 #[test]
 fn test_empty_dep() {
+    init();
     let path = get_module_path("empty_dep");
 
     let config = Config::new(path);
@@ -903,6 +936,7 @@ fn test_empty_dep() {
 
 #[test]
 fn test_bin_js() {
+    init();
     let path = get_module_path("bin_js");
 
     let config = Config::new(path).with_ignore_bin_package(true);
@@ -919,6 +953,7 @@ fn test_bin_js() {
 
 #[test]
 fn test_bin_js_ignore_bin_package_false() {
+    init();
     let path = get_module_path("bin_js");
 
     let config = Config::new(path);
@@ -935,6 +970,7 @@ fn test_bin_js_ignore_bin_package_false() {
 
 #[test]
 fn test_good_ignore_bin_package_true() {
+    init();
     let path = get_module_path("good");
 
     let config = Config::new(path);
@@ -954,6 +990,7 @@ fn test_good_ignore_bin_package_true() {
 
 #[test]
 fn test_skip_missing_true() {
+    init();
     let path = get_module_path("missing");
 
     let config = Config::new(path).with_skip_missing(true);
@@ -973,6 +1010,7 @@ fn test_skip_missing_true() {
 
 #[test]
 fn test_skip_missing_false() {
+    init();
     let path = get_module_path("missing");
 
     let config = Config::new(path);
@@ -996,6 +1034,7 @@ fn test_skip_missing_false() {
 
 #[test]
 fn test_require_nothing() {
+    init();
     let path = get_module_path("require_nothing");
 
     let config = Config::new(path);
@@ -1012,6 +1051,7 @@ fn test_require_nothing() {
 
 #[test]
 fn test_require_dynamic() {
+    init();
     let path = get_module_path("require_dynamic");
 
     let config = Config::new(path);
@@ -1031,6 +1071,7 @@ fn test_require_dynamic() {
 
 #[test]
 fn test_ignore_matches() {
+    init();
     let path = get_module_path("bad");
 
     let config = Config::new(path).with_ignore_matches(vec![String::from(r"o*")]);
@@ -1046,6 +1087,7 @@ fn test_ignore_matches() {
 
 #[test]
 fn test_ignore_matches_for_missing() {
+    init();
     let path = get_module_path("missing_ignore");
 
     let config = Config::new(path).with_ignore_matches(vec![
@@ -1087,6 +1129,7 @@ fn test_ignore_matches_for_missing() {
 
 #[test]
 fn test_jsx() {
+    init();
     let path = get_module_path("jsx");
 
     let config = Config::new(path);
@@ -1106,6 +1149,7 @@ fn test_jsx() {
 
 #[test]
 fn test_jsx_js() {
+    init();
     let path = get_module_path("jsx_js");
 
     let config = Config::new(path);
@@ -1125,6 +1169,7 @@ fn test_jsx_js() {
 
 #[test]
 fn test_scoped_module() {
+    init();
     let path = get_module_path("scoped_module");
 
     let config = Config::new(path);
@@ -1163,6 +1208,7 @@ fn test_scoped_module() {
 
 #[test]
 fn test_ignore_number() {
+    init();
     let path = get_module_path("ignore_number");
 
     let config = Config::new(path);
@@ -1179,6 +1225,7 @@ fn test_ignore_number() {
 
 #[test]
 fn test_decorators() {
+    init();
     let path = get_module_path("decorators");
 
     let config = Config::new(path);
@@ -1198,6 +1245,7 @@ fn test_decorators() {
 
 #[test]
 fn test_depcheckignore() {
+    init();
     let path = get_module_path("depcheckignore");
 
     let config = Config::new(path).with_ignore_path(Some(PathBuf::from(".depcheckignore")));
