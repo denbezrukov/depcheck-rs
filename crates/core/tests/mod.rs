@@ -256,7 +256,7 @@ fn test_bad() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["optimist"].into(),
+        unused_dependencies: [String::from("optimist")].into(),
         ..Default::default()
     };
 
@@ -327,7 +327,7 @@ fn test_bad_es6() {
                 [String::from("index.js")].into(),
             ),
         ]),
-        unused_dependencies: ["dont-find-me"].into(),
+        unused_dependencies: [String::from("dont-find-me")].into(),
         ..Default::default()
     };
 
@@ -420,7 +420,7 @@ fn test_good_es6() {
                 [String::from("index.js")].into(),
             ),
         ]),
-        unused_dependencies: ["unsupported-syntax"].into(),
+        unused_dependencies: [String::from("unsupported-syntax")].into(),
         ..Default::default()
     };
 
@@ -436,9 +436,11 @@ fn test_gatsby() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["gatsby-plugin-react-helmet", "gatsby-plugin-sass"]
-            .into_iter()
-            .collect(),
+        unused_dependencies: [
+            String::from("gatsby-plugin-react-helmet"),
+            String::from("gatsby-plugin-sass"),
+        ]
+        .into(),
         ..Default::default()
     };
 
@@ -493,7 +495,7 @@ fn test_typescript() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["unused-dep"].into(),
+        unused_dependencies: [String::from("unused-dep")].into(),
         using_dependencies: BTreeMap::from([
             (
                 String::from("react"),
@@ -578,7 +580,7 @@ fn test_vue() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["unused-dep"].into(),
+        unused_dependencies: [String::from("unused-dep")].into(),
         using_dependencies: BTreeMap::from([
             (String::from("vue"), [String::from("index.js")].into()),
             (
@@ -606,7 +608,7 @@ fn test_vue3() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["unused-dep"].into(),
+        unused_dependencies: [String::from("unused-dep")].into(),
         using_dependencies: BTreeMap::from([
             (String::from("vue"), [String::from("index.js")].into()),
             (
@@ -752,7 +754,7 @@ fn test_dev() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dev_dependencies: ["unused-dev-dep"].into(),
+        unused_dev_dependencies: [String::from("unused-dev-dep")].into(),
         using_dependencies: BTreeMap::from([(
             String::from("used-dep"),
             [String::from("index.js")].into(),
@@ -772,7 +774,7 @@ fn test_peer_dep() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["unused-dep"].into(),
+        unused_dependencies: [String::from("unused-dep")].into(),
         using_dependencies: BTreeMap::from([
             (String::from("host"), [String::from("index.js")].into()),
             (String::from("peer"), [String::from("index.js")].into()),
@@ -792,7 +794,7 @@ fn test_peer_dep_nested() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["unused-nested-dep"].into(),
+        unused_dependencies: [String::from("unused-nested-dep")].into(),
         using_dependencies: BTreeMap::from([
             (
                 String::from("host"),
@@ -818,7 +820,7 @@ fn test_optional_dep() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["unused-dep"].into(),
+        unused_dependencies: [String::from("unused-dep")].into(),
         using_dependencies: BTreeMap::from([
             (String::from("host"), [String::from("index.js")].into()),
             (String::from("optional"), [String::from("index.js")].into()),
@@ -857,7 +859,7 @@ fn test_empty_file() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["empty-package"].into(),
+        unused_dependencies: [String::from("empty-package")].into(),
         ..Default::default()
     };
 
@@ -873,7 +875,7 @@ fn test_shebang() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["shebang"].into(),
+        unused_dependencies: [String::from("shebang")].into(),
         using_dependencies: BTreeMap::from([(
             String::from("shebang-script"),
             [String::from("index.js")].into(),
@@ -908,7 +910,7 @@ fn test_bin_js() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["nobin"].into(),
+        unused_dependencies: [String::from("nobin")].into(),
         ..Default::default()
     };
 
@@ -924,7 +926,7 @@ fn test_bin_js_ignore_bin_package_false() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["anybin", "nobin"].into(),
+        unused_dependencies: [String::from("anybin"), String::from("nobin")].into(),
         ..Default::default()
     };
 
@@ -1001,7 +1003,7 @@ fn test_require_nothing() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["require-nothing"].into(),
+        unused_dependencies: [String::from("require-nothing")].into(),
         ..Default::default()
     };
 
@@ -1130,7 +1132,7 @@ fn test_scoped_module() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["@unused/package"].into(),
+        unused_dependencies: [String::from("@unused/package")].into(),
         using_dependencies: BTreeMap::from([
             (
                 String::from("@owner/package"),
@@ -1168,7 +1170,7 @@ fn test_ignore_number() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dependencies: ["number"].into(),
+        unused_dependencies: [String::from("number")].into(),
         ..Default::default()
     };
 
@@ -1203,7 +1205,7 @@ fn test_depcheckignore() {
     let actual = checker.check_package().unwrap();
 
     let expected = ExpectedCheckResult {
-        unused_dev_dependencies: ["debug"].into(),
+        unused_dev_dependencies: [String::from("debug")].into(),
         missing_dependencies: BTreeMap::from([(
             String::from("react"),
             [String::from("used.js")].into(),
