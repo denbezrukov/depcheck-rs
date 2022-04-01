@@ -36,14 +36,14 @@ impl Checker {
 
         let mut using_dependencies = BTreeMap::new();
 
-        dependencies.into_iter().for_each(|(path, dependencies)| {
-            dependencies.iter().for_each(|dependency| {
+        for (file, file_dependencies) in dependencies {
+            for dependency in file_dependencies {
                 let files = using_dependencies
-                    .entry(dependency.clone())
+                    .entry(dependency)
                     .or_insert_with(|| HashSet::with_capacity(100));
-                files.insert(path.to_string());
-            })
-        });
+                files.insert(file.to_string());
+            }
+        }
 
         let result = CheckerResult::new(using_dependencies, package, &self.config);
 
