@@ -106,13 +106,13 @@ impl Dependency {
 
             return match (captures.get(1), captures.get(2)) {
                 (Some(first), Some(second)) => {
-                    Some(first.as_str().to_string() + "/" + second.as_str())
+                    Some(first.as_str().to_owned() + "/" + second.as_str())
                 }
                 _ => None,
             };
         } else {
             let captures = base_pattern.captures(&specifier)?;
-            captures.get(1).map(|v| v.as_str().to_string())
+            captures.get(1).map(|v| v.as_str().to_owned())
         }
     }
 

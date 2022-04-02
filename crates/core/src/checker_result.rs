@@ -36,8 +36,8 @@ impl CheckerResult {
                 })
                 .map(|(dependency, files)| {
                     (
-                        dependency.to_string(),
-                        files.iter().map(|file| file.to_string()).collect(),
+                        dependency.to_owned(),
+                        files.iter().map(|file| file.to_owned()).collect(),
                     )
                 })
                 .collect()
