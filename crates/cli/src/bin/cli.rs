@@ -2,22 +2,26 @@ use clap::Parser;
 use depcheck_rs_cli::Args;
 use depckeck_rs_core::checker::Checker;
 use depckeck_rs_core::config::Config;
-use depckeck_rs_core::package;
-use thiserror::Error;
+use proc_exit::WithCodeResultExt;
 
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error("failed to read package")]
-    Package(#[from] package::Error),
-
-    #[error("failed to serialize result")]
-    Serialize(#[from] serde_json::Error),
+fn main() {
+    human_panic::setup_panic!();
+    let result = run();
+    proc_exit::exit(result);
 }
 
-pub type Result<T> = std::result::Result<T, Error>;
-
-fn main() -> Result<()> {
-    human_panic::setup_panic!();
+fn run() -> proc_exit::ExitResult {
+    let args = match Args::try_parse() {
+        Ok(args) => args,
+        Err(e) if e.use_stderr() => {
+            let _ = e.print();
+            return proc_exit::Code::USAGE_ERR.ok();
+        }
+        Err(e) => {
+            let _ = e.print();
+            return proc_exit::Code::SUCCESS.ok();
+        }
+    };
 
     let Args {
         directory,
@@ -27,7 +31,7 @@ fn main() -> Result<()> {
         ignore_patterns,
         ignore_matches,
         verbose,
-    } = Args::parse();
+    } = args;
 
     env_logger::Builder::new()
         .filter_level(verbose.log_level_filter())
@@ -46,7 +50,9 @@ fn main() -> Result<()> {
         config = config.with_ignore_matches(ignore_matches);
     }
 
-    let result = Checker::new(config).check_package()?;
+    let result = Checker::new(config)
+        .check_package()
+        .with_code(proc_exit::Code::USAGE_ERR)?;
 
     println!("{:#?}", result);
 

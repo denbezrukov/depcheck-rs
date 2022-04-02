@@ -1,3 +1,4 @@
+use eyre::WrapErr;
 use std::collections::{BTreeMap, HashSet};
 
 use ignore::overrides::OverrideBuilder;
@@ -9,7 +10,7 @@ use swc_ecma_dep_graph::analyze_dependencies;
 use crate::checker_result::CheckerResult;
 use crate::config::Config;
 use crate::dependency::Dependency;
-use crate::package::{self, Package};
+use crate::package::Package;
 use crate::parser::Parser;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
@@ -31,16 +32,17 @@ impl Checker {
 }
 
 impl Checker {
-    pub fn check_package(self) -> package::Result<CheckerResult> {
+    pub fn check_package(self) -> eyre::Result<CheckerResult> {
         let directory = self.config.get_directory();
 
         log::debug!("checking directory {:#?}", directory);
 
-        let package = load_module(directory)?;
+        let package = load_module(directory)
+            .wrap_err_with(|| format!("Failed to read package json from {:?}", directory))?;
 
         log::debug!("loaded package json {:#?}", package);
 
-        let dependencies = self.check_directory(&package);
+        let dependencies = self.check_directory(&package)?;
 
         let mut using_dependencies = BTreeMap::new();
 
@@ -58,7 +60,10 @@ impl Checker {
         Ok(result)
     }
 
-    pub fn check_directory(&self, package: &Package) -> BTreeMap<RelativePathBuf, HashSet<String>> {
+    pub fn check_directory(
+        &self,
+        package: &Package,
+    ) -> eyre::Result<BTreeMap<RelativePathBuf, HashSet<String>>> {
         let directory = self.config.get_directory();
         let comments = SingleThreadedComments::default();
         let mut override_builder = OverrideBuilder::new(directory);
@@ -66,13 +71,12 @@ impl Checker {
         for pattern in self.config.get_ignore_patterns() {
             override_builder
                 .add(&format!("!{pattern}"))
-                .map_err(|e| format!("Malformed exclude pattern: {e}"))
-                .unwrap();
+                .wrap_err_with(|| format!("Malformed ignore pattern: {pattern}"))?;
         }
 
         let overrides = override_builder
             .build()
-            .expect("Mismatch in exclude patterns");
+            .wrap_err_with(|| "Failed to build override builder")?;
         let mut walker = WalkBuilder::new(directory);
 
         walker.overrides(overrides).filter_entry(move |entry| {
@@ -86,7 +90,7 @@ impl Checker {
 
         let walker = walker.build();
 
-        walker
+        let result = walker
             .into_iter()
             .filter_map(|entry| {
                 log::debug!("walk entry {:#?}", entry);
@@ -126,6 +130,8 @@ impl Checker {
 
                 (relative_file_path, file_dependencies)
             })
-            .collect()
+            .collect();
+
+        Ok(result)
     }
 }

@@ -267,9 +267,10 @@ dependencies = [
  "clap_mangen",
  "depckeck-rs-core",
  "env_logger",
+ "eyre",
  "human-panic",
+ "proc-exit",
  "serde_json",
- "thiserror",
 ]
 
 [[package]]
@@ -287,6 +288,7 @@ name = "depckeck-rs-core"
 version = "0.0.0"
 dependencies = [
  "env_logger",
+ "eyre",
  "globset",
  "ignore",
  "log",
@@ -339,6 +341,16 @@ dependencies = [
  "log",
  "regex",
  "termcolor",
+]
+
+[[package]]
+name = "eyre"
+version = "0.6.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9289ed2c0440a6536e65119725cf91fc2c6b5e513bfd2e36e1134d7cca6ca12f"
+dependencies = [
+ "indenter",
+ "once_cell",
 ]
 
 [[package]]
@@ -475,6 +487,12 @@ dependencies = [
  "walkdir",
  "winapi-util",
 ]
+
+[[package]]
+name = "indenter"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ce23b50ad8242c51a442f3ff322d56b02f08852c77e4c0b4d3fd684abc89c683"
 
 [[package]]
 name = "indexmap"
@@ -849,6 +867,12 @@ dependencies = [
  "diff",
  "output_vt100",
 ]
+
+[[package]]
+name = "proc-exit"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0da6bbc8ef87314d4f596ad9d02db375c3f2d77fba91067a6f6a5754fdc8cb49"
 
 [[package]]
 name = "proc-macro-error"

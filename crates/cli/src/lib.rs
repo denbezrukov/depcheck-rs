@@ -1,5 +1,4 @@
 use std::path::{Path, PathBuf};
-use thiserror::Error;
 
 #[derive(Debug, clap::Parser)]
 #[clap(bin_name = "depcheck-rs")]
@@ -45,21 +44,26 @@ pub struct Args {
     pub verbose: clap_verbosity_flag::Verbosity,
 }
 
-#[derive(Debug, Error)]
-pub enum Error {
-    #[error("directory not found")]
-    DirectoryNotFound,
-}
-
 fn is_existing_directory(path: &Path) -> bool {
     path.is_dir() && (path.file_name().is_some() || path.canonicalize().is_ok())
 }
 
-fn validate_directory(path: &str) -> Result<(), Error> {
+fn validate_directory(path: &str) -> eyre::Result<()> {
     let path = PathBuf::from(path);
     if is_existing_directory(&path) {
         Ok(())
     } else {
-        Err(Error::DirectoryNotFound)
+        Err(eyre::eyre!("directory doesn't exist."))
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+
+    #[test]
+    fn verify_app() {
+        use clap::CommandFactory;
+        Args::command().debug_assert()
     }
 }

@@ -20,6 +20,7 @@ regex = "1"
 globset = "0.4.8"
 ignore = "0.4.18"
 log = "0.4.16"
+eyre = "0.6.7"
 
 [dev-dependencies]
 pretty_assertions = "1.1.0"
