@@ -1,8 +1,10 @@
 [package]
-edition = "2021"
 name = "depcheck-rs-node"
+edition = "2021"
 version = "0.0.0"
 authors = ["Depcheck rs developers"]
+license = "MIT"
+repository = "https://github.com/Dominionys/depcheck-rs.git"
 
 [lib]
 crate-type = ["cdylib"]

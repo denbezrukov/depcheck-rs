@@ -1,8 +1,10 @@
 [package]
 name = "depckeck-rs-core"
 version = "0.0.0"
-edition = "2021"
 authors = ["Depcheck rs developers"]
+edition = "2021"
+license = "MIT"
+repository = "https://github.com/Dominionys/depcheck-rs.git"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
