@@ -4,12 +4,17 @@ use crate::util::is_bin_dependency::is_bin_dependency;
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashSet};
 
+/// Dependencies checker result.
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CheckerResult {
+    /// Using dependencies in directory. Key is dependency and value is unique file paths.
     pub using_dependencies: BTreeMap<String, HashSet<String>>,
+    /// Missing dependencies in directory. Key is dependency and value is unique file paths.
     pub missing_dependencies: BTreeMap<String, HashSet<String>>,
+    /// Unique unused dependencies.
     pub unused_dependencies: HashSet<String>,
+    /// Unique unused dev dependencies.
     pub unused_dev_dependencies: HashSet<String>,
 }
 
@@ -70,15 +75,5 @@ impl CheckerResult {
             unused_dependencies,
             unused_dev_dependencies,
         }
-    }
-}
-
-impl CheckerResult {
-    pub fn to_json(&self) -> serde_json::Result<String> {
-        serde_json::to_string(self)
-    }
-
-    pub fn to_pretty_json(&self) -> serde_json::Result<String> {
-        serde_json::to_string_pretty(self)
     }
 }

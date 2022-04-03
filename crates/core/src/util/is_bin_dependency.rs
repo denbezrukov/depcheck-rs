@@ -2,6 +2,7 @@ use std::path::Path;
 
 use crate::util::load_module::load_module;
 
+/// Check if a dependency is a bin dependency for a directory.
 pub fn is_bin_dependency(directory: &Path, dependency: &str) -> bool {
     let dependency_module = load_module(&directory.join("node_modules").join(dependency));
 

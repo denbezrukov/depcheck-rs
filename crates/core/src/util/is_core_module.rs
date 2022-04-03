@@ -53,6 +53,7 @@ const CORE_MODULES: [&str; 52] = [
     "zlib",
 ];
 
+/// Check if a module is core node module.
 pub fn is_core_module(module: &str) -> bool {
     CORE_MODULES.contains(&module)
 }

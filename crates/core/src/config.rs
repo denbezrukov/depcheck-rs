@@ -1,13 +1,47 @@
 use globset::{self, Glob, GlobSet, GlobSetBuilder};
 use std::path::{Path, PathBuf};
 
+/// Config for dependency checker.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Config {
+    /// The directory argument is the root directory of your project.
     directory: PathBuf,
+    /// A flag to indicate if depcheck ignores the packages containing bin entry.
     ignore_bin_package: bool,
+    /// Patterns describing files to ignore.
+    ///
+    /// Default values:
+    ///```r".git",
+    /// r".svn",
+    /// r".hg",
+    /// r".idea",
+    /// r"node_modules",
+    /// r"dist",
+    /// r"build",
+    /// r"bower_components",
+    /// /// Images
+    /// r"*.png",
+    /// r"*.gif",
+    /// r"*.jpg",
+    /// r"*.jpeg",
+    /// r"*.svg",
+    /// /// Fonts
+    /// r"*.woff",
+    /// r"*.woff2",
+    /// r"*.eot",
+    /// r"*.ttf",
+    /// /// Archives
+    /// r"*.zip",
+    /// r"*.gz",
+    /// /// Videos
+    /// r"*.mp4",
+    /// ```
     ignore_patterns: Vec<String>,
+    /// A comma separated array containing package names to ignore.
     ignore_matches: Vec<String>,
+    /// A flag to indicate if depcheck skips calculation of missing dependencies.
     skip_missing: bool,
+    /// Path to a file with patterns describing files to ignore.
     ignore_path: Option<PathBuf>,
 }
 

@@ -15,6 +15,7 @@ use crate::parser::Parser;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 
+/// Dependencies checker.
 pub struct Checker {
     config: Config,
     parsers: Parser,
@@ -32,6 +33,7 @@ impl Checker {
 }
 
 impl Checker {
+    /// check dependencies with config and parsers.
     pub fn check_package(self) -> eyre::Result<CheckerResult> {
         let directory = self.config.get_directory();
 
@@ -60,7 +62,7 @@ impl Checker {
         Ok(result)
     }
 
-    pub fn check_directory(
+    fn check_directory(
         &self,
         package: &Package,
     ) -> eyre::Result<BTreeMap<RelativePathBuf, HashSet<String>>> {
