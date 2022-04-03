@@ -1,3 +1,4 @@
+use clap::Command;
 use std::path::{Path, PathBuf};
 
 #[derive(Debug, clap::Parser)]
@@ -57,13 +58,17 @@ fn validate_directory(path: &str) -> eyre::Result<()> {
     }
 }
 
+pub fn get_command() -> Command<'static> {
+    use clap::CommandFactory;
+    Args::command()
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
     #[test]
     fn verify_app() {
-        use clap::CommandFactory;
-        Args::command().debug_assert()
+        get_command().debug_assert()
     }
 }
