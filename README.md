@@ -1,4 +1,5 @@
 # depcheck-rs
+Work in progress.
 
 Depcheck is a tool for analyzing the dependencies in a project to see: how each dependency is used, which dependencies are useless, and which dependencies are missing from `package.json`.
 It is a port of original [depcheck](https://github.com/depcheck/depcheck). It uses [swc](https://github.com/swc-project/swc) for parsing.

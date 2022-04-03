@@ -2,6 +2,7 @@
 edition = "2021"
 name = "depcheck-rs-node"
 version = "0.0.0"
+authors = ["Depcheck rs developers"]
 
 [lib]
 crate-type = ["cdylib"]
