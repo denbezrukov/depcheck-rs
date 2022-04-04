@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "depcheck-rs.freebsd-x64.node",
+  "main": "depcheck-rs-node.freebsd-x64.node",
   "files": [
-    "depcheck-rs.freebsd-x64.node"
+    "depcheck-rs-node.freebsd-x64.node"
   ],
   "license": "MIT",
   "engines": {

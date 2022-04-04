@@ -7,9 +7,9 @@
   "cpu": [
     "arm"
   ],
-  "main": "depcheck-rs.android-arm-eabi.node",
+  "main": "depcheck-rs-node.android-arm-eabi.node",
   "files": [
-    "depcheck-rs.android-arm-eabi.node"
+    "depcheck-rs-node.android-arm-eabi.node"
   ],
   "license": "MIT",
   "engines": {

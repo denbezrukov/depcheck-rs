@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "depcheck-rs.linux-x64-gnu.node",
+  "main": "depcheck-rs-node.linux-x64-gnu.node",
   "files": [
-    "depcheck-rs.linux-x64-gnu.node"
+    "depcheck-rs-node.linux-x64-gnu.node"
   ],
   "license": "MIT",
   "engines": {

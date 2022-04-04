@@ -7,9 +7,9 @@
   "cpu": [
     "arm64"
   ],
-  "main": "depcheck-rs.android-arm64.node",
+  "main": "depcheck-rs-node.android-arm64.node",
   "files": [
-    "depcheck-rs.android-arm64.node"
+    "depcheck-rs-node.android-arm64.node"
   ],
   "license": "MIT",
   "engines": {

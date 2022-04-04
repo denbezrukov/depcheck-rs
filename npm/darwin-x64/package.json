@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "depcheck-rs.darwin-x64.node",
+  "main": "depcheck-rs-node.darwin-x64.node",
   "files": [
-    "depcheck-rs.darwin-x64.node"
+    "depcheck-rs-node.darwin-x64.node"
   ],
   "license": "MIT",
   "engines": {

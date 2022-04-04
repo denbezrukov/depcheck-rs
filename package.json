@@ -5,7 +5,7 @@
   "main": "index.js",
   "types": "index.d.ts",
   "napi": {
-    "name": "depcheck-rs",
+    "name": "depcheck-rs-node",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
