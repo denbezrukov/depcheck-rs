@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-rs-node/core-android-arm-eabi",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "os": [
     "android"
   ],
