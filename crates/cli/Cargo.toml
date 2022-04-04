@@ -3,6 +3,7 @@ name = "depcheck-rs-cli"
 description = "Cli for depcheck rs"
 version = "0.0.0"
 authors = ["Depcheck rs developers"]
+keywords = ["cli", "search", "npm dependencies"]
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/Dominionys/depcheck-rs.git"

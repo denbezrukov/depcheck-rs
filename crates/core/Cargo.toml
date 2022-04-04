@@ -2,6 +2,7 @@
 name = "depckeck-rs-core"
 version = "0.0.0"
 authors = ["Depcheck rs developers"]
+keywords = ["search", "npm dependencies"]
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/Dominionys/depcheck-rs.git"
