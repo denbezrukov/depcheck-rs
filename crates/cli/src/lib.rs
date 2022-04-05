@@ -1,78 +1,62 @@
-use std::path::{Path, PathBuf};
+mod args;
 
-/// The dependencies checker CLI arguments.
-#[derive(Debug, clap::Parser)]
-#[clap(bin_name = "depcheck-rs")]
-#[clap(about = "The dependency check CLI")]
-#[clap(author = clap::crate_authors!())]
-#[clap(version = clap::crate_version!())]
-pub struct Args {
-    /// The directory argument is the root directory of your project.
-    #[clap(long, short = 'd')]
-    #[clap(help = "The directory argument is the root directory of your project")]
-    #[clap(default_value = ".")]
-    #[clap(parse(from_os_str))]
-    #[clap(takes_value = true)]
-    #[clap(allow_invalid_utf8 = true)]
-    #[clap(validator = validate_directory)]
-    pub directory: PathBuf,
+use crate::args::Args;
+use clap::Parser;
+use depckeck_rs_core::checker::Checker;
+use depckeck_rs_core::config::Config;
+use proc_exit::WithCodeResultExt;
 
-    /// A flag to indicate if depcheck ignores the packages containing bin entry.
-    #[clap(long = "ignore-bin-package")]
-    #[clap(help = "A flag to indicate if depcheck ignores the packages containing bin entry")]
-    pub ignore_bin_package: bool,
-
-    /// A flag to indicate if depcheck skips calculation of missing dependencies.
-    #[clap(long = "skip-missing")]
-    #[clap(help = "A flag to indicate if depcheck skips calculation of missing dependencies")]
-    pub skip_missing: bool,
-
-    /// Path to a file with patterns describing files to ignore.
-    #[clap(long = "ignore-path")]
-    #[clap(help = "Path to a file with patterns describing files to ignore")]
-    #[clap(parse(from_os_str))]
-    #[clap(takes_value = true)]
-    #[clap(allow_invalid_utf8 = true)]
-    pub ignore_path: Option<PathBuf>,
-
-    /// Comma separated patterns describing files or directories to ignore.
-    #[clap(long = "ignore-patterns")]
-    #[clap(help = "Comma separated patterns describing files or directories to ignore")]
-    #[clap(use_value_delimiter = true)]
-    pub ignore_patterns: Option<Vec<String>>,
-
-    /// A comma separated array containing package names to ignore.
-    #[clap(long = "ignore_matches")]
-    #[clap(help = "A comma separated array containing package names to ignore")]
-    #[clap(use_value_delimiter = true)]
-    pub ignore_matches: Option<Vec<String>>,
-
-    /// logging level
-    #[clap(flatten)]
-    pub verbose: clap_verbosity_flag::Verbosity,
+pub fn run() {
+    human_panic::setup_panic!();
+    let result = try_run();
+    proc_exit::exit(result);
 }
 
-fn is_existing_directory(path: &Path) -> bool {
-    path.is_dir() && (path.file_name().is_some() || path.canonicalize().is_ok())
-}
+fn try_run() -> proc_exit::ExitResult {
+    let args = match Args::try_parse() {
+        Ok(args) => args,
+        Err(e) if e.use_stderr() => {
+            let _ = e.print();
+            return proc_exit::Code::USAGE_ERR.ok();
+        }
+        Err(e) => {
+            let _ = e.print();
+            return proc_exit::Code::SUCCESS.ok();
+        }
+    };
 
-/// validation function for directory argument
-fn validate_directory(path: &str) -> eyre::Result<()> {
-    let path = PathBuf::from(path);
-    if is_existing_directory(&path) {
-        Ok(())
-    } else {
-        Err(eyre::eyre!("directory doesn't exist."))
+    let Args {
+        directory,
+        ignore_bin_package,
+        skip_missing,
+        ignore_path,
+        ignore_patterns,
+        ignore_matches,
+        verbose,
+    } = args;
+
+    env_logger::Builder::new()
+        .filter_level(verbose.log_level_filter())
+        .init();
+
+    let mut config = Config::new(directory)
+        .with_ignore_bin_package(ignore_bin_package)
+        .with_skip_missing(skip_missing)
+        .with_ignore_path(ignore_path);
+
+    if let Some(ignore_patterns) = ignore_patterns {
+        config = config.with_ignore_patterns(ignore_patterns);
     }
-}
 
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn verify_app() {
-        use clap::CommandFactory;
-        Args::command().debug_assert();
+    if let Some(ignore_matches) = ignore_matches {
+        config = config.with_ignore_matches(ignore_matches);
     }
+
+    let result = Checker::new(config)
+        .check_package()
+        .with_code(proc_exit::Code::USAGE_ERR)?;
+
+    println!("{:#?}", result);
+
+    Ok(())
 }
