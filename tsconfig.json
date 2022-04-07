@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "./__tests__/",
     "target": "es6",
     "module": "CommonJS",
     "moduleResolution": "node",
@@ -23,7 +22,6 @@
     "noUnusedLocals": true,
     "noImplicitThis": true,
     "removeComments": false,
-    "sourceMap": true,
     "preserveConstEnums": true,
     "types": [
       "node",
@@ -42,9 +40,9 @@
   "buildOnSave": false,
   "compileOnSave": false,
   "include": [
-    "./__tests__/**/*",
+    "./node/**/*",
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
   ]
 }

@@ -11,6 +11,9 @@ Profile-*.json
 npm-shrinkwrap.json
 pnpm-lock.yaml
 **/dist
+dist
+
+yarn-error.log
 
 node_modules/
 **/node_modules
