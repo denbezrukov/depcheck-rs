@@ -1,4 +1,4 @@
-name: NodeCI
+name: Publish (node)
 env:
   DEBUG: napi:*
   APP_NAME: depcheck-rs-node
