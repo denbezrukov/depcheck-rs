@@ -33,11 +33,11 @@
     "build:napi:debug": "napi build --platform --cargo-name depcheck_rs_node --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-rs-node",
     "build:ts": "tsc --project tsconfig.build.json",
     "build:ts:debug": "tsc --noEmit",
-    "build": "yarn clean && yarn build:napi && yarn build:ts",
+    "build": "yarn clean && yarn build:napi && yarn build:ts && yarn copy-files",
     "build:debug": "yarn build:napi:debug && yarn build:ts:debug",
     "test": "jest",
     "clean": "rimraf node/dist",
-    "copy-files": "copyfiles -u 2 ./node/src/binding.js ./node/src/binding.d.ts dist/"
+    "copy-files": "node copy.js"
   },
   "devDependencies": {
     "@napi-rs/cli": "^2.5.0",
