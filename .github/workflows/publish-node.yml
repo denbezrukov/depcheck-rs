@@ -36,7 +36,7 @@ jobs:
           - host: windows-latest
             build: |
               yarn build:napi --target i686-pc-windows-msvc
-#              yarn test
+              yarn test
             target: i686-pc-windows-msvc
             architecture: x86
           - host: ubuntu-latest
