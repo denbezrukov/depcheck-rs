@@ -16,6 +16,7 @@ use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 
 /// Dependencies checker.
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Checker {
     config: Config,
     parsers: Parser,

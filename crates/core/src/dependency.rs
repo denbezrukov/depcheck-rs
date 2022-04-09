@@ -10,6 +10,7 @@ use std::path::{Component, PathBuf};
 use swc_ecma_dep_graph::{DependencyDescriptor, DependencyKind};
 use swc_ecma_parser::Syntax;
 
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Dependency {
     descriptor: DependencyDescriptor,
 }

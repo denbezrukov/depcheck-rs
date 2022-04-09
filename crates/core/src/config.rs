@@ -2,7 +2,7 @@ use globset::{self, Glob, GlobSet, GlobSetBuilder};
 use std::path::{Path, PathBuf};
 
 /// Config for dependency checker.
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Config {
     /// The directory argument is the root directory of your project.
     directory: PathBuf,

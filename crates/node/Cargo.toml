@@ -15,6 +15,7 @@ keywords = [
     "dependencies",
     "devDependencies"]
 license = "MIT"
+homepage = "https://github.com/Dominionys/depcheck-rs.git"
 repository = "https://github.com/Dominionys/depcheck-rs.git"
 
 [lib]

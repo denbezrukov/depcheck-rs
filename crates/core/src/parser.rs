@@ -8,7 +8,7 @@ use swc_ecma_ast::Module;
 use swc_ecma_parser::lexer::Lexer;
 use swc_ecma_parser::{EsConfig, StringInput, Syntax, TsConfig};
 
-#[derive(Default)]
+#[derive(Clone, Debug, Eq, PartialEq, Default)]
 pub struct Parser {}
 
 impl Parser {

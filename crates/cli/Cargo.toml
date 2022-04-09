@@ -17,6 +17,7 @@ keywords = [
     "devDependencies"]
 edition = "2021"
 license = "MIT"
+homepage = "https://github.com/Dominionys/depcheck-rs.git"
 repository = "https://github.com/Dominionys/depcheck-rs.git"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
