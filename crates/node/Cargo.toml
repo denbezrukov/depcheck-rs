@@ -1,9 +1,10 @@
 [package]
 name = "depcheck-rs-node"
 edition = "2021"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Depcheck rs developers"]
 categories = ["command-line-utilities"]
+description = "Depcheck rs node bindings"
 keywords = [
     "search",
     "npm dependencies",
@@ -23,7 +24,7 @@ crate-type = ["cdylib"]
 name = "depcheck_rs_node"
 
 [dependencies]
-depckeck-rs-core = { version = "0.0.0", path = "../core" }
+depckeck-rs-core = { version = "0.0.1", path = "../core" }
 
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
 napi = { version = "2.3.0-canary.0", default-features = false, features = ["napi4"] }

@@ -1,8 +1,9 @@
 [package]
 name = "depckeck-rs-core"
-version = "0.0.0"
+version = "0.0.1"
 authors = ["Depcheck rs developers"]
 categories = ["command-line-utilities"]
+description = "Depcheck rs core"
 keywords = [
     "search",
     "npm dependencies",
