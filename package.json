@@ -4,6 +4,9 @@
   "version": "0.0.14",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist/"
+  ],
   "napi": {
     "name": "depcheck-rs-node",
     "triples": {
