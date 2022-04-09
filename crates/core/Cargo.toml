@@ -6,7 +6,6 @@ categories = ["command-line-utilities"]
 description = "Depcheck rs core"
 keywords = [
     "search",
-    "npm dependencies",
     "unused",
     "package",
     "packages",

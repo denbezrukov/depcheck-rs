@@ -7,7 +7,6 @@ description = "Commandline for Depcheck rs"
 keywords = [
     "cli",
     "search",
-    "npm dependencies",
     "unused",
     "package",
     "packages",
