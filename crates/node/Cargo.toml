@@ -8,12 +8,9 @@ description = "Depcheck rs node bindings"
 keywords = [
     "search",
     "unused",
-    "package",
-    "packages",
     "depcheck",
     "dependency",
-    "dependencies",
-    "devDependencies"]
+    "dependencies"]
 license = "MIT"
 homepage = "https://github.com/Dominionys/depcheck-rs.git"
 repository = "https://github.com/Dominionys/depcheck-rs.git"

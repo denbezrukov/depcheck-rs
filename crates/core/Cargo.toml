@@ -7,12 +7,9 @@ description = "Depcheck rs core"
 keywords = [
     "search",
     "unused",
-    "package",
-    "packages",
     "depcheck",
     "dependency",
-    "dependencies",
-    "devDependencies"]
+    "dependencies"]
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/Dominionys/depcheck-rs.git"

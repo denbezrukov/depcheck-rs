@@ -5,15 +5,11 @@ authors = ["Depcheck rs developers"]
 categories = ["command-line-utilities"]
 description = "Commandline for Depcheck rs"
 keywords = [
-    "cli",
     "search",
     "unused",
-    "package",
-    "packages",
     "depcheck",
     "dependency",
-    "dependencies",
-    "devDependencies"]
+    "dependencies"]
 edition = "2021"
 license = "MIT"
 homepage = "https://github.com/Dominionys/depcheck-rs.git"
