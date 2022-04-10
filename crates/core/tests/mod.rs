@@ -1267,3 +1267,23 @@ fn test_depcheckignore() {
 
     assert_result(actual, expected);
 }
+
+#[test]
+fn test_mjs() {
+    init();
+    let path = get_module_path("mjs");
+
+    let config = Config::new(path);
+    let checker = Checker::new(config);
+    let actual = checker.check_package().unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (String::from("optimist"), [String::from("index.mjs")].into()),
+            (String::from("foo"), [String::from("index.mjs")].into()),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}

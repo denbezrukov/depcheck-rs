@@ -24,7 +24,7 @@ impl Parser {
                 decorators: true,
                 no_early_errors: true,
             }),
-            "js" | "jsx" => Syntax::Es(EsConfig {
+            "mjs" | "js" | "jsx" => Syntax::Es(EsConfig {
                 jsx: true,
                 fn_bind: true,
                 decorators: true,
