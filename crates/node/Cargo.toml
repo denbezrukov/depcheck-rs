@@ -17,7 +17,7 @@ repository = "https://github.com/Dominionys/depcheck-rs.git"
 
 [lib]
 crate-type = ["cdylib"]
-name = "depcheck_rs_node"
+name = "depcheck_rs_npm"
 
 [dependencies]
 depckeck-rs-core = { version = "0.0.1", path = "../core" }
