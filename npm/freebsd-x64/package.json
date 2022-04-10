@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs-node/core-freebsd-x64",
+  "name": "@depcheck-node-rs/core-freebsd-x64",
   "version": "0.0.15",
   "os": [
     "freebsd"
@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "depcheck-rs-node.freebsd-x64.node",
+  "main": "depcheck-node-rs.freebsd-x64.node",
   "files": [
-    "depcheck-rs-node.freebsd-x64.node"
+    "depcheck-node-rs.freebsd-x64.node"
   ],
   "license": "MIT",
   "engines": {

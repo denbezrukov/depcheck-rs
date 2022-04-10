@@ -1,3 +1,3 @@
-# `@depcheck-rs-node/core-linux-arm64-gnu`
+# `@depcheck-node-rs/core-linux-arm64-gnu`
 
-This is the **aarch64-unknown-linux-gnu** binary for `@depcheck-rs-node/core`
+This is the **aarch64-unknown-linux-gnu** binary for `@depcheck-node-rs/core`

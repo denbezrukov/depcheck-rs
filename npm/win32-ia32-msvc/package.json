@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs-node/core-win32-ia32-msvc",
+  "name": "@depcheck-node-rs/core-win32-ia32-msvc",
   "version": "0.0.15",
   "os": [
     "win32"
@@ -7,9 +7,9 @@
   "cpu": [
     "ia32"
   ],
-  "main": "depcheck-rs-node.win32-ia32-msvc.node",
+  "main": "depcheck-node-rs.win32-ia32-msvc.node",
   "files": [
-    "depcheck-rs-node.win32-ia32-msvc.node"
+    "depcheck-node-rs.win32-ia32-msvc.node"
   ],
   "license": "MIT",
   "engines": {

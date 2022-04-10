@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs-node/core",
+  "name": "@depcheck-node-rs/core",
   "repository": "https://github.com/Dominionys/depcheck-rs.git",
   "version": "0.0.15",
   "main": "./dist/index.js",
@@ -8,7 +8,7 @@
     "dist/"
   ],
   "napi": {
-    "name": "depcheck-rs-node",
+    "name": "depcheck-node-rs",
     "triples": {
       "additional": [
         "aarch64-apple-darwin",
@@ -32,8 +32,8 @@
     "artifacts": "napi artifacts",
     "prepublishOnly": "yarn build:ts && yarn copy-bindings && napi prepublish -t npm",
     "version": "napi version",
-    "build": "napi build --platform --cargo-name depcheck_rs_node --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-rs-node --release",
-    "build:debug": "napi build --platform --cargo-name depcheck_rs_node --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-rs-node",
+    "build": "napi build --platform --cargo-name depcheck_rs_node --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-node-rs --release",
+    "build:debug": "napi build --platform --cargo-name depcheck_rs_node --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-node-rs",
     "build:ts": "tsc --project tsconfig.build.json",
     "build:ts:debug": "tsc --noEmit",
     "test": "yarn copy-test-bindings && jest",

@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs-node/core-linux-arm-gnueabihf",
+  "name": "@depcheck-node-rs/core-linux-arm-gnueabihf",
   "version": "0.0.15",
   "os": [
     "linux"
@@ -7,9 +7,9 @@
   "cpu": [
     "arm"
   ],
-  "main": "depcheck-rs-node.linux-arm-gnueabihf.node",
+  "main": "depcheck-node-rs.linux-arm-gnueabihf.node",
   "files": [
-    "depcheck-rs-node.linux-arm-gnueabihf.node"
+    "depcheck-node-rs.linux-arm-gnueabihf.node"
   ],
   "license": "MIT",
   "engines": {

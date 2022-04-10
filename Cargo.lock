@@ -249,6 +249,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "depcheck-node-rs"
+version = "0.0.1"
+dependencies = [
+ "depckeck-rs-core",
+ "napi",
+ "napi-build",
+ "napi-derive",
+]
+
+[[package]]
 name = "depcheck-rs-cli"
 version = "0.0.1"
 dependencies = [
@@ -260,16 +270,6 @@ dependencies = [
  "human-panic",
  "proc-exit",
  "serde_json",
-]
-
-[[package]]
-name = "depcheck-rs-node"
-version = "0.0.1"
-dependencies = [
- "depckeck-rs-core",
- "napi",
- "napi-build",
- "napi-derive",
 ]
 
 [[package]]

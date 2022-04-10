@@ -1,3 +1,3 @@
-# `@depcheck-rs-node/core-linux-arm-gnueabihf`
+# `@depcheck-node-rs/core-linux-arm-gnueabihf`
 
-This is the **armv7-unknown-linux-gnueabihf** binary for `@depcheck-rs-node/core`
+This is the **armv7-unknown-linux-gnueabihf** binary for `@depcheck-node-rs/core`

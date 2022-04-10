@@ -1,3 +1,3 @@
-# `@depcheck-rs-node/core-win32-arm64-msvc`
+# `@depcheck-node-rs/core-win32-arm64-msvc`
 
-This is the **aarch64-pc-windows-msvc** binary for `@depcheck-rs-node/core`
+This is the **aarch64-pc-windows-msvc** binary for `@depcheck-node-rs/core`

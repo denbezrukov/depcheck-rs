@@ -1,5 +1,5 @@
 [package]
-name = "depcheck-rs-node"
+name = "depcheck-node-rs"
 edition = "2021"
 version = "0.0.1"
 authors = ["Depcheck rs developers"]
