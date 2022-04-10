@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-rs-npm/core-linux-x64-musl",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "os": [
     "linux"
   ],
