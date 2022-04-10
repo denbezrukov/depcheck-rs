@@ -20,7 +20,7 @@ crate-type = ["cdylib"]
 name = "depcheck_rs_npm"
 
 [dependencies]
-depckeck-rs-core = { version = "0.0.1", path = "../core" }
+depckeck-rs-core = { version = "0.0.2", path = "../core" }
 
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
 napi = { version = "2.3.0-canary.0", default-features = false, features = ["napi4"] }
