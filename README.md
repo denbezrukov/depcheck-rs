@@ -72,111 +72,54 @@ Depcheck not only recognizes the dependencies in JavaScript files, but also supp
 
 [comment]: <> (The rc configuration file can also contain the following extensions: `.json`, `.yaml`, `.yml`.)
 
-[comment]: <> (## API)
+## API
 
-[comment]: <> (Similar options are provided to `depcheck` function for programming:)
+```js
 
-[comment]: <> (```js)
+import {depcheck} from "@depcheck-rs-npm/core";
 
-[comment]: <> (import depcheck from 'depcheck';)
+const options = {
 
-[comment]: <> (const options = {)
+  ignoreBinPackage: false, // ignore the packages with bin entry
 
-[comment]: <> (  ignoreBinPackage: false, // ignore the packages with bin entry)
+  skipMissing: false, // skip calculation of missing dependencies
 
-[comment]: <> (  skipMissing: false, // skip calculation of missing dependencies)
+  ignorePatterns: [
 
-[comment]: <> (  ignorePatterns: [)
+    // files matching these patterns will be ignored
 
-[comment]: <> (    // files matching these patterns will be ignored)
+    'sandbox',
 
-[comment]: <> (    'sandbox',)
+    'dist',
 
-[comment]: <> (    'dist',)
+    'bower_components',
 
-[comment]: <> (    'bower_components',)
+  ],
 
-[comment]: <> (  ],)
+  ignoreMatches: [
 
-[comment]: <> (  ignoreMatches: [)
+    // ignore dependencies that matches these globs
 
-[comment]: <> (    // ignore dependencies that matches these globs)
+    'grunt-*',
 
-[comment]: <> (    'grunt-*',)
+  ],
 
-[comment]: <> (  ],)
+  ignorePath: '/path/to/your/.depcheckignore',
+};
 
-[comment]: <> (  parsers: {)
+depcheck('/path/to/your/project', options).then((result) => {
 
-[comment]: <> (    // the target parsers)
+  console.log(result.unusedDependencies); // an array containing the unused dependencies
 
-[comment]: <> (    '**/*.js': depcheck.parser.es6,)
+  console.log(result.unusedDevDependencies); // an array containing the unused devDependencies
 
-[comment]: <> (    '**/*.jsx': depcheck.parser.jsx,)
+  console.log(result.missingDependencies); // a lookup containing the dependencies missing in `package.json` and where they are used
 
-[comment]: <> (  },)
+  console.log(result.usingDependencies); // a lookup indicating each dependency is used by which files
 
-[comment]: <> (  detectors: [)
+});
 
-[comment]: <> (    // the target detectors)
-
-[comment]: <> (    depcheck.detector.requireCallExpression,)
-
-[comment]: <> (    depcheck.detector.importDeclaration,)
-
-[comment]: <> (  ],)
-
-[comment]: <> (  specials: [)
-
-[comment]: <> (    // the target special parsers)
-
-[comment]: <> (    depcheck.special.eslint,)
-
-[comment]: <> (    depcheck.special.webpack,)
-
-[comment]: <> (  ],)
-
-[comment]: <> (  package: {)
-
-[comment]: <> (    // may specify dependencies instead of parsing package.json)
-
-[comment]: <> (    dependencies: {)
-
-[comment]: <> (      lodash: '^4.17.15',)
-
-[comment]: <> (    },)
-
-[comment]: <> (    devDependencies: {)
-
-[comment]: <> (      eslint: '^6.6.0',)
-
-[comment]: <> (    },)
-
-[comment]: <> (    peerDependencies: {},)
-
-[comment]: <> (    optionalDependencies: {},)
-
-[comment]: <> (  },)
-
-[comment]: <> (};)
-
-[comment]: <> (depcheck&#40;'/path/to/your/project', options&#41;.then&#40;&#40;unused&#41; => {)
-
-[comment]: <> (  console.log&#40;unused.dependencies&#41;; // an array containing the unused dependencies)
-
-[comment]: <> (  console.log&#40;unused.devDependencies&#41;; // an array containing the unused devDependencies)
-
-[comment]: <> (  console.log&#40;unused.missing&#41;; // a lookup containing the dependencies missing in `package.json` and where they are used)
-
-[comment]: <> (  console.log&#40;unused.using&#41;; // a lookup indicating each dependency is used by which files)
-
-[comment]: <> (  console.log&#40;unused.invalidFiles&#41;; // files that cannot access or parse)
-
-[comment]: <> (  console.log&#40;unused.invalidDirs&#41;; // directories that cannot access)
-
-[comment]: <> (}&#41;;)
-
-[comment]: <> (```)
+```
 
 [comment]: <> (## Example)
 
