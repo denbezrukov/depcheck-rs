@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-rs-npm/core-win32-arm64-msvc",
-  "version": "0.0.18",
+  "version": "0.0.19",
   "os": [
     "win32"
   ],
