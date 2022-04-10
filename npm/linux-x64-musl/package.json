@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-node-rs/core-linux-x64-musl",
+  "name": "@depcheck-rs-npm/core-linux-x64-musl",
   "version": "0.0.16",
   "os": [
     "linux"
@@ -7,9 +7,9 @@
   "cpu": [
     "x64"
   ],
-  "main": "depcheck-node-rs.linux-x64-musl.node",
+  "main": "depcheck-rs-npm.linux-x64-musl.node",
   "files": [
-    "depcheck-node-rs.linux-x64-musl.node"
+    "depcheck-rs-npm.linux-x64-musl.node"
   ],
   "license": "MIT",
   "engines": {

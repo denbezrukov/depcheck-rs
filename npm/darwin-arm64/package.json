@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-node-rs/core-darwin-arm64",
+  "name": "@depcheck-rs-npm/core-darwin-arm64",
   "version": "0.0.16",
   "os": [
     "darwin"
@@ -7,9 +7,9 @@
   "cpu": [
     "arm64"
   ],
-  "main": "depcheck-node-rs.darwin-arm64.node",
+  "main": "depcheck-rs-npm.darwin-arm64.node",
   "files": [
-    "depcheck-node-rs.darwin-arm64.node"
+    "depcheck-rs-npm.darwin-arm64.node"
   ],
   "license": "MIT",
   "engines": {

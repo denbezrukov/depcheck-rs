@@ -7,7 +7,7 @@ It is a port of original [depcheck](https://github.com/depcheck/depcheck). It us
 ## Installation
 
 ```
-npm install @depcheck-node-rs/core
+npm install @depcheck-rs-npm/core
 ```
 
 ## Syntax Support
