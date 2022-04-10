@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-node-rs/core-darwin-x64",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "os": [
     "darwin"
   ],
