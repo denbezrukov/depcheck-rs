@@ -4,8 +4,14 @@ Depcheck is a tool for analyzing the dependencies in a project to see: how each 
 It is a port of original [depcheck](https://github.com/depcheck/depcheck). It uses [swc](https://github.com/swc-project/swc) for parsing.
 
 ## Installation
+
+Install with npm:
 ```
-npm install @depcheck-rs-npm/core
+npm install --save-dev @depcheck-rs-npm/core
+```
+Install with yarn:
+```
+yarn add @depcheck-rs-npm/core --dev
 ```
 
 Or use rust to install depcheck-rs cli:
