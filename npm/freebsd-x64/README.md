@@ -1,3 +1,3 @@
-# `@depcheck-rs-npm/core-freebsd-x64`
+# `@depcheck-rs-node/core-freebsd-x64`
 
-This is the **x86_64-unknown-freebsd** binary for `@depcheck-rs-npm/core`
+This is the **x86_64-unknown-freebsd** binary for `@depcheck-rs-node/core`

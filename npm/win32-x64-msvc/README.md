@@ -1,3 +1,3 @@
-# `@depcheck-rs-npm/core-win32-x64-msvc`
+# `@depcheck-rs-node/core-win32-x64-msvc`
 
-This is the **x86_64-pc-windows-msvc** binary for `@depcheck-rs-npm/core`
+This is the **x86_64-pc-windows-msvc** binary for `@depcheck-rs-node/core`

@@ -1,5 +1,5 @@
 {
-  "name": "@depcheck-rs-npm/core-android-arm64",
+  "name": "@depcheck-rs-node/core-android-arm64",
   "version": "0.0.20",
   "os": [
     "android"
@@ -7,9 +7,9 @@
   "cpu": [
     "arm64"
   ],
-  "main": "depcheck-rs-npm.android-arm64.node",
+  "main": "depcheck-rs-node.android-arm64.node",
   "files": [
-    "depcheck-rs-npm.android-arm64.node"
+    "depcheck-rs-node.android-arm64.node"
   ],
   "license": "MIT",
   "engines": {
