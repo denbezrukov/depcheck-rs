@@ -18,13 +18,13 @@ impl Parser {
         log::debug!("parse file {:#?}", file);
 
         let syntax = match extension {
-            "ts" | "tsx" => Syntax::Typescript(TsConfig {
+            "ts" | "tsx" | "cts" | "mts" => Syntax::Typescript(TsConfig {
                 dts: file.ends_with(".d.ts"),
                 tsx: extension == "tsx",
                 decorators: true,
                 no_early_errors: true,
             }),
-            "mjs" | "js" | "jsx" => Syntax::Es(EsConfig {
+            "mjs" | "js" | "jsx" | "cjs" => Syntax::Es(EsConfig {
                 jsx: true,
                 fn_bind: true,
                 decorators: true,

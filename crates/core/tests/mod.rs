@@ -1287,3 +1287,23 @@ fn test_mjs() {
 
     assert_result(actual, expected);
 }
+
+#[test]
+fn test_cjs() {
+    init();
+    let path = get_module_path("cjs");
+
+    let config = Config::new(path);
+    let checker = Checker::new(config);
+    let actual = checker.check_package().unwrap();
+
+    let expected = ExpectedCheckResult {
+        using_dependencies: BTreeMap::from([
+            (String::from("optimist"), [String::from("index.cjs")].into()),
+            (String::from("foo"), [String::from("index.cjs")].into()),
+        ]),
+        ..Default::default()
+    };
+
+    assert_result(actual, expected);
+}
