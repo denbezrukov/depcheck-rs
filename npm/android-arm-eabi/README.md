@@ -1,3 +1,3 @@
-# `@depcheck-rs-npm/core-android-arm-eabi`
+# `@depcheck-rs-node/core-android-arm-eabi`
 
-This is the **armv7-linux-androideabi** binary for `@depcheck-rs-npm/core`
+This is the **armv7-linux-androideabi** binary for `@depcheck-rs-node/core`

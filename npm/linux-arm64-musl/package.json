@@ -1,15 +1,15 @@
 {
-  "name": "@depcheck-rs-npm/core-linux-arm64-musl",
-  "version": "0.0.20",
+  "name": "@depcheck-rs-node/core-linux-arm64-musl",
+  "version": "0.0.21",
   "os": [
     "linux"
   ],
   "cpu": [
     "arm64"
   ],
-  "main": "depcheck-rs-npm.linux-arm64-musl.node",
+  "main": "depcheck-rs-node.linux-arm64-musl.node",
   "files": [
-    "depcheck-rs-npm.linux-arm64-musl.node"
+    "depcheck-rs-node.linux-arm64-musl.node"
   ],
   "license": "MIT",
   "engines": {

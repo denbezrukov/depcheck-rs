@@ -7,11 +7,11 @@ It is a port of original [depcheck](https://github.com/depcheck/depcheck). It us
 
 Install with npm:
 ```
-npm install --save-dev @depcheck-rs-npm/core
+npm install --save-dev @depcheck-rs-node/core
 ```
 Install with yarn:
 ```
-yarn add @depcheck-rs-npm/core --dev
+yarn add --dev @depcheck-rs-node/core
 ```
 
 Or use rust to install depcheck-rs cli:
@@ -71,7 +71,7 @@ OPTIONS:
 
 ```js
 
-import {depcheck} from "@depcheck-rs-npm/core";
+import {depcheck} from "@depcheck-rs-node/core";
 
 const options = {
 

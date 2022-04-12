@@ -1,15 +1,15 @@
 {
-  "name": "@depcheck-rs-npm/core-android-arm-eabi",
-  "version": "0.0.20",
+  "name": "@depcheck-rs-node/core-android-arm-eabi",
+  "version": "0.0.21",
   "os": [
     "android"
   ],
   "cpu": [
     "arm"
   ],
-  "main": "depcheck-rs-npm.android-arm-eabi.node",
+  "main": "depcheck-rs-node.android-arm-eabi.node",
   "files": [
-    "depcheck-rs-npm.android-arm-eabi.node"
+    "depcheck-rs-node.android-arm-eabi.node"
   ],
   "license": "MIT",
   "engines": {

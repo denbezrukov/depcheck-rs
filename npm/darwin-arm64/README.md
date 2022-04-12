@@ -1,3 +1,3 @@
-# `@depcheck-rs-npm/core-darwin-arm64`
+# `@depcheck-rs-node/core-darwin-arm64`
 
-This is the **aarch64-apple-darwin** binary for `@depcheck-rs-npm/core`
+This is the **aarch64-apple-darwin** binary for `@depcheck-rs-node/core`

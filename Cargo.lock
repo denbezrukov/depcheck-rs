@@ -263,7 +263,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "depcheck-rs-npm"
+name = "depcheck-rs-node"
 version = "0.0.1"
 dependencies = [
  "depckeck-rs-core",

@@ -1,15 +1,15 @@
 {
-  "name": "@depcheck-rs-npm/core-win32-arm64-msvc",
-  "version": "0.0.20",
+  "name": "@depcheck-rs-node/core-win32-arm64-msvc",
+  "version": "0.0.21",
   "os": [
     "win32"
   ],
   "cpu": [
     "arm64"
   ],
-  "main": "depcheck-rs-npm.win32-arm64-msvc.node",
+  "main": "depcheck-rs-node.win32-arm64-msvc.node",
   "files": [
-    "depcheck-rs-npm.win32-arm64-msvc.node"
+    "depcheck-rs-node.win32-arm64-msvc.node"
   ],
   "license": "MIT",
   "engines": {
