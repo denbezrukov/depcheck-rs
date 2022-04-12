@@ -250,7 +250,7 @@ dependencies = [
 
 [[package]]
 name = "depcheck-rs-cli"
-version = "0.0.2"
+version = "0.0.21"
 dependencies = [
  "clap",
  "clap-verbosity-flag",
@@ -274,7 +274,7 @@ dependencies = [
 
 [[package]]
 name = "depckeck-rs-core"
-version = "0.0.2"
+version = "0.0.21"
 dependencies = [
  "env_logger",
  "eyre",

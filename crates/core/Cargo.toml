@@ -1,6 +1,6 @@
 [package]
 name = "depckeck-rs-core"
-version = "0.0.2"
+version = "0.0.21"
 authors = ["Depcheck rs developers"]
 categories = ["command-line-utilities"]
 description = "Depcheck rs core"
