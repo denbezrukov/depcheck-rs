@@ -31,7 +31,8 @@
   "scripts": {
     "artifacts": "napi artifacts",
     "prepublishOnly": "yarn build:ts && yarn copy-bindings && napi prepublish -t npm",
-    "version:patch": "napi version patch",
+    "version:patch": "cargo workspaces version --no-git-commit patch -y && npm version patch",
+    "version": "napi version",
     "build": "napi build --platform --cargo-name depcheck_rs_npm --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-rs-node --release",
     "build:debug": "napi build --platform --cargo-name depcheck_rs_npm --js ./node/src/binding.js --dts ./node/src/binding.d.ts -p depcheck-rs-node",
     "build:ts": "tsc --project tsconfig.build.json",
