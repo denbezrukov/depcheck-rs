@@ -23,8 +23,8 @@ name = "depcheck_rs_npm"
 depckeck-rs-core = { version = "0.0.22", path = "../core" }
 
 # Default enable napi4 feature, see https://nodejs.org/api/n-api.html#node-api-version-matrix
-napi = { version = "2.3.0-canary.0", default-features = false, features = ["napi4"] }
-napi-derive = "2.3.0-canary.0"
+napi = { version = "2.3.0-canary.1", default-features = false, features = ["napi4"] }
+napi-derive = "2.3.0-canary.1"
 
 [build-dependencies]
 napi-build = "1.2.1"
