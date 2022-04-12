@@ -640,9 +640,9 @@ dependencies = [
 
 [[package]]
 name = "napi"
-version = "2.3.0-canary.0"
+version = "2.3.0-canary.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6963df00cf8d3749f3693a76a0a238bedf23d3e3a3d26b07d9165c891d87da38"
+checksum = "b6a694fe35a8831ae93e09d8d6e19a98cfb9f9f3ff03e7f58cbb79f913ae856d"
 dependencies = [
  "ctor",
  "lazy_static",
