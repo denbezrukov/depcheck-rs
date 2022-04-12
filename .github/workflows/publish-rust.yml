@@ -1,0 +1,24 @@
+name: publish-rust
+on:
+  push:
+    tags:
+    - "v*"
+
+jobs:
+  release-crates:
+    runs-on: ubuntu-latest
+    name: Release Rust crate
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+      - run: cargo login ${CRATES_IO_TOKEN}
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      - run: |
+          cargo install cargo-workspaces
+          cargo workspaces publish --from-git -y
