@@ -9,6 +9,7 @@ export interface Options {
   ignoreMatches?: Array<string> | undefined | null
   skipMissing?: boolean | undefined | null
   ignorePath?: string | undefined | null
+  verbose?: number | undefined | null
 }
 export interface DepcheckResult {
   usingDependencies: Record<string, Array<string>>

@@ -5,6 +5,7 @@ extern crate napi_derive;
 
 use std::collections::HashMap;
 use std::path::PathBuf;
+use log::LevelFilter;
 
 use depckeck_rs_core::checker::Checker;
 use depckeck_rs_core::checker_result::CheckerResult;
@@ -17,6 +18,7 @@ pub struct Options {
     pub ignore_matches: Option<Vec<String>>,
     pub skip_missing: Option<bool>,
     pub ignore_path: Option<String>,
+    pub verbose: Option<u32>,
 }
 
 #[napi(object)]
@@ -80,6 +82,18 @@ pub fn depcheck(path: String, options: Option<Options>) -> DepcheckResult {
         if let Some(skip_missing) = options.skip_missing {
             config = config.with_skip_missing(skip_missing);
         }
+
+        let verbose = options.verbose.unwrap_or(0);
+        let verbose = match verbose {
+            0 => LevelFilter::Error,
+            1 => LevelFilter::Warn,
+            2 => LevelFilter::Info,
+            3 => LevelFilter::Debug,
+            4..=u32::MAX => LevelFilter::Trace,
+        };
+        env_logger::Builder::new()
+            .filter_level(verbose)
+            .init();
 
         let ignore_path = options.ignore_path.map(PathBuf::from);
         config = config.with_ignore_path(ignore_path);
