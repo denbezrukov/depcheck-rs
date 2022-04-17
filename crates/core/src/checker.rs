@@ -84,53 +84,16 @@ impl Checker {
             walker.add_custom_ignore_filename(path);
         }
 
-        let (tx, rx) = channel::unbounded::<WorkerResult>();
+        let (file_sender, file_receiver) = channel::unbounded::<WorkerResult>();
 
         let nums_of_thread = num_cpus::get();
+        let parallel_walker = walker.threads(nums_of_thread).build_parallel();
 
-        walker.threads(nums_of_thread).build_parallel().run(|| {
-            let tx = tx.clone();
-            Box::new(move |entry| {
-                log::debug!("walk entry {:#?}", entry);
-                return match entry {
-                    Ok(ref entry) => {
-                        if entry.depth() == 0 {
-                            return ignore::WalkState::Continue;
-                        }
-
-                        if is_module(entry.path()) {
-                            return ignore::WalkState::Skip;
-                        }
-
-                        if let Some(file_type) = entry.file_type() {
-                            if file_type.is_file() {
-                                let worker_result = WorkerResult::Entry(entry.path().to_owned());
-                                return match tx.send(worker_result) {
-                                    Ok(_) => ignore::WalkState::Continue,
-                                    Err(_) => ignore::WalkState::Quit,
-                                };
-                            }
-                        }
-
-                        ignore::WalkState::Continue
-                    }
-                    Err(error) => {
-                        log::error!("walk error {:#?}", error);
-
-                        return match tx.send(WorkerResult::Error(error)) {
-                            Ok(_) => ignore::WalkState::Continue,
-                            Err(_) => ignore::WalkState::Quit,
-                        };
-                    }
-                };
-            })
-        });
-
-        drop(tx);
+        spawn_file_senders(parallel_walker, file_sender);
 
         let mut using_dependencies = BTreeMap::new();
 
-        while let Ok(message) = rx.try_recv() {
+        while let Ok(message) = file_receiver.try_recv() {
             match message {
                 WorkerResult::Entry(path) => {
                     let file = path
@@ -165,4 +128,47 @@ impl Checker {
 
         Ok(using_dependencies)
     }
+}
+
+fn spawn_file_senders(
+    parallel_walker: ignore::WalkParallel,
+    file_sender: channel::Sender<WorkerResult>,
+) {
+    parallel_walker.run(|| {
+        let file_sender = file_sender.clone();
+        Box::new(move |entry| {
+            log::debug!("walk entry {:#?}", entry);
+            return match entry {
+                Ok(ref entry) => {
+                    if entry.depth() == 0 {
+                        return ignore::WalkState::Continue;
+                    }
+
+                    if is_module(entry.path()) {
+                        return ignore::WalkState::Skip;
+                    }
+
+                    if let Some(file_type) = entry.file_type() {
+                        if file_type.is_file() {
+                            let worker_result = WorkerResult::Entry(entry.path().to_owned());
+                            return match file_sender.send(worker_result) {
+                                Ok(_) => ignore::WalkState::Continue,
+                                Err(_) => ignore::WalkState::Quit,
+                            };
+                        }
+                    }
+
+                    ignore::WalkState::Continue
+                }
+                Err(error) => {
+                    log::error!("walk error {:#?}", error);
+
+                    return match file_sender.send(WorkerResult::Error(error)) {
+                        Ok(_) => ignore::WalkState::Continue,
+                        Err(_) => ignore::WalkState::Quit,
+                    };
+                }
+            };
+        })
+    });
 }
