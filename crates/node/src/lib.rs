@@ -3,9 +3,9 @@
 #[macro_use]
 extern crate napi_derive;
 
+use log::LevelFilter;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use log::LevelFilter;
 
 use depckeck_rs_core::checker::Checker;
 use depckeck_rs_core::checker_result::CheckerResult;
@@ -91,9 +91,7 @@ pub fn depcheck(path: String, options: Option<Options>) -> DepcheckResult {
             3 => LevelFilter::Debug,
             4..=u32::MAX => LevelFilter::Trace,
         };
-        env_logger::Builder::new()
-            .filter_level(verbose)
-            .init();
+        env_logger::Builder::new().filter_level(verbose).init();
 
         let ignore_path = options.ignore_path.map(PathBuf::from);
         config = config.with_ignore_path(ignore_path);
