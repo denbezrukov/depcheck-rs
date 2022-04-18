@@ -16,6 +16,8 @@ use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
 use crossbeam::channel;
 use std::path::PathBuf;
+use std::sync::{Arc, Mutex};
+use std::thread;
 
 /// Dependencies checker.
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -64,7 +66,6 @@ impl Checker {
         package: &Package,
     ) -> eyre::Result<BTreeMap<String, HashSet<String>>> {
         let directory = self.config.get_directory();
-        let comments = SingleThreadedComments::default();
         let mut override_builder = OverrideBuilder::new(directory);
 
         for pattern in self.config.get_ignore_patterns() {
@@ -84,45 +85,86 @@ impl Checker {
             walker.add_custom_ignore_filename(path);
         }
 
-        let (file_sender, file_receiver) = channel::unbounded::<WorkerResult>();
+        let (file_sender, file_receiver) = channel::unbounded();
+        let (dependency_sender, dependency_receiver) = channel::unbounded();
 
         let nums_of_thread = num_cpus::get();
         let parallel_walker = walker.threads(nums_of_thread).build_parallel();
 
-        spawn_file_senders(parallel_walker, file_sender);
-
         let mut using_dependencies = BTreeMap::new();
 
-        while let Ok(message) = file_receiver.try_recv() {
-            match message {
-                WorkerResult::Entry(path) => {
-                    let file = path
-                        .strip_prefix(directory)
-                        .map(|path| RelativePathBuf::from_path(path).ok())
-                        .ok()
-                        .flatten();
-                    let file_dependencies =
-                        self.parsers.parse_file(&path).map(|(module, syntax)| {
-                            analyze_dependencies(&module, &comments)
-                                .into_iter()
-                                .map(Dependency::new)
-                                .filter(|dependency| dependency.is_external())
-                                .flat_map(|dependency| {
-                                    dependency.extract_dependencies(&syntax, package, &self.config)
-                                })
-                                .collect::<HashSet<_>>()
-                        });
+        let config = Arc::new(self.config.clone());
+        let parsers = Arc::new(self.parsers.clone());
+        let package = Arc::new(package.clone());
+        let handle = thread::spawn(move || {
+            let shared_file_receiver = Arc::new(Mutex::new(file_receiver));
 
-                    if let (Some(file), Some(file_dependencies)) = (file, file_dependencies) {
-                        for dependency in file_dependencies {
-                            let files = using_dependencies
-                                .entry(dependency)
-                                .or_insert_with(|| HashSet::with_capacity(100));
-                            files.insert(file.to_string());
+            let mut handles = Vec::with_capacity(nums_of_thread);
+
+            for _ in 0..nums_of_thread {
+                let file_receiver = Arc::clone(&shared_file_receiver);
+                let config = Arc::clone(&config);
+                let parsers = Arc::clone(&parsers);
+                let package = Arc::clone(&package);
+                let dependency_sender = dependency_sender.clone();
+
+                let handle = thread::spawn(move || {
+                    loop {
+                        let lock = file_receiver.lock().unwrap();
+
+                        let path: PathBuf = match lock.recv() {
+                            Ok(WorkerResult::Entry(path)) => path,
+                            Ok(WorkerResult::Error(_)) => {
+                                continue;
+                            }
+                            Err(_) => break,
+                        };
+
+                        drop(lock);
+                        let comments = SingleThreadedComments::default();
+
+                        let file = path
+                            .strip_prefix(config.get_directory())
+                            .map(|path| RelativePathBuf::from_path(path).ok())
+                            .ok()
+                            .flatten();
+                        let file_dependencies =
+                            parsers.parse_file(&path).map(|(module, syntax)| {
+                                analyze_dependencies(&module, &comments)
+                                    .into_iter()
+                                    .map(Dependency::new)
+                                    .filter(|dependency| dependency.is_external())
+                                    .flat_map(|dependency| {
+                                        dependency.extract_dependencies(&syntax, &package, &config)
+                                    })
+                                    .collect::<HashSet<_>>()
+                            });
+
+                        if let (Some(file), Some(file_dependencies)) = (file, file_dependencies) {
+                            dependency_sender.send((file, file_dependencies)).unwrap();
                         }
                     }
-                }
-                WorkerResult::Error(error) => return Err(eyre::Report::from(error)),
+                });
+
+                handles.push(handle);
+            }
+
+            handles
+                .into_iter()
+                .map(|handle| handle.join().unwrap())
+                .collect::<Vec<_>>()
+        });
+
+        spawn_file_senders(parallel_walker, file_sender);
+
+        handle.join().unwrap();
+
+        while let Ok((file, file_dependencies)) = dependency_receiver.recv() {
+            for dependency in file_dependencies {
+                let files = using_dependencies
+                    .entry(dependency)
+                    .or_insert_with(|| HashSet::with_capacity(100));
+                files.insert(file.to_string());
             }
         }
 
