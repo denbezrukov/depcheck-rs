@@ -14,8 +14,9 @@ use crate::package::Package;
 use crate::parser::Parser;
 use crate::util::is_module::is_module;
 use crate::util::load_module::load_module;
-use crossbeam::channel;
 use std::path::PathBuf;
+use std::sync::mpsc;
+use std::sync::mpsc::{Receiver, Sender};
 use std::sync::{Arc, Mutex};
 use std::thread;
 
@@ -85,8 +86,8 @@ impl Checker {
             walker.add_custom_ignore_filename(path);
         }
 
-        let (file_sender, file_receiver) = channel::unbounded();
-        let (dependency_sender, dependency_receiver) = channel::unbounded();
+        let (file_sender, file_receiver) = mpsc::channel();
+        let (dependency_sender, dependency_receiver) = mpsc::channel();
 
         let nums_of_thread = num_cpus::get();
         let parallel_walker = walker.threads(nums_of_thread).build_parallel();
@@ -118,10 +119,7 @@ impl Checker {
     }
 }
 
-fn spawn_file_senders(
-    parallel_walker: ignore::WalkParallel,
-    file_sender: channel::Sender<WorkerResult>,
-) {
+fn spawn_file_senders(parallel_walker: ignore::WalkParallel, file_sender: Sender<WorkerResult>) {
     parallel_walker.run(|| {
         let file_sender = file_sender.clone();
         Box::new(move |entry| {
@@ -162,8 +160,8 @@ fn spawn_file_senders(
 }
 
 fn spawn_dependency_senders(
-    file_receiver: channel::Receiver<WorkerResult>,
-    dependency_sender: channel::Sender<(RelativePathBuf, HashSet<String>)>,
+    file_receiver: Receiver<WorkerResult>,
+    dependency_sender: Sender<(RelativePathBuf, HashSet<String>)>,
     config: &Arc<Config>,
     parser: &Arc<Parser>,
     package: &Arc<Package>,
