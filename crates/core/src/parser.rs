@@ -31,7 +31,6 @@ impl Parser {
                 decorators_before_export: true,
                 export_default_from: true,
                 import_assertions: true,
-                static_blocks: true,
                 private_in_object: true,
                 allow_super_outside_method: true,
             }),
