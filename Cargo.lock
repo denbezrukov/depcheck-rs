@@ -1209,10 +1209,13 @@ checksum = "73473c0e59e6d5812c5dfe2a064a6444949f089e20eec9a2e5506596494e4623"
 
 [[package]]
 name = "swc_atoms"
-version = "0.2.11"
+version = "0.2.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba8735ce37e421749498e038955abc1135eec6a4af0b54a173e55d2e5542d472"
+checksum = "0d99c0ac33707dd1162a3665d6ca1a28b2f6594e9c37c4703e417fc5e1ce532e"
 dependencies = [
+ "once_cell",
+ "rustc-hash",
+ "serde",
  "string_cache",
  "string_cache_codegen",
 ]
