@@ -1,5 +1,5 @@
-use std::path::{Path, PathBuf};
 use clap::builder::ValueParser;
+use std::path::{Path, PathBuf};
 
 /// The dependencies checker CLI arguments.
 #[derive(Debug, clap::Parser)]
