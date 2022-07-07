@@ -1,7 +1,7 @@
 [package]
 name = "depcheck-rs-node"
 edition = "2021"
-version = "0.0.27"
+version = "0.0.28"
 authors = ["Depcheck rs developers"]
 categories = ["command-line-utilities"]
 description = "Depcheck rs node bindings"
@@ -20,7 +20,7 @@ crate-type = ["cdylib"]
 name = "depcheck_rs_npm"
 
 [dependencies]
-depckeck-rs-core = { version = "0.0.27", path = "../core" }
+depckeck-rs-core = { version = "0.0.28", path = "../core" }
 env_logger = "0.9.0"
 log = "0.4.17"
 
