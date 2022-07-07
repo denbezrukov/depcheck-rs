@@ -1,6 +1,6 @@
 {
   "name": "@depcheck-rs-node/core-freebsd-x64",
-  "version": "0.0.30",
+  "version": "0.0.31",
   "os": [
     "freebsd"
   ],
