@@ -33,6 +33,7 @@ impl Parser {
                 import_assertions: true,
                 private_in_object: true,
                 allow_super_outside_method: true,
+                allow_return_outside_function: true,
             }),
             _ => return None,
         };
@@ -61,7 +62,7 @@ impl Parser {
             error.into_diagnostic(&handler).emit();
         }
 
-        let module = parser
+        let module: Module = parser
             .parse_module()
             .map_err(|e| e.into_diagnostic(&handler).emit())
             .map_err(|error| {
