@@ -43,7 +43,7 @@
     "copy-test-bindings": "node copy-test-bindings.js"
   },
   "devDependencies": {
-    "@napi-rs/cli": "^2.6.2",
+    "@napi-rs/cli": "^2.10.1",
     "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
     "rimraf": "^3.0.2",
