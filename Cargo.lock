@@ -1318,9 +1318,9 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_parser"
-version = "0.110.0"
+version = "0.113.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2aa3d20223b9f58ef842d64710c0a7a7ffc37cfc95451b7ae83c83c3ecf3e05a"
+checksum = "b743803ca5de3213b0df02777ba0f8b36db6b13910170601e11e179de3e7df0c"
 dependencies = [
  "either",
  "enum_kind",
@@ -1329,8 +1329,8 @@ dependencies = [
  "serde",
  "smallvec",
  "swc_atoms",
- "swc_common 0.22.0",
- "swc_ecma_ast 0.83.0",
+ "swc_common 0.24.1",
+ "swc_ecma_ast 0.86.0",
  "tracing",
  "typed-arena",
 ]
