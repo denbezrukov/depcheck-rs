@@ -1,7 +1,7 @@
 {
   "name": "@depcheck-rs-node/core",
   "repository": "https://github.com/Dominionys/depcheck-rs.git",
-  "version": "0.0.31",
+  "version": "0.0.32",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
