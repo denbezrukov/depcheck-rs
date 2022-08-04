@@ -358,9 +358,9 @@ dependencies = [
  "relative-path",
  "serde",
  "serde_json",
- "swc_atoms",
+ "swc_atoms 0.3.1",
  "swc_common 0.22.0",
- "swc_ecma_ast 0.86.0",
+ "swc_ecma_ast",
  "swc_ecma_dep_graph",
  "swc_ecma_parser",
  "thiserror",
@@ -1215,6 +1215,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "swc_atoms"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "66e252fe697709a0fc8710b5b9dee2d72fd9852d3f5fd1a057ce808b6987ccba"
+dependencies = [
+ "once_cell",
+ "rustc-hash",
+ "serde",
+ "string_cache",
+ "string_cache_codegen",
+]
+
+[[package]]
 name = "swc_common"
 version = "0.22.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1234,7 +1247,7 @@ dependencies = [
  "serde",
  "siphasher",
  "string_cache",
- "swc_atoms",
+ "swc_atoms 0.2.13",
  "swc_eq_ignore_macros",
  "swc_visit 0.3.2",
  "termcolor",
@@ -1262,29 +1275,12 @@ dependencies = [
  "serde",
  "siphasher",
  "string_cache",
- "swc_atoms",
+ "swc_atoms 0.2.13",
  "swc_eq_ignore_macros",
  "swc_visit 0.5.0",
  "tracing",
  "unicode-width",
  "url",
-]
-
-[[package]]
-name = "swc_ecma_ast"
-version = "0.83.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bd6f5cb9b55e34a6cae6471c62c253f17b9188a335ea53080c3f00e323bcf595"
-dependencies = [
- "bitflags",
- "is-macro",
- "num-bigint",
- "scoped-tls",
- "serde",
- "string_enum",
- "swc_atoms",
- "swc_common 0.22.0",
- "unicode-id",
 ]
 
 [[package]]
@@ -1299,7 +1295,7 @@ dependencies = [
  "scoped-tls",
  "serde",
  "string_enum",
- "swc_atoms",
+ "swc_atoms 0.2.13",
  "swc_common 0.24.1",
  "unicode-id",
 ]
@@ -1310,9 +1306,9 @@ version = "0.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f402ea23d3a862c8e249967369d17a7793923ae8fe9bb016f50b521f7cd1095"
 dependencies = [
- "swc_atoms",
+ "swc_atoms 0.2.13",
  "swc_common 0.24.1",
- "swc_ecma_ast 0.86.0",
+ "swc_ecma_ast",
  "swc_ecma_visit",
 ]
 
@@ -1328,9 +1324,9 @@ dependencies = [
  "num-bigint",
  "serde",
  "smallvec",
- "swc_atoms",
+ "swc_atoms 0.2.13",
  "swc_common 0.24.1",
- "swc_ecma_ast 0.86.0",
+ "swc_ecma_ast",
  "tracing",
  "typed-arena",
 ]
@@ -1343,9 +1339,9 @@ checksum = "e227dc3034adf4837fd0cd9f99a406634b80f8f0c0560cf3ca6440affcad37ae"
 dependencies = [
  "num-bigint",
  "serde",
- "swc_atoms",
+ "swc_atoms 0.2.13",
  "swc_common 0.24.1",
- "swc_ecma_ast 0.86.0",
+ "swc_ecma_ast",
  "swc_visit 0.5.0",
  "tracing",
 ]
