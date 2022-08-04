@@ -1306,13 +1306,13 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_dep_graph"
-version = "0.82.0"
+version = "0.85.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "aeeb48e8a2c1cc64df9d193cf85846938a6466d200ffffd1eec9fbbfd2ec5537"
+checksum = "5f402ea23d3a862c8e249967369d17a7793923ae8fe9bb016f50b521f7cd1095"
 dependencies = [
  "swc_atoms",
- "swc_common 0.22.0",
- "swc_ecma_ast 0.83.0",
+ "swc_common 0.24.1",
+ "swc_ecma_ast 0.86.0",
  "swc_ecma_visit",
 ]
 
@@ -1337,15 +1337,16 @@ dependencies = [
 
 [[package]]
 name = "swc_ecma_visit"
-version = "0.69.0"
+version = "0.72.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64eb0d1db9b216d175831424fccc3aaf2f5322e79b6c2af11203cc2148b7b743"
+checksum = "e227dc3034adf4837fd0cd9f99a406634b80f8f0c0560cf3ca6440affcad37ae"
 dependencies = [
  "num-bigint",
+ "serde",
  "swc_atoms",
- "swc_common 0.22.0",
- "swc_ecma_ast 0.83.0",
- "swc_visit 0.3.2",
+ "swc_common 0.24.1",
+ "swc_ecma_ast 0.86.0",
+ "swc_visit 0.5.0",
  "tracing",
 ]
 
